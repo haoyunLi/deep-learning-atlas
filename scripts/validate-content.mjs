@@ -23,15 +23,24 @@ const requiredText = [
   "example",
 ];
 const requiredLists = [
+  "mechanicsSteps",
   "whenToUse",
+  "limits",
   "howToUse",
   "tuning",
   "modifications",
   "pitfalls",
   "compareTo",
 ];
+const minimumLengths = {
+  mechanicsSteps: 4,
+  limits: 2,
+  howToUse: 4,
+  tuning: 3,
+};
 const errors = [];
 const lessons = [];
+const totals = { mechanicsSteps: 0, limits: 0, settings: 0 };
 let categories = [];
 
 function property(object, name) {
@@ -115,9 +124,42 @@ for (const [filename, exportName] of files) {
     }
     for (const field of requiredLists) {
       const values = arrayValue(property(item, field));
+      if (values && field in totals) totals[field] += values.length;
       if (!values || !values.length) errors.push(`${name}: empty ${field}`);
       else if (values.some((value) => !textValue(value))) {
         errors.push(`${name}: ${field} contains an empty or non-text item`);
+      }
+      if (
+        values &&
+        field in minimumLengths &&
+        values.length < minimumLengths[field]
+      ) {
+        errors.push(
+          `${name}: ${field} needs at least ${minimumLengths[field]} items`,
+        );
+      }
+    }
+    const settings = arrayValue(property(item, "settings"));
+    if (settings) totals.settings += settings.length;
+    if (!settings || settings.length < 3) {
+      errors.push(`${name}: settings needs at least 3 rows`);
+    } else {
+      const settingNames = new Set();
+      for (const setting of settings) {
+        if (!ts.isObjectLiteralExpression(setting)) {
+          errors.push(`${name}: settings must contain objects`);
+          continue;
+        }
+        for (const field of ["name", "start", "adjust"]) {
+          if (!textValue(property(setting, field))) {
+            errors.push(`${name}: setting missing ${field}`);
+          }
+        }
+        const settingName = textValue(property(setting, "name"));
+        if (settingNames.has(settingName)) {
+          errors.push(`${name}: duplicate setting ${settingName}`);
+        }
+        settingNames.add(settingName);
       }
     }
     const sourceValue = property(item, "source");
@@ -162,6 +204,6 @@ if (errors.length) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Validated ${lessons.length} lessons in ${categories.length} categories.`,
+    `Validated ${lessons.length} lessons in ${categories.length} categories: ${totals.mechanicsSteps} steps, ${totals.limits} limits, ${totals.settings} settings.`,
   );
 }

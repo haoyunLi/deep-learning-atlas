@@ -830,6 +830,60 @@ svg {
   padding: 16px 18px;
   overflow: auto;
 }
+.mechanics-steps {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.mechanics-steps li {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+}
+.mechanics-steps li > span {
+  font-family: Georgia, var(--serif);
+  font-size: 17px;
+  color: var(--blue);
+}
+.mechanics-steps p {
+  margin: 0;
+}
+.settings-list {
+  border-top: 1px solid var(--line);
+  margin-top: 25px;
+}
+.setting-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 0.55fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--line);
+}
+.setting-row > strong {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.setting-row > div {
+  min-width: 0;
+}
+.setting-row span {
+  display: block;
+  color: #6d7f9a;
+  font-size: 11px;
+  font-weight: 650;
+  margin-bottom: 5px;
+}
+.setting-row p {
+  font-size: 13px;
+  line-height: 1.75;
+  margin: 0;
+}
 .equation span {
   display: block;
   color: #657693;
@@ -977,6 +1031,26 @@ svg {
   width: 4px;
   height: 4px;
 }
+.quick-setting {
+  border-bottom: 1px solid var(--line);
+  padding: 0 0 13px;
+  margin: 0 0 13px;
+}
+.quick-setting strong {
+  display: block;
+  color: var(--ink);
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.quick-setting p {
+  margin: 0;
+  color: #526580;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.quick-setting + .notes-link {
+  margin-top: 22px;
+}
 .notes-link {
   border-bottom: 1px solid #8ca6ca;
   display: flex;
@@ -1051,6 +1125,23 @@ svg {
   padding: 0 14px;
   color: var(--ink);
   font-size: 15px;
+}
+.comparison-insight {
+  border-left: 3px solid var(--blue);
+  background: #f1f6fd;
+  padding: 17px 21px;
+  margin: 0 0 25px;
+}
+.comparison-insight strong {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--ink);
+}
+.comparison-insight p {
+  color: #485e7d;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 8px 0 0;
 }
 .comparison-table {
   border-top: 1px solid var(--line);
@@ -1449,6 +1540,10 @@ svg {
   }
   .detail-section h2 {
     font-size: 22px;
+  }
+  .setting-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   .mechanism-diagram {
     padding: 15px 10px;

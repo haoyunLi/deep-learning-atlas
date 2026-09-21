@@ -702,9 +702,9 @@ function Detail({ id }: { id: string }) {
         <nav className="detail-toc">
           {[
             ["intuition", "直觉 Intuition"],
-            ["mechanics", "原理 Mechanics"],
-            ["usage", "怎么用 How to use"],
-            ["tuning", "调参 Tuning"],
+            ["mechanics", "步骤 Mechanics"],
+            ["usage", "选型与上手 Use"],
+            ["tuning", "配置与调参 Settings"],
             ["modify", "怎么改 Modify"],
             ["pitfalls", "常见问题 Pitfalls"],
             ["related", "对比 Compare"],
@@ -755,6 +755,17 @@ function Detail({ id }: { id: string }) {
             机制拆解 <span>How it works</span>
           </h2>
           <p>{lesson.core}</p>
+          <h3>
+            按步骤看算法 <span>Step by step</span>
+          </h3>
+          <ol className="mechanics-steps">
+            {lesson.mechanicsSteps.map((step, stepIndex) => (
+              <li key={`${lesson.id}-step-${stepIndex}`}>
+                <span>{String(stepIndex + 1).padStart(2, "0")}</span>
+                <p>{step}</p>
+              </li>
+            ))}
+          </ol>
           <div className="equation">
             <span>核心表达 / Core expression</span>
             <code>{lesson.equation}</code>
@@ -765,6 +776,10 @@ function Detail({ id }: { id: string }) {
             什么时候用 <span>When to use</span>
           </h2>
           <TextList items={lesson.whenToUse} />
+          <h3>
+            边界与替代 <span>Limits & alternatives</span>
+          </h3>
+          <TextList items={lesson.limits} />
           <h3>
             如何上手 <span>Setup checklist</span>
           </h3>
@@ -779,6 +794,21 @@ function Detail({ id }: { id: string }) {
             先调这些 <span>First knobs</span>
           </h2>
           <TextList items={lesson.tuning} />
+          <div className="settings-list" aria-label="具体配置与调整信号">
+            {lesson.settings.map((setting) => (
+              <div className="setting-row" key={setting.name}>
+                <strong>{setting.name}</strong>
+                <div>
+                  <span>从这里开始 / Start</span>
+                  <p>{setting.start}</p>
+                </div>
+                <div>
+                  <span>何时调整 / Adjust</span>
+                  <p>{setting.adjust}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
         <section className="detail-section" id="modify">
           <h2>
@@ -845,6 +875,15 @@ function Detail({ id }: { id: string }) {
             先调这些 <span>First knobs</span>
           </h3>
           <TextList items={lesson.tuning.slice(0, 3)} />
+          <h3>
+            配置起点 <span>Start here</span>
+          </h3>
+          {lesson.settings.slice(0, 2).map((setting) => (
+            <div className="quick-setting" key={setting.name}>
+              <strong>{setting.name}</strong>
+              <p>{setting.start}</p>
+            </div>
+          ))}
           <a href="#/compare" className="notes-link">
             对比其他算法 <ArrowIcon />
           </a>
@@ -867,6 +906,11 @@ const compareRows: {
     format: (value) => (value as string[]).join(" "),
   },
   {
+    label: "边界与替代",
+    field: "limits",
+    format: (value) => (value as string[]).join(" "),
+  },
+  {
     label: "上手步骤",
     field: "howToUse",
     format: (value) => (value as string[]).join(" "),
@@ -877,17 +921,53 @@ const compareRows: {
     format: (value) => (value as string[]).join(" "),
   },
   {
+    label: "配置起点",
+    field: "settings",
+    format: (value) =>
+      (value as Lesson["settings"])
+        .map((item) => `${item.name}：${item.start} ${item.adjust}`)
+        .join(" "),
+  },
+  {
     label: "常见问题",
     field: "pitfalls",
     format: (value) => (value as string[]).join(" "),
   },
 ];
 
+const comparisonInsights: Record<string, string> = {
+  "rnn|transformer":
+    "RNN 逐步更新 hidden state，适合流式输入或较小序列基线；Transformer 用 attention 直接连接位置，训练时更容易并行，但长序列的注意力成本要单独测。",
+  "bert|gpt-language-model":
+    "BERT 双向读取完整输入，优先用于分类、抽取和表示；GPT 式 LM 用因果掩码预测下一个 token，优先用于开放式生成。两者的预训练目标与可见上下文不同。",
+  "resnet|vit":
+    "ResNet 的卷积先验适合从局部纹理逐层建特征；ViT 把 patch 当 token 交给 attention。先用相近参数量、预训练数据和输入分辨率比较，不能只比模型名称。",
+  "nnunet|unet":
+    "U-Net 是编码器、解码器和跳接构成的分割架构；nnU-Net 是依据数据指纹自动配置预处理、网络、训练与后处理的完整流程。需要强医学分割基线时先跑 nnU-Net，再决定改哪里。",
+  "moco|simclr":
+    "SimCLR 主要使用同一 batch 内的负例，依赖批量和增强质量；MoCo 以动量编码器维护跨 batch 队列。显存限制 batch 时先比较 MoCo，同时检查队列负例是否过时。",
+  "byol|simclr":
+    "SimCLR 明确拉近正例、拉远负例；BYOL 用在线网络预测动量目标网络，不依赖显式负例。比较时固定 encoder、数据增强和下游评估，避免把训练配方差异误当作目标函数差异。",
+  "q-learning|sarsa":
+    "Q-learning 的目标使用下一状态最大 Q，是 off-policy；SARSA 使用当前行为策略实际选出的下一动作，是 on-policy。探索动作有风险时，SARSA 会把这种风险纳入学习目标。",
+  "dqn|ppo":
+    "DQN 用 replay 训练离散动作的 Q 网络，属于 off-policy value-based；PPO 用新采轨迹更新策略，属于 on-policy policy-based。先看动作空间和交互成本，再比较样本效率与训练稳定性。",
+  "ppo|sac":
+    "PPO 反复用一批新 rollout 做有限更新，随后重采；SAC 可复用旧经验并加入 entropy 目标。连续控制且交互昂贵时先比较 SAC，有大规模稳定模拟器时 PPO 常是清晰基线。",
+  "knn|svm":
+    "kNN 预测时查训练样本的邻居，表现取决于距离和存储库；SVM 在训练时学习最大间隔边界。小数据先同时跑，两者都要在训练集内完成缩放和选参。",
+  "diffusion|gan":
+    "GAN 通过生成器与判别器对抗训练，采样通常较快；扩散模型学逐步去噪，采样通常需要多步。比较质量时同时报告多样性、失败案例、训练稳定性与推理延迟。",
+  "adamw|gradient-descent":
+    "SGD 按梯度与全局学习率更新，可加入 momentum；AdamW 用梯度一、二阶动量做参数级自适应更新，并把 weight decay 解耦。两者都要认真调学习率和调度。",
+};
+
 function Compare() {
   const [first, setFirst] = useState("rnn");
   const [second, setSecond] = useState("transformer");
   const a = lessons.find((item) => item.id === first),
     b = lessons.find((item) => item.id === second);
+  const insight = comparisonInsights[[first, second].sort().join("|")];
   return (
     <main className="utility-page page-gutter">
       <div className="utility-heading">
@@ -938,6 +1018,12 @@ function Compare() {
       </div>
       {a && b && (
         <>
+          {insight && (
+            <div className="comparison-insight">
+              <strong>差别与选择 / Key distinction</strong>
+              <p>{insight}</p>
+            </div>
+          )}
           {a.category !== b.category && (
             <p className="comparison-axis-note">
               这两项属于不同层次：

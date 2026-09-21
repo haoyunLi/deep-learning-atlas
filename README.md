@@ -16,6 +16,8 @@
 6. 如何修改或扩展？
 7. 常见问题和相邻方法的区别是什么？
 
+每节进一步提供至少 4 步的算法运行过程、2 条适用边界，以及至少 3 个具体设置项。设置项分别说明从哪里开始、观察到什么信号后怎样调整；这些是实验起点，仍要依据数据、验证集和资源预算决定。
+
 还包括关键词搜索、分类筛选、两算法并排比较、按数据结构选起点的指南、术语表，以及保存在本机浏览器的阅读进度。每篇课程都链接到原始论文或官方文档。
 
 > 阅读时要区分不同层次：CNN、RNN、Transformer 和 GNN 是模型架构；EM 是处理潜变量的一种优化框架；kNN、随机森林等是非深度学习基线；对比学习和强化学习描述学习目标或训练范式；SGD、AdamW 是更新参数的优化方法。不同层次的方法常常能够组合。
@@ -47,7 +49,7 @@ npm run preview
 - [`scripts/validate-content.mjs`](scripts/validate-content.mjs)：构建时检查课程字段、来源、分类、唯一 ID 和比较链接。
 - [`design/concept-home.png`](design/concept-home.png)、[`design/concept-lesson.png`](design/concept-lesson.png)：首页和课程详情的设计参考。
 
-添加课程时给出唯一的 `id`、所属 `category`，填写课程各字段，并确保 `compareTo` 引用已有课程 ID。项目采用 hash 路由，因此课程链接可在 GitHub Pages 上直接打开或分享。
+添加课程时给出唯一的 `id`、所属 `category`，填写课程各字段，特别是 `mechanicsSteps`、`limits` 与 `settings`，并确保 `compareTo` 引用已有课程 ID。生产构建会检查这三组内容的最低条目数和设置项字段。项目采用 hash 路由，因此课程链接可在 GitHub Pages 上直接打开或分享。
 
 ## 发布到 GitHub Pages
 
