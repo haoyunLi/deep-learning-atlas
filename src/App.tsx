@@ -26,8 +26,10 @@ const StudyReview = lazy(() => import("./components/StudyReview"));
 const GlossaryPage = lazy(() => import("./components/GlossaryPage"));
 const ModelGuide = lazy(() => import("./components/ModelGuide"));
 const PracticeHub = lazy(() => import("./components/PracticeHub"));
+const StudioPage = lazy(() => import("./components/studio/StudioPage"));
 
 const repoUrl = "https://github.com/haoyunLi/deep-learning-atlas";
+const codeLabLessonIds = new Set(["attention", "cnn", "rnn", "unet", "gnn"]);
 function scrollBehavior(): ScrollBehavior {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ? "auto"
@@ -68,6 +70,7 @@ function Logo({ onClick }: { onClick?: () => void }) {
 function Header({ route }: { route: string }) {
   const [open, setOpen] = useState(false);
   const links = [
+    { href: "#/studio", label: "学习工作台" },
     { href: "#/path", label: "学习路径" },
     { href: "#/animations", label: "动效实验室" },
     { href: "#/practice", label: "实践工坊" },
@@ -97,6 +100,7 @@ function Header({ route }: { route: string }) {
               key={link.href}
               className={
                 route === link.href.slice(1) ||
+                (link.href === "#/studio" && route.startsWith("/studio/")) ||
                 (link.href === "#/concepts" && route.startsWith("/concepts/"))
                   ? "active"
                   : ""
@@ -357,6 +361,27 @@ function Home({
           {last && <a href={`#/lesson/${last.id}`}>继续：{last.title} →</a>}
           <a href="#/review">学习记录与错题复习 →</a>
         </div>
+      </section>
+      <section
+        className="learning-studio-promo page-gutter"
+        aria-labelledby="studio-promo-title"
+      >
+        <div>
+          <span>NEW · LEARNING STUDIO</span>
+          <h2 id="studio-promo-title">
+            从会解释，走到会实现、会诊断、会交付。
+          </h2>
+          <p>
+            学习前诊断与掌握度地图 · 三层代码实验 · 五类 Tensor Shape Debugger ·
+            同切分算法竞技场 · 七个端到端项目
+          </p>
+        </div>
+        <nav aria-label="学习工作台快捷入口">
+          <a href="#/studio">打开工作台 →</a>
+          <a href="#/studio/code">Code Lab</a>
+          <a href="#/studio/shapes">Shape Debugger</a>
+          <a href="#/studio/arena">Algorithm Arena</a>
+        </nav>
       </section>
       <section className="route-section page-gutter" id="path">
         <div className="section-intro">
@@ -778,6 +803,21 @@ function Detail({
             }
           />
         </Suspense>
+        {codeLabLessonIds.has(lesson.id) && (
+          <aside className="lesson-code-lab-link">
+            <div>
+              <span>FROM EQUATION TO CODE</span>
+              <strong>这节课有三层代码实验</strong>
+              <p>
+                逐行比较 From scratch、PyTorch 与 Production，并检查
+                shape、参数量、FLOPs、激活显存与梯度路径。
+              </p>
+            </div>
+            <a href={`#/studio/code?lesson=${lesson.id}`}>
+              打开 {lesson.id} Code Lab →
+            </a>
+          </aside>
+        )}
         <div className="practice-promo">
           <div>
             <strong>把原理带进完整实验</strong>
@@ -1338,6 +1378,11 @@ function App() {
     "/guide": "选型指南",
     "/glossary": "术语表",
     "/review": "学习记录",
+    "/studio": "学习工作台",
+    "/studio/code": "代码实验",
+    "/studio/shapes": "张量形状调试器",
+    "/studio/arena": "跨算法竞技场",
+    "/studio/projects": "端到端项目案例",
   };
   const routeTitle = path.startsWith("/lesson/")
     ? lessons.find((l) => l.id === lessonId)?.title || "课程未找到"
@@ -1363,6 +1408,14 @@ function App() {
   else if (path === "/guide") page = <ModelGuide />;
   else if (path === "/glossary") page = <GlossaryPage />;
   else if (path === "/review") page = <StudyReview />;
+  else if (
+    path === "/studio" ||
+    path === "/studio/code" ||
+    path === "/studio/shapes" ||
+    path === "/studio/arena" ||
+    path === "/studio/projects"
+  )
+    page = <StudioPage path={path} query={routeQuery} />;
   else if (
     path === "/concepts" ||
     (path.startsWith("/concepts/") &&

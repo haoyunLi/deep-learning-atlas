@@ -58,7 +58,7 @@ const { glossaryEntries, glossaryGroups, filterGlossary } = load(
 );
 const { guideTasks } = load("src/data/modelGuide.ts");
 
-assert.equal(glossaryEntries.length, 85, "Glossary keeps the audited 85 terms");
+assert.equal(glossaryEntries.length, 97, "Glossary keeps the audited 97 terms");
 assert.equal(
   glossaryGroups.length,
   8,
@@ -90,11 +90,11 @@ for (const query of ["BN", "GQA", "KV cache", "Cohort", "OPE", "流匹配"])
     `Glossary query ${query} returns a term`,
   );
 
-assert.equal(guideTasks.length, 10, "Guide covers ten task families");
+assert.equal(guideTasks.length, 13, "Guide covers thirteen task families");
 assert.equal(
   guideTasks.reduce((sum, task) => sum + task.contexts.length, 0),
-  27,
-  "Guide keeps 27 contextual branches",
+  33,
+  "Guide keeps 33 contextual branches",
 );
 assert.equal(
   new Set(guideTasks.map((task) => task.id)).size,

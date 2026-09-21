@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "node scripts/validate-content.mjs && tsc -b && node scripts/validate-experience.mjs && node scripts/validate-animations.mjs && node scripts/validate-sandboxes.mjs && node scripts/validate-practice.mjs && vite build",
+    "build": "node scripts/validate-content.mjs && tsc -b && node scripts/validate-experience.mjs && node scripts/validate-animations.mjs && node scripts/validate-sandboxes.mjs && node scripts/validate-practice.mjs && node scripts/validate-studio.mjs && vite build",
+    "validate:studio": "node scripts/validate-studio.mjs",
     "validate:practice": "node scripts/validate-sandboxes.mjs && node scripts/validate-practice.mjs",
     "validate:animations": "node scripts/validate-animations.mjs",
     "validate:experience": "node scripts/validate-experience.mjs",

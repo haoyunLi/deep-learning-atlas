@@ -307,4 +307,172 @@ export const conceptPaths: ConceptPath[] = [
       },
     ],
   },
+  {
+    id: "modern-sequence-backbones",
+    title: "现代序列模型：Attention、SSM、Mamba 与 RWKV",
+    description:
+      "用同一组 shape、状态大小、训练并行性和逐 token 延迟问题，比较显式 token 交互与压缩递推状态。",
+    steps: [
+      {
+        lessonId: "rnn",
+        why: "从逐步 hidden state 开始，建立固定状态与序列递推的基准。",
+      },
+      {
+        lessonId: "attention",
+        why: "让每个 token 直接读取其他位置，理解显式内容寻址和 T² score 矩阵。",
+      },
+      {
+        lessonId: "state-space-models",
+        why: "把线性递推改写为并行卷积，理解 S4 的结构化长程状态。",
+      },
+      {
+        lessonId: "mamba",
+        why: "让状态更新依赖当前内容，用 selective scan 连接选择性与线性序列成本。",
+      },
+      {
+        lessonId: "rwkv",
+        why: "比较另一条加权递推路线：训练可并行，生成保留固定大小状态。",
+      },
+      {
+        lessonId: "transformer",
+        why: "回到完整 Transformer，以质量、显存、prefill 和 decode 实测做架构选择。",
+      },
+    ],
+  },
+  {
+    id: "multimodal-perception",
+    title: "视觉与多模态：分类、检测、分割到 VLM",
+    description:
+      "沿输出粒度逐步增加：整图类别、对象框、像素 mask、promptable segmentation，再让文本查询视觉证据。",
+    steps: [
+      {
+        lessonId: "resnet",
+        why: "先用卷积 backbone 把图像压成可迁移的多尺度特征。",
+      },
+      {
+        lessonId: "faster-rcnn-yolo",
+        why: "比较 two-stage 与 one-stage 如何从特征图定位多个对象。",
+      },
+      {
+        lessonId: "detr",
+        why: "用 object queries 与集合匹配替代密集候选和传统 NMS 流程。",
+      },
+      {
+        lessonId: "unet",
+        why: "把输出粒度推进到每个像素，并通过 skip connection 恢复边界。",
+      },
+      {
+        lessonId: "segment-anything",
+        why: "加入点、框与 mask prompt，理解开放目标的交互式分割。",
+      },
+      {
+        lessonId: "clip",
+        why: "先把图像与文本投到同一表示空间，为 zero-shot 检索与分类打基础。",
+      },
+      {
+        lessonId: "vision-language-models",
+        why: "用 cross-attention 让文本 token 读取视觉 tokens，并验证真实 grounding。",
+      },
+    ],
+  },
+  {
+    id: "recommendation-to-policy",
+    title: "推荐与决策：召回、排序、反馈到策略",
+    description:
+      "从静态交互矩阵到百万候选召回和列表排序，再处理旧策略日志、示范学习与安全决策。",
+    steps: [
+      {
+        lessonId: "matrix-factorization",
+        why: "先用低秩 user/item factors 建立快速、可解释的推荐基线。",
+      },
+      {
+        lessonId: "two-tower-retrieval",
+        why: "用特征 towers 与 ANN 把召回扩展到大候选和冷启动。",
+      },
+      {
+        lessonId: "learning-to-rank",
+        why: "在固定候选上优化顶部顺序，区分召回上限与排序质量。",
+      },
+      {
+        lessonId: "multi-armed-bandit",
+        why: "当展示会影响未来数据时，引入探索、利用与在线反馈。",
+      },
+      {
+        lessonId: "imitation-learning",
+        why: "从专家示范学习策略，并用 DAgger 处理闭环状态分布偏移。",
+      },
+      {
+        lessonId: "offline-rl",
+        why: "不能在线探索时，用旧策略日志保守改进并做 OPE。",
+      },
+      {
+        lessonId: "safe-rl-pomdp",
+        why: "观测不完整且存在硬约束时，显式建模 memory、cost 与回退。",
+      },
+    ],
+  },
+  {
+    id: "uncertainty-causality",
+    title: "可信预测：校准、不确定性、生存与因果",
+    description:
+      "先让概率可解释，再表达模型分歧和预测集合；随后处理删失时间，并区分预测风险与干预效果。",
+    steps: [
+      {
+        lessonId: "calibration-uncertainty",
+        why: "先检查预测概率与实际频率是否一致，并定义阈值与成本。",
+      },
+      {
+        lessonId: "deep-ensembles",
+        why: "用独立模型成员的分歧观察数据未充分约束的区域。",
+      },
+      {
+        lessonId: "conformal-selective-prediction",
+        why: "用独立 calibration set 构造预测集合，并量化拒答工作量。",
+      },
+      {
+        lessonId: "domain-shift",
+        why: "验证新时间、设备和人群是否破坏校准与 conformal 假设。",
+      },
+      {
+        lessonId: "survival-analysis",
+        why: "结局是事件时间且有删失时，保留风险集信息而非退化为二分类。",
+      },
+      {
+        lessonId: "causal-treatment-effects",
+        why: "最后区分谁会发生事件与给 treatment 是否会改变事件。",
+      },
+    ],
+  },
+  {
+    id: "deployment-lifecycle",
+    title: "部署优化：精度、压缩、服务与监控",
+    description:
+      "从训练 dtype 走到整数推理、知识迁移和紧凑结构，最后把导出、延迟、版本、漂移与反馈写成系统契约。",
+    steps: [
+      {
+        lessonId: "mixed-precision",
+        why: "先理解训练中的 dtype、loss scaling 与数值边界。",
+      },
+      {
+        lessonId: "quantization",
+        why: "用 scale、zero-point、PTQ/QAT 把推理转为低比特，并在硬件实测。",
+      },
+      {
+        lessonId: "distillation-pruning",
+        why: "让小 student 学 teacher，并真正删除通道或 block 形成紧凑图。",
+      },
+      {
+        lessonId: "model-evaluation",
+        why: "压缩后重新检查主指标、子群 guardrails 与置信区间。",
+      },
+      {
+        lessonId: "model-serving-monitoring",
+        why: "固定输入输出契约，测 p99、canary、漂移与延迟反馈。",
+      },
+      {
+        lessonId: "data-leakage",
+        why: "部署数据可用性与训练定义必须一致，防止离线特征在线不可获得。",
+      },
+    ],
+  },
 ];

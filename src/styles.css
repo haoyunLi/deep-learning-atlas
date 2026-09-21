@@ -256,6 +256,79 @@ svg {
   padding-top: 32px;
   padding-bottom: 31px;
 }
+.learning-studio-promo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(390px, 1fr);
+  gap: 48px;
+  align-items: end;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+.learning-studio-promo > div > span,
+.lesson-code-lab-link > div > span {
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+.learning-studio-promo h2 {
+  font: 700 clamp(24px, 2.3vw, 35px)/1.35 var(--serif);
+  margin: 10px 0 8px;
+}
+.learning-studio-promo p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+}
+.learning-studio-promo nav {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1px solid var(--ink);
+}
+.learning-studio-promo nav a {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 10px 13px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+}
+.learning-studio-promo nav a:first-child {
+  grid-column: 1 / -1;
+  background: var(--blue-pale);
+}
+.lesson-code-lab-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 30px;
+  align-items: center;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding: 20px 0;
+  margin: 31px 0;
+}
+.lesson-code-lab-link strong {
+  display: block;
+  font: 700 20px/1.35 var(--serif);
+  margin-top: 7px;
+}
+.lesson-code-lab-link p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 6px 0 0;
+}
+.lesson-code-lab-link > a {
+  color: var(--blue);
+  font-size: 13px;
+  white-space: nowrap;
+}
 .section-intro h2 {
   font-family: var(--serif);
   font-size: 27px;
@@ -1391,10 +1464,27 @@ svg {
     height: 43px;
     border-bottom: 1px solid #e9eef4;
   }
+  .learning-studio-promo {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 }
 @media (max-width: 760px) {
   :root {
     --gutter: 20px;
+  }
+  .learning-studio-promo nav {
+    grid-template-columns: 1fr;
+  }
+  .learning-studio-promo nav a:first-child {
+    grid-column: 1;
+  }
+  .lesson-code-lab-link {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .lesson-code-lab-link > a {
+    white-space: normal;
   }
   .hero {
     grid-template-columns: 1fr;

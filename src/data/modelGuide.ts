@@ -920,4 +920,196 @@ export const guideTasks: GuideTask[] = [
     ],
     preparationIds: ["offline-rl", "off-policy-evaluation", "data-leakage"],
   },
+  {
+    id: "speech",
+    title: "语音识别与转录",
+    english: "Speech recognition",
+    description:
+      "把 waveform 转成文本。先根据标注量、语言、流式要求和生成幻觉风险选择 CTC 或 encoder-decoder。",
+    question: "你最主要的数据与服务约束是什么？",
+    contexts: [
+      {
+        id: "limited-labels",
+        label: "标注少，有无标注语音",
+        baseline:
+          "先用预训练声学表示与简单 CTC head，建立 greedy WER 和分组结果。",
+        recommendationIds: ["ctc-wav2vec", "whisper"],
+      },
+      {
+        id: "multilingual",
+        label: "多语种、转录或翻译",
+        baseline: "先固定语言和任务 token 运行短音频，再扩展到长音频分段。",
+        recommendationIds: ["whisper", "ctc-wav2vec"],
+      },
+    ],
+    recommendations: [
+      {
+        lessonId: "ctc-wav2vec",
+        name: "wav2vec 2.0 + CTC",
+        role: "少标注与单调对齐",
+        reason: "无标注语音可用于预训练，CTC 不需要帧级转录对齐。",
+        settings: [
+          "沿用 checkpoint 采样率与文本字典。",
+          "先冻结 encoder 训练 head，再低学习率解冻。",
+        ],
+        limitation: "CTC 语言依赖建模较弱，beam/LM 会增加服务复杂度。",
+      },
+      {
+        lessonId: "whisper",
+        name: "Whisper",
+        role: "多语种生成式转录",
+        reason: "统一转录、翻译、语言和时间戳 tokens，zero-shot 基线较强。",
+        settings: [
+          "显式设置已知 language/task。",
+          "对长音频验证 VAD、overlap、重复和时间戳。",
+        ],
+        limitation:
+          "静音与域外音频可能生成无证据文本，且大模型逐 token 解码较慢。",
+      },
+    ],
+    evaluation: [
+      "按说话人和完整录音切分，文本 normalization 必须固定。",
+      "同时报告 WER、删除/插入、实时因子，以及语言、口音、噪声和时长 cohort。",
+    ],
+    preparationIds: ["rnn", "transformer", "data-leakage"],
+  },
+  {
+    id: "recommendation",
+    title: "推荐、召回与排序",
+    english: "Recommendation and ranking",
+    description:
+      "从交互日志构造时间正确的候选与反馈，先解决召回上限，再优化列表顶部顺序。",
+    question: "系统当前卡在找不到候选，还是候选顺序不够好？",
+    contexts: [
+      {
+        id: "retrieval",
+        label: "百万候选，需要高召回",
+        baseline:
+          "先用 popularity 与矩阵分解；固定未来窗口和 catalog 后再比较双塔。",
+        recommendationIds: ["matrix-factorization", "two-tower-retrieval"],
+      },
+      {
+        id: "ranking",
+        label: "候选已有，需要精排",
+        baseline:
+          "固定同一候选集训练 pointwise 树模型，记录 candidate recall 上限。",
+        recommendationIds: ["learning-to-rank", "two-tower-retrieval"],
+      },
+    ],
+    recommendations: [
+      {
+        lessonId: "matrix-factorization",
+        name: "矩阵分解",
+        role: "协同过滤基线",
+        reason: "参数少、训练快，能验证交互矩阵本身是否有可用信号。",
+        settings: [
+          "按用户内时间切分。",
+          "从 32–128 latent rank 与 L2 正则开始。",
+        ],
+        limitation: "纯 ID factors 不能处理冷启动，也继承曝光偏差。",
+      },
+      {
+        lessonId: "two-tower-retrieval",
+        name: "双塔召回",
+        role: "大规模候选检索",
+        reason: "item embedding 可预计算并建立 ANN，特征 tower 可支持冷启动。",
+        settings: [
+          "先试 64–128 维并测索引大小。",
+          "审计 in-batch/hard negatives 的假负样本。",
+        ],
+        limitation: "最后只有内积，精细交叉通常留给 ranker。",
+      },
+      {
+        lessonId: "learning-to-rank",
+        name: "LambdaMART / LTR",
+        role: "候选精排",
+        reason: "让更新关注会改变 NDCG 的 pair，并组合 query-item 特征。",
+        settings: [
+          "固定候选生成器和 cutoff。",
+          "用浅树、early stopping，并按位置检查偏差。",
+        ],
+        limitation: "无法找回召回阶段缺失的 item，离线点击标签受旧策略影响。",
+      },
+    ],
+    evaluation: [
+      "召回报告 Recall@k 与 ANN recall；排序在固定候选上报告 NDCG，并按用户和 item 流行度分层。",
+      "未曝光不等于负反馈，所有特征、候选与负样本都要遵守预测 cutoff。",
+    ],
+    preparationIds: [
+      "matrix-factorization",
+      "data-leakage",
+      "model-evaluation",
+    ],
+  },
+  {
+    id: "deployment",
+    title: "模型压缩与生产服务",
+    english: "Compression and serving",
+    description:
+      "先定义目标设备与 SLO，再选择量化、蒸馏或剪枝；最后以导出图和真实服务路径验证。",
+    question: "瓶颈主要是模型大小、延迟，还是服务可靠性？",
+    contexts: [
+      {
+        id: "edge",
+        label: "边缘设备、内存与整数算子",
+        baseline: "先 profile FP32/FP16 的算子、内存与 batch=1 延迟。",
+        recommendationIds: ["quantization", "distillation-pruning"],
+      },
+      {
+        id: "service",
+        label: "在线服务、版本与漂移",
+        baseline:
+          "先建立 golden I/O、p50/p99、fallback 与版本日志，再优化模型。",
+        recommendationIds: ["model-serving-monitoring", "quantization"],
+      },
+    ],
+    recommendations: [
+      {
+        lessonId: "quantization",
+        name: "PTQ / QAT",
+        role: "低比特推理",
+        reason: "INT8 可减少存储和内存带宽，并利用目标硬件整数 kernel。",
+        settings: [
+          "先做代表性 calibration。",
+          "敏感层保留高精度并逐层定位误差。",
+        ],
+        limitation:
+          "无对应 kernel 时可能不加速，极端 activation 会造成 clipping。",
+      },
+      {
+        lessonId: "distillation-pruning",
+        name: "蒸馏与结构化剪枝",
+        role: "紧凑计算图",
+        reason:
+          "student 可吸收 teacher 软分布，删除通道或 block 可直接缩小 dense 图。",
+        settings: [
+          "比较相同 student 从头训练。",
+          "小步剪枝、fine-tune，并重建紧凑权重。",
+        ],
+        limitation:
+          "student 容量有上限，非结构化零权重通常不自动带来延迟收益。",
+      },
+      {
+        lessonId: "model-serving-monitoring",
+        name: "导出与监控",
+        role: "生产闭环",
+        reason: "把预处理、模型、后处理、版本和反馈写成可重放系统契约。",
+        settings: [
+          "验证 eager/exported parity 与 dynamic shapes。",
+          "分钟级系统、日级数据、标签到达后性能分层监控。",
+        ],
+        limitation:
+          "没有及时标签时只能看到 proxy；drift 不自动等于 accuracy 下降。",
+      },
+    ],
+    evaluation: [
+      "所有优化都在目标设备测端到端 p50/p95/p99、吞吐、峰值内存和能耗。",
+      "压缩后重新跑完整锁定测试与 cohort guardrails，并用 canary 和自动回滚上线。",
+    ],
+    preparationIds: [
+      "mixed-precision",
+      "model-evaluation",
+      "model-serving-monitoring",
+    ],
+  },
 ];

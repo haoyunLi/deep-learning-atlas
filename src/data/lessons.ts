@@ -5,6 +5,7 @@ import { rlLessons } from "./rlModels";
 import { visionLanguageLessons } from "./visionLanguage";
 import { trainingLanguageExpansionLessons } from "./trainingLanguageExpansion";
 import { modelFamilyExpansionLessons } from "./modelFamilyExpansion";
+import { frontierSystemsExpansionLessons } from "./frontierSystemsExpansion";
 
 export type Lesson = {
   id: string;
@@ -1919,6 +1920,7 @@ export const lessons: Lesson[] = [
   ...dataConceptLessons,
   ...trainingLanguageExpansionLessons,
   ...modelFamilyExpansionLessons,
+  ...frontierSystemsExpansionLessons,
 ].sort(
   (a, b) =>
     categories.findIndex((category) => category.id === a.category) -
