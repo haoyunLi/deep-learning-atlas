@@ -1,9 +1,21 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import { categories, lessons, type Lesson } from "./data/lessons";
 import { conceptPaths } from "./data/conceptPaths";
 import AnimatedExplainer from "./components/AnimatedExplainer";
 import AnimationDirectory from "./components/AnimationDirectory";
 import { mechanismCount, parameterLabs } from "./components/labs";
+import HandCalculationSandbox, {
+  handCalculationLessonIds,
+} from "./components/HandCalculationSandbox";
+import LessonExercises from "./components/LessonExercises";
+const PracticeHub = lazy(() => import("./components/PracticeHub"));
 
 const repoUrl = "https://github.com/haoyunLi/deep-learning-atlas";
 function scrollBehavior(): ScrollBehavior {
@@ -48,6 +60,7 @@ function Header({ route }: { route: string }) {
   const links = [
     { href: "#/path", label: "学习路径" },
     { href: "#/animations", label: "动效实验室" },
+    { href: "#/practice", label: "实践工坊" },
     { href: "#/concepts", label: "关键概念" },
     { href: "#/atlas", label: "算法图谱" },
     { href: "#/compare", label: "对比" },
@@ -375,6 +388,16 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
       </section>
 
       <section className="atlas-section page-gutter" id="atlas">
+        <div className="practice-promo">
+          <div>
+            <strong>新：手算、练习与完整实践闭环</strong>
+            <p>
+              五个逐步计算沙盘 · 每课两题 · 可复现选型案例 · 训练诊断树 · LM
+              显存计算器
+            </p>
+          </div>
+          <a href="#/practice">进入实践工坊 →</a>
+        </div>
         <div className="atlas-heading">
           <div className="section-intro">
             <h2>选择你要理解的主题</h2>
@@ -515,19 +538,21 @@ function TextList({ items }: { items: string[] }) {
 function Detail({
   id,
   showAnimation = false,
+  showSandbox = false,
 }: {
   id: string;
   showAnimation?: boolean;
+  showSandbox?: boolean;
 }) {
   const lesson = lessons.find((item) => item.id === id);
   const [completed, setCompleted] = useState<string[]>(readProgress);
   useLayoutEffect(() => {
     window.scrollTo({ top: 0 });
-    if (!showAnimation) return;
+    if (!showAnimation && !showSandbox) return;
     document
-      .getElementById("animation")
+      .getElementById(showSandbox ? "sandbox" : "animation")
       ?.scrollIntoView({ behavior: "instant" });
-  }, [id, showAnimation]);
+  }, [id, showAnimation, showSandbox]);
   if (!lesson)
     return (
       <div className="not-found page-gutter">
@@ -592,11 +617,15 @@ function Detail({
           {[
             ["intuition", "直觉 Intuition"],
             ["animation", "动效 Walkthrough"],
+            ...(handCalculationLessonIds.includes(lesson.id)
+              ? [["sandbox", "手算 Calculate"]]
+              : []),
             ["mechanics", "步骤 Mechanics"],
             ["usage", "选型与上手 Use"],
             ["tuning", "配置与调参 Settings"],
             ["modify", "怎么改 Modify"],
             ["pitfalls", "常见问题 Pitfalls"],
+            ["exercises", "练习 Check"],
             ["related", "对比 Compare"],
           ].map(([section, label]) => (
             <button
@@ -640,6 +669,20 @@ function Detail({
           <p>{lesson.intuition}</p>
         </section>
         <AnimatedExplainer key={lesson.id} lesson={lesson} />
+        <HandCalculationSandbox
+          key={`sandbox-${lesson.id}`}
+          lessonId={lesson.id}
+        />
+        <div className="practice-promo">
+          <div>
+            <strong>把原理带进完整实验</strong>
+            <p>
+              数据切分 → 基线 → 调参 → 消融 → 错误分析 →
+              独立测试；还有训练诊断树与 LM 显存计算器。
+            </p>
+          </div>
+          <a href="#/practice">打开实践工坊 →</a>
+        </div>
         <section className="detail-section" id="mechanics">
           <h2>
             机制拆解 <span>How it works</span>
@@ -712,6 +755,7 @@ function Detail({
           </h2>
           <TextList items={lesson.pitfalls} />
         </section>
+        <LessonExercises key={`exercises-${lesson.id}`} lessonId={lesson.id} />
         <section className="detail-section" id="related">
           <h2>
             放在一起看 <span>Compare nearby ideas</span>
@@ -1366,9 +1410,22 @@ function App() {
       <Detail
         id={id}
         showAnimation={new URLSearchParams(query).get("animation") === "1"}
+        showSandbox={new URLSearchParams(query).get("sandbox") === "1"}
       />
     );
   } else if (route === "/animations") page = <AnimationDirectory />;
+  else if (route === "/practice")
+    page = (
+      <Suspense
+        fallback={
+          <main className="practice-page page-gutter" role="status">
+            正在打开实践工坊…
+          </main>
+        }
+      >
+        <PracticeHub />
+      </Suspense>
+    );
   else if (route === "/compare") page = <Compare />;
   else if (route === "/guide") page = <Guide />;
   else if (route.startsWith("/concepts"))

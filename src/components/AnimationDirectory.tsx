@@ -54,6 +54,13 @@ export default function AnimationDirectory() {
           </div>
         </dl>
       </div>
+      <div className="practice-promo">
+        <div>
+          <strong>进一步：把每个中间数算出来</strong>
+          <p>五个逐步手算沙盘、每课两题，以及完整实验案例和 LM 显存计算器。</p>
+        </div>
+        <a href="#/practice">打开实践工坊 →</a>
+      </div>
       <section className="animation-starts" aria-label="动效学习起点">
         <strong>从一个问题开始</strong>
         <a href="#/lesson/gradient-descent?animation=1">学习率太大会怎样？ ↗</a>

@@ -11,6 +11,147 @@ export type ConceptPath = {
  */
 export const conceptPaths: ConceptPath[] = [
   {
+    id: "language-model-pipeline",
+    title: "语言模型：从文本到可靠应用",
+    description:
+      "串起 tokenizer、位置、prefill/decode、KV/GQA，再比较 prompting、RAG 与微调，最后用独立评估闭环；到实践工坊可交互计算显存与张量形状。",
+    steps: [
+      {
+        lessonId: "tokenization",
+        why: "文本先变成 token IDs；长度、词表和特殊 token 影响后续所有预算。",
+      },
+      {
+        lessonId: "positional-encoding",
+        why: "位置编码告诉 attention token 的顺序；认识绝对位置与 RoPE 的差异。",
+      },
+      {
+        lessonId: "autoregressive-inference",
+        why: "分开并行读取 prompt 的 prefill 与逐 token 的 decode，理解首 token 延迟。",
+      },
+      {
+        lessonId: "kv-cache",
+        why: "跟踪每一层 K/V 的形状与增长，避免把缓存显存误当总显存。",
+      },
+      {
+        lessonId: "grouped-query-attention",
+        why: "多个 query heads 共享 K/V，连接架构选择与缓存预算。",
+      },
+      {
+        lessonId: "in-context-learning",
+        why: "先用明确指令、模板和少量示例建立 prompt baseline，不更新模型权重。",
+      },
+      {
+        lessonId: "retrieval-augmented-generation",
+        why: "当答案依赖可更新资料时，检索证据，并分别检查召回与生成忠实度。",
+      },
+      {
+        lessonId: "transfer-lora",
+        why: "任务行为需要稳定适配时再比较微调，控制数据、冻结范围和训练预算。",
+      },
+      {
+        lessonId: "language-model-evaluation",
+        why: "用固定测试集、切片、生成设置与成本指标，验证这条工作链是否满足目标。",
+      },
+    ],
+  },
+  {
+    id: "stable-training",
+    title: "训练为何会稳定，也为何会崩",
+    description:
+      "从梯度到 normalization、学习率、裁剪与混合精度，按统计量和更新过程逐项定位训练问题。",
+    steps: [
+      {
+        lessonId: "backpropagation",
+        why: "先确认 loss 的梯度确实流到需要更新的参数。",
+      },
+      {
+        lessonId: "batch-normalization",
+        why: "查看 batch/channel 统计和 running statistics，理解 train/eval 的差异。",
+      },
+      {
+        lessonId: "layer-normalization",
+        why: "切换统计轴，理解为什么序列模型常使用每 token 的特征归一化。",
+      },
+      {
+        lessonId: "learning-rate-schedules",
+        why: "把学习率画成训练步数的函数，区分 warmup 与衰减。",
+      },
+      {
+        lessonId: "gradient-clipping",
+        why: "观察原始 norm 和更新量，再决定如何限制异常梯度。",
+      },
+      {
+        lessonId: "mixed-precision",
+        why: "最后引入精度和 scaling，掌握 unscale → clip → step 的顺序与 NaN 排查。",
+      },
+    ],
+  },
+  {
+    id: "generative-trajectories",
+    title: "生成模型的路径：噪声、潜空间与速度场",
+    description:
+      "用同一视角比较随机反向过程、DDIM 路径、latent 空间与 flow matching 的向量场，区分训练目标和采样器。",
+    steps: [
+      {
+        lessonId: "diffusion",
+        why: "先建立逐步破坏与逐步恢复数据的整体直觉。",
+      },
+      {
+        lessonId: "ddpm",
+        why: "看清前向加噪、噪声预测与随机反向采样的每个量。",
+      },
+      {
+        lessonId: "ddim",
+        why: "保持训练目标，修改生成轨迹与跳步设置，比较确定性和随机性。",
+      },
+      {
+        lessonId: "autoencoder-vae",
+        why: "理解把高维图像压到有结构的 latent space 会保留和丢失什么。",
+      },
+      {
+        lessonId: "latent-diffusion",
+        why: "把去噪计算搬到 latent 空间，代价从分辨率、压缩率与重建质量共同产生。",
+      },
+      {
+        lessonId: "flow-matching",
+        why: "改为拟合条件速度，比较 ODE 积分的步数、误差与生成质量。",
+      },
+    ],
+  },
+  {
+    id: "structured-model-selection",
+    title: "表格、图与时间：先看数据结构",
+    description:
+      "把树、图聚合与时间序列方法放回数据结构和部署目标；比较何时需要邻域、归纳能力或时间回测。",
+    steps: [
+      {
+        lessonId: "random-forest",
+        why: "用 bagging 树建立表格基线，明确与 boosting 的差异。",
+      },
+      {
+        lessonId: "xgboost",
+        why: "逐轮拟合梯度并正则化叶节点，学习如何调深度、学习率和轮数。",
+      },
+      {
+        lessonId: "gnn",
+        why: "只有关系真正携带任务信息时，再把样本组织成图。",
+      },
+      { lessonId: "gcn", why: "先从带自环的归一化邻域聚合理解消息传递。" },
+      {
+        lessonId: "graphsage",
+        why: "采样邻域、学习聚合函数，为未见过的新节点生成表示。",
+      },
+      {
+        lessonId: "gat",
+        why: "再让不同邻居拥有可学习权重，同时留意 softmax 邻域与开销。",
+      },
+      {
+        lessonId: "time-series-forecasting",
+        why: "当预测目标在未来，用 horizon、季节基线与滚动回测重新定义验证。",
+      },
+    ],
+  },
+  {
     id: "two-kinds-of-heads",
     title: "Head 到底指什么？",
     description:

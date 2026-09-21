@@ -9,6 +9,8 @@ const files = [
   ["src/data/rlModels.ts", "rlLessons"],
   ["src/data/learningConcepts.ts", "learningConceptLessons"],
   ["src/data/dataConcepts.ts", "dataConceptLessons"],
+  ["src/data/trainingLanguageExpansion.ts", "trainingLanguageExpansionLessons"],
+  ["src/data/modelFamilyExpansion.ts", "modelFamilyExpansionLessons"],
 ];
 const requiredText = [
   "id",
