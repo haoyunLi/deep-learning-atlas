@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { categories, lessons, type Lesson } from "./data/lessons";
+import { conceptPaths } from "./data/conceptPaths";
 
 const repoUrl = "https://github.com/haoyunLi/deep-learning-atlas";
 
@@ -38,6 +39,7 @@ function Header({ route }: { route: string }) {
   const [open, setOpen] = useState(false);
   const links = [
     { href: "#/path", label: "学习路径" },
+    { href: "#/concepts", label: "关键概念" },
     { href: "#/atlas", label: "算法图谱" },
     { href: "#/compare", label: "对比" },
     { href: "#/guide", label: "怎么选" },
@@ -61,7 +63,12 @@ function Header({ route }: { route: string }) {
           {links.map((link) => (
             <a
               key={link.href}
-              className={route === link.href.slice(1) ? "active" : ""}
+              className={
+                route === link.href.slice(1) ||
+                (link.href === "#/concepts" && route.startsWith("/concepts/"))
+                  ? "active"
+                  : ""
+              }
               href={link.href}
               onClick={() => setOpen(false)}
             >
@@ -261,8 +268,9 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
             From intuition to implementation — 一次理清原理、选择与调参。
           </p>
           <p className="hero-description">
-            从 kNN、EM 到 BERT、U-Net、PPO 与 Reward
-            Model，用直觉、机制、对比和调参步骤看懂不同方法，并在真实问题中做出合适的选择。
+            从 kNN、EM 到 BERT、U-Net、PPO 与 Reward Model，再到
+            head、zero/few-shot 与
+            cohort，用直觉、逐步机制、对比和调参步骤看懂方法，并在真实问题中做出合适的选择。
           </p>
           <a className="primary-button" href="#/atlas">
             开始学习 <ArrowIcon />
@@ -300,11 +308,26 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
         </div>
       </section>
 
+      <section className="concept-preview page-gutter">
+        <div>
+          <span className="concept-kicker">KEY IDEAS · CONNECTED</span>
+          <h2>把容易混淆的概念，接成一条线。</h2>
+          <p>
+            两种 head 的含义、zero-shot 到 few-shot、prompt
+            中的示例与参数微调、cohort
+            到外部验证：先看区别，再沿着实际任务学会使用。
+          </p>
+        </div>
+        <a href="#/concepts">
+          探索关键概念路径 <ArrowIcon />
+        </a>
+      </section>
+
       <section className="atlas-section page-gutter" id="atlas">
         <div className="atlas-heading">
           <div className="section-intro">
-            <h2>选择你要理解的算法</h2>
-            <p>Find and learn algorithms</p>
+            <h2>选择你要理解的主题</h2>
+            <p>Find algorithms and key ideas</p>
           </div>
           <div className="atlas-tools">
             <label className="search-field">
@@ -312,8 +335,8 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索算法或缩写，如 BERT、U-Net、PPO"
-                aria-label="搜索算法"
+                placeholder="搜索算法或概念，如 BERT、zero-shot、cohort"
+                aria-label="搜索算法或概念"
               />
             </label>
             <div className="filter-row">
@@ -436,7 +459,100 @@ function MechanismDiagram({ lesson }: { lesson: Lesson }) {
     "计算损失 Loss",
     "参数更新 Update",
   ];
-  if (/expectation.maximization|^em\b|em-algorithm/.test(name))
+  const conceptFlows: Record<string, string[]> = {
+    "prediction-heads": [
+      "读取 backbone 表示",
+      "选聚合与输出形状",
+      "产生 logits 或数值",
+      "按任务损失训练",
+    ],
+    "attention-heads": [
+      "投影多组 Q/K/V",
+      "每组分别注意",
+      "拼接各 head 输出",
+      "输出投影融合",
+    ],
+    "zero-shot-learning": [
+      "固定未见任务",
+      "写任务描述或标签",
+      "不提供目标样例",
+      "独立测试泛化",
+    ],
+    "few-shot-learning": [
+      "准备少量 support",
+      "限定示例预算",
+      "适配或放进 prompt",
+      "测 query 泛化",
+    ],
+    "in-context-learning": [
+      "选择任务示例",
+      "放进上下文窗口",
+      "保持模型权重不变",
+      "预测新输入",
+    ],
+    "chain-of-thought-prompting": [
+      "给任务或示例",
+      "引导中间步骤",
+      "生成推理文本",
+      "核验最终答案",
+    ],
+    "linear-probe": [
+      "冻结预训练编码器",
+      "抽取 embedding",
+      "训练线性分类器",
+      "评估表示质量",
+    ],
+    "prototypical-networks": [
+      "编码 support 样本",
+      "每类求 prototype",
+      "计算 query 距离",
+      "按距离分类",
+    ],
+    "meta-learning-maml": [
+      "采样多个任务",
+      "任务内快速更新",
+      "跨任务求元梯度",
+      "适应新任务",
+    ],
+    "cohort-design": [
+      "定义目标人群",
+      "设 index date",
+      "限定特征与结局窗口",
+      "按个体切分评估",
+    ],
+    "data-leakage": [
+      "画预测时间线",
+      "核查特征可用时点",
+      "隔离训练与测试",
+      "重跑无泄漏评估",
+    ],
+    "domain-shift": [
+      "定义训练分布",
+      "识别目标环境",
+      "比较漂移类型",
+      "外部数据验证",
+    ],
+    "external-validation": [
+      "冻结模型与阈值",
+      "选择新时间或地点",
+      "独立计算指标",
+      "分析性能差异",
+    ],
+    "calibration-uncertainty": [
+      "输出预测概率",
+      "按风险段分组",
+      "比较预测与发生率",
+      "必要时重新校准",
+    ],
+    "class-imbalance": [
+      "检查类别基率",
+      "选任务相关指标",
+      "训练对比基线",
+      "调阈值与校准",
+    ],
+  };
+  if (conceptFlows[lesson.id]) steps = conceptFlows[lesson.id];
+  else if (/expectation.maximization|^em\b|em-algorithm/.test(name))
     steps = ["观测数据", "E-step 估计隐变量", "M-step 更新参数", "重复至收敛"];
   else if (/\bknn\b|k-nearest/.test(name))
     steps = ["保存训练样本", "计算查询距离", "找到 k 个近邻", "投票或取平均"];
@@ -659,6 +775,12 @@ function Detail({ id }: { id: string }) {
     .map((other) => lessons.find((item) => item.id === other))
     .filter((item): item is Lesson => Boolean(item))
     .slice(0, 3);
+  const pathways = conceptPaths
+    .map((path) => ({
+      path,
+      step: path.steps.find((step) => step.lessonId === lesson.id),
+    }))
+    .filter((item) => Boolean(item.step));
   function toggle() {
     const next = completed.includes(lesson!.id)
       ? completed.filter((item) => item !== lesson!.id)
@@ -844,6 +966,22 @@ function Detail({ id }: { id: string }) {
             </a>
           )}
         </section>
+        {pathways.length > 0 && (
+          <section className="detail-section concept-connections">
+            <h2>
+              把这节课连起来 <span>Concept connections</span>
+            </h2>
+            {pathways.map(({ path, step }) => (
+              <a href={`#/concepts/${path.id}`} key={path.id}>
+                <span>
+                  <strong>{path.title}</strong>
+                  <small>{step?.why}</small>
+                </span>
+                <ArrowIcon />
+              </a>
+            ))}
+          </section>
+        )}
         {lesson.source && (
           <div className="source-line">
             延伸阅读 / Primary source　
@@ -936,6 +1074,16 @@ const compareRows: {
 ];
 
 const comparisonInsights: Record<string, string> = {
+  "attention-heads|prediction-heads":
+    "Attention head 是注意力模块里的并行 Q/K/V 分支，用来从不同表示子空间汇聚上下文；prediction head 是 backbone 后接的任务输出模块，把表示转成类别、数值、token 或 mask。它们可以同时出现在一个模型中，但位置与作用不同。",
+  "few-shot-learning|zero-shot-learning":
+    "Zero-shot 的目标任务没有标注示例；few-shot 允许少量示例。比较时固定任务、模型、测试集与标签空间，明确示例是放进 prompt、用于参数适配还是用于原型计算；这三种 few-shot 实现方式不同。",
+  "few-shot-learning|in-context-learning":
+    "Few-shot 描述可用标注样例很少的任务设置；in-context learning 是把示例放入 prompt、在推理时不更新权重的一种实现。Few-shot 也可以通过微调或 metric-based 方法完成。",
+  "cohort-design|data-leakage":
+    "Cohort 先定义哪些个体在什么时间进入研究、何时预测、观察什么结局；leakage 检查模型是否读取了预测时不可用的信息，或让同一个体同时进入训练与测试。时间窗口和切分单位要一起设计。",
+  "domain-shift|external-validation":
+    "Domain shift 指部署环境的数据关系与训练时不同；external validation 用新时间、地点或人群的独立数据测这种变化对性能的影响。外部验证能揭示问题，但不能单独证明漂移的原因。",
   "rnn|transformer":
     "RNN 逐步更新 hidden state，适合流式输入或较小序列基线；Transformer 用 attention 直接连接位置，训练时更容易并行，但长序列的注意力成本要单独测。",
   "bert|gpt-language-model":
@@ -990,6 +1138,11 @@ function Compare() {
           ["knn", "svm", "kNN ↔ SVM"],
           ["gan", "diffusion", "GAN ↔ Diffusion"],
           ["gradient-descent", "adamw", "SGD ↔ AdamW"],
+          ["prediction-heads", "attention-heads", "输出 Head ↔ Attention Head"],
+          ["zero-shot-learning", "few-shot-learning", "Zero-shot ↔ Few-shot"],
+          ["few-shot-learning", "in-context-learning", "Few-shot ↔ ICL"],
+          ["cohort-design", "data-leakage", "Cohort ↔ Leakage"],
+          ["domain-shift", "external-validation", "Shift ↔ 外部验证"],
         ].map(([left, right, label]) => (
           <button
             key={label}
@@ -1220,6 +1373,70 @@ function Guide() {
   );
 }
 
+function Concepts({ selectedPath }: { selectedPath?: string }) {
+  useEffect(() => {
+    if (!selectedPath) return;
+    const timeout = window.setTimeout(() => {
+      document
+        .getElementById(selectedPath)
+        ?.scrollIntoView({ behavior: "smooth" });
+    }, 50);
+    return () => window.clearTimeout(timeout);
+  }, [selectedPath]);
+  return (
+    <main className="utility-page concept-page page-gutter">
+      <div className="utility-heading">
+        <a href="#/atlas">← 算法图谱</a>
+        <h1>从一个概念，走到完整方法。</h1>
+        <p>Connected ideas · 用逐步路径看清相邻概念如何组合、在哪一步分叉。</p>
+      </div>
+      <nav className="concept-index" aria-label="关键概念路径">
+        {conceptPaths.map((path, index) => (
+          <a href={`#/concepts/${path.id}`} key={path.id}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{path.title}</strong>
+            <ArrowIcon />
+          </a>
+        ))}
+      </nav>
+      <div className="concept-paths">
+        {conceptPaths.map((path, pathIndex) => (
+          <section className="concept-path" id={path.id} key={path.id}>
+            <div className="concept-path-intro">
+              <span>PATH {String(pathIndex + 1).padStart(2, "0")}</span>
+              <h2>{path.title}</h2>
+              <p>{path.description}</p>
+            </div>
+            <ol>
+              {path.steps.map((step, index) => {
+                const lesson = lessons.find(
+                  (item) => item.id === step.lessonId,
+                );
+                if (!lesson) return null;
+                return (
+                  <li key={step.lessonId}>
+                    <span className="concept-step-no">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div>
+                      <a href={`#/lesson/${lesson.id}`}>
+                        <strong>{lesson.title}</strong>
+                        <em>{lesson.englishTitle}</em>
+                        <ArrowIcon />
+                      </a>
+                      <p>{step.why}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        ))}
+      </div>
+    </main>
+  );
+}
+
 const glossary = [
   [
     "张量 Tensor",
@@ -1263,6 +1480,50 @@ const glossary = [
   ["On-policy", "主要用当前策略采集的数据更新这个策略的学习方式。"],
   ["Off-policy", "可以利用其他策略产生的数据学习目标策略的方式。"],
   ["奖励模型 Reward model", "从人类或其他偏好反馈学习打分信号的模型。"],
+  [
+    "预测头 Prediction head",
+    "接在 backbone 表示之后的任务输出模块；分类输出 logits，回归输出数值，分割可输出像素级结果。",
+  ],
+  [
+    "注意力头 Attention head",
+    "多头注意力中的一组 Q/K/V 投影及其加权汇聚分支；与任务的 prediction head 不是同一个部件。",
+  ],
+  [
+    "零样本 Zero-shot",
+    "目标任务没有可供适配的标注示例，依靠预训练知识、任务描述或类别语义进行预测；评估须说清训练中见过什么。",
+  ],
+  [
+    "少样本 Few-shot",
+    "目标任务只有少量示例；示例可放进 prompt、用于训练浅层分类器或用于快速参数适配。",
+  ],
+  [
+    "上下文学习 In-context learning",
+    "在 prompt 中给任务说明或示例，让模型在不更新权重的推理过程中条件化输出。",
+  ],
+  [
+    "思维链提示 Chain-of-thought",
+    "在提示或示例中使用中间推理步骤，帮助某些多步问题；输出的推理文本仍要核验。",
+  ],
+  [
+    "队列 Cohort",
+    "按纳排条件、起始时点和观察窗口定义的一组研究对象；预测研究中应明确每人的特征可用时间与结局窗口。",
+  ],
+  [
+    "数据泄漏 Data leakage",
+    "训练或评估使用了预测时不可得的信息，或训练与测试之间出现不该共享的实体、处理统计量等。",
+  ],
+  [
+    "分布漂移 Domain shift",
+    "训练数据与目标环境的数据分布或输入和目标的关系发生变化。",
+  ],
+  [
+    "外部验证 External validation",
+    "将冻结的模型放到独立时间、地点或来源的数据上评估，检验其泛化表现。",
+  ],
+  [
+    "校准 Calibration",
+    "预测概率和实际发生频率的一致程度；例如预测为 0.2 的组若长期约有 20% 事件则该组较校准。",
+  ],
 ];
 
 function Glossary() {
@@ -1329,6 +1590,8 @@ function App() {
     page = <Detail id={decodeURIComponent(route.slice(8))} />;
   else if (route === "/compare") page = <Compare />;
   else if (route === "/guide") page = <Guide />;
+  else if (route.startsWith("/concepts"))
+    page = <Concepts selectedPath={route.split("/")[2]} />;
   else if (route === "/glossary") page = <Glossary />;
   else
     page = (

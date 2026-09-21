@@ -1,4 +1,6 @@
 import { classicalRepresentationLessons } from "./classicalRepresentation";
+import { dataConceptLessons } from "./dataConcepts";
+import { learningConceptLessons } from "./learningConcepts";
 import { rlLessons } from "./rlModels";
 import { visionLanguageLessons } from "./visionLanguage";
 
@@ -1859,6 +1861,8 @@ export const lessons: Lesson[] = [
   ...classicalRepresentationLessons,
   ...visionLanguageLessons,
   ...rlLessons,
+  ...learningConceptLessons,
+  ...dataConceptLessons,
 ].sort(
   (a, b) =>
     categories.findIndex((category) => category.id === a.category) -

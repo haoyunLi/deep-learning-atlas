@@ -1670,3 +1670,215 @@ svg {
     font-size: clamp(40px, 9vw, 54px);
   }
 }
+
+.concept-preview {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 50px;
+  padding-top: 40px;
+  padding-bottom: 42px;
+  background: #f3f7fd;
+  border-bottom: 1px solid var(--line);
+}
+.concept-preview > div {
+  max-width: 760px;
+}
+.concept-kicker,
+.concept-path-intro > span {
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+.concept-preview h2 {
+  font-family: var(--serif);
+  font-size: clamp(25px, 2.5vw, 35px);
+  margin: 10px 0;
+}
+.concept-preview p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #546782;
+}
+.concept-preview > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  flex: none;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 700;
+  border-bottom: 1px solid #9ab3d4;
+  padding-bottom: 7px;
+}
+.concept-preview > a svg,
+.concept-index svg,
+.concept-path li svg,
+.concept-connections svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  flex: none;
+}
+.concept-index {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 48px 0 68px;
+}
+.concept-index a {
+  display: flex;
+  flex-direction: column;
+  min-height: 134px;
+  border: 1px solid #cbd8e9;
+  background: #f7faff;
+  padding: 20px;
+}
+.concept-index a:hover {
+  border-color: var(--blue);
+  background: var(--blue-pale);
+}
+.concept-index a span {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--blue);
+}
+.concept-index a strong {
+  font-family: var(--serif);
+  font-size: 18px;
+  margin-top: 11px;
+}
+.concept-index a svg {
+  align-self: end;
+  margin-top: auto;
+}
+.concept-paths {
+  display: grid;
+  gap: 65px;
+}
+.concept-path {
+  scroll-margin-top: 28px;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.5fr) minmax(0, 1fr);
+  gap: clamp(30px, 5vw, 95px);
+  border-top: 1px solid #afc0d8;
+  padding-top: 28px;
+}
+.concept-path-intro h2 {
+  font-family: var(--serif);
+  font-size: clamp(25px, 2.5vw, 34px);
+  line-height: 1.35;
+  margin: 13px 0;
+}
+.concept-path-intro p {
+  color: #566b87;
+  font-size: 14px;
+  line-height: 1.85;
+  margin: 0;
+}
+.concept-path ol {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.concept-path li {
+  display: grid;
+  grid-template-columns: 55px minmax(0, 1fr);
+  gap: 13px;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 4px;
+}
+.concept-step-no {
+  color: var(--blue);
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1.3;
+}
+.concept-path li a {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.concept-path li a strong {
+  font-family: var(--serif);
+  font-size: 18px;
+}
+.concept-path li a em {
+  color: #62748e;
+  font-family: var(--serif);
+  font-style: normal;
+  font-size: 14px;
+}
+.concept-path li a svg {
+  margin-left: auto;
+  align-self: center;
+}
+.concept-path li p {
+  color: #536782;
+  line-height: 1.75;
+  font-size: 13px;
+  margin: 6px 0 0;
+}
+.concept-connections > a {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+}
+.concept-connections > a strong,
+.concept-connections > a small {
+  display: block;
+}
+.concept-connections > a strong {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+.concept-connections > a small {
+  color: #5d6f87;
+  line-height: 1.6;
+  font-size: 12px;
+}
+@media (max-width: 1100px) {
+  .concept-index {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .concept-preview {
+    align-items: start;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .concept-index {
+    margin: 35px 0 52px;
+  }
+  .concept-path {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .concept-path li a {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 450px) {
+  .concept-index {
+    grid-template-columns: 1fr;
+  }
+  .concept-index a {
+    min-height: 110px;
+  }
+  .concept-path li {
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 8px;
+  }
+  .concept-path li a em {
+    flex-basis: 100%;
+  }
+}

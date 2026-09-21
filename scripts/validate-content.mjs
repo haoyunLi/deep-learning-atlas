@@ -7,6 +7,8 @@ const files = [
   ["src/data/classicalRepresentation.ts", "classicalRepresentationLessons"],
   ["src/data/visionLanguage.ts", "visionLanguageLessons"],
   ["src/data/rlModels.ts", "rlLessons"],
+  ["src/data/learningConcepts.ts", "learningConceptLessons"],
+  ["src/data/dataConcepts.ts", "dataConceptLessons"],
 ];
 const requiredText = [
   "id",
@@ -196,6 +198,51 @@ for (const lesson of lessons) {
   for (const reference of lesson.references) {
     if (!ids.has(reference))
       errors.push(`${lesson.id}: unknown comparison ${reference}`);
+  }
+}
+
+const pathsFilename = "src/data/conceptPaths.ts";
+const pathsSource = ts.createSourceFile(
+  pathsFilename,
+  readFileSync(resolve(pathsFilename), "utf8"),
+  ts.ScriptTarget.Latest,
+  true,
+  ts.ScriptKind.TS,
+);
+const paths = getArray(pathsSource, "conceptPaths");
+if (!paths) {
+  errors.push(`${pathsFilename}: missing conceptPaths array`);
+} else {
+  const pathIds = new Set();
+  for (const path of paths.elements) {
+    if (!ts.isObjectLiteralExpression(path)) continue;
+    const id = textValue(property(path, "id"));
+    if (!id || pathIds.has(id))
+      errors.push(`concept path: missing or duplicate id ${id}`);
+    pathIds.add(id);
+    for (const field of ["title", "description"]) {
+      if (!textValue(property(path, field)))
+        errors.push(`${id}: missing ${field}`);
+    }
+    const steps = arrayValue(property(path, "steps"));
+    if (!steps || steps.length < 5) {
+      errors.push(`${id}: concept path needs at least 5 steps`);
+      continue;
+    }
+    const stepIds = new Set();
+    for (const step of steps) {
+      if (!ts.isObjectLiteralExpression(step)) {
+        errors.push(`${id}: concept path step must be an object`);
+        continue;
+      }
+      const lessonId = textValue(property(step, "lessonId"));
+      if (!ids.has(lessonId)) errors.push(`${id}: unknown lesson ${lessonId}`);
+      if (stepIds.has(lessonId))
+        errors.push(`${id}: repeated lesson ${lessonId}`);
+      stepIds.add(lessonId);
+      if (!textValue(property(step, "why")))
+        errors.push(`${id}: missing step explanation`);
+    }
   }
 }
 
