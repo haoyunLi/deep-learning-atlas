@@ -61,6 +61,17 @@ const masteryTopics = [
       "model-serving-monitoring",
     ],
   },
+  {
+    id: "adaptation",
+    label: "元学习与适应",
+    english: "Learning to adapt",
+    lessonIds: [
+      "episodic-meta-learning",
+      "meta-learning-maml",
+      "domain-adaptation-dann",
+      "continual-learning",
+    ],
+  },
 ];
 
 const levels = [
@@ -79,6 +90,7 @@ const diagnosticQuestions = [
       ["code", "从公式写到代码"],
       ["debug", "定位训练和形状错误"],
       ["project", "完成一个端到端项目"],
+      ["adapt", "解决少样本或跨域适配"],
     ],
   },
   {
@@ -115,6 +127,13 @@ function recommendation(answers: Record<string, string>) {
       href: "#/studio/shapes",
       title: "从 Tensor Shape Debugger 开始",
       reason: "先把轴、元素数和 reshape 契约练成可检查的步骤。",
+    };
+  if (answers.goal === "adapt")
+    return {
+      href: "#/concepts",
+      title: "进入 Meta-Learning 完整学习路径",
+      reason:
+        "先固定 support/query 协议，再比较度量式、优化式、记忆式与跨域适配。",
     };
   if (answers.goal === "project")
     return {
@@ -269,7 +288,7 @@ export default function LearningStudio() {
           ],
           [
             "Project Cases",
-            "七个项目，每个按八阶段交付证据。",
+            "八个项目，每个按八阶段交付证据。",
             "#/studio/projects",
           ],
         ].map(([title, text, href], index) => (

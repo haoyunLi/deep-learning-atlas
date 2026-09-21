@@ -181,6 +181,22 @@ export const animationCatalog: Record<string, { label: string; hint: string }> =
       label: "温度 T",
       hint: "T>1 通常降低最大 softmax 概率；正温度不会改变类别排序。",
     },
+    "episodic-meta-learning": {
+      label: "每类 support 数 K",
+      hint: "固定 3-way 和每类 4 个 query；只改变 support 标注预算。",
+    },
+    "fomaml-reptile": {
+      label: "Inner learning rate α",
+      hint: "固定 L=(θ−2)²、θ=0；实时重算适配点、query loss 与三种 outer direction。",
+    },
+    "active-learning": {
+      label: "本轮标注预算",
+      hint: "按固定 entropy 排序选择；预算增加时展示 acquisition batch 的扩张。",
+    },
+    "federated-learning": {
+      label: "Local steps E",
+      hint: "三个客户端目标和样本数固定；增加本地步数会让各自模型更靠本地 optimum。",
+    },
   };
 export const legacyAnimationIds: readonly string[] = [
   "attention",
@@ -193,6 +209,7 @@ export const handCalculationLessonIds: readonly string[] = [
   "attention",
   "ppo",
   "cohort-design",
+  "meta-learning-maml",
 ];
 export const mechanismCount =
   Object.keys(animationCatalog).length + legacyAnimationIds.length;

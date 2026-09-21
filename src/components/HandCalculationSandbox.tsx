@@ -5,6 +5,7 @@ import {
   calculateCohort,
   calculateEM,
   calculateKNN,
+  calculateMetaLearning,
   calculatePPO,
   emSamples,
   knnSamples,
@@ -1425,12 +1426,218 @@ function CohortSandbox() {
   );
 }
 
+function MetaLearningSandbox() {
+  const defaults = { innerRate: 0.2, shots: 2, innerSteps: 2 };
+  const [innerRate, setInnerRate] = useState(defaults.innerRate);
+  const [shots, setShots] = useState(defaults.shots);
+  const [innerSteps, setInnerSteps] = useState(defaults.innerSteps);
+  const result = calculateMetaLearning(innerRate, shots, innerSteps);
+  const steps: SandboxStep[] = [
+    {
+      title: "构造任务与 support/query",
+      english: "Build tasks and splits",
+      explanation: (
+        <>
+          两个未见任务共享初始化 θ={number(result.theta)}。每个任务用 K=
+          {shots} 个 support 估计任务目标；query
+          仍使用真实目标，只用于适配后检验。
+        </>
+      ),
+    },
+    {
+      title: "Inner loop 只看 support",
+      english: "Adapt on support only",
+      explanation: (
+        <>
+          每一步计算 g=2(θ−support estimate)，再做 θ′←θ′−αg。
+          这里展示每个任务完整的参数轨迹，query 从未进入这些更新。
+        </>
+      ),
+    },
+    {
+      title: "在 query 上计算 outer 目标",
+      english: "Evaluate adapted parameters",
+      explanation: (
+        <>
+          适配结束后才计算 query loss。平均 outer loss=
+          {number(result.queryLoss, 4)}；MAML 还要沿 inner steps
+          对共享起点求导。
+        </>
+      ),
+    },
+    {
+      title: "比较三种 meta direction",
+      english: "Compare outer updates",
+      explanation: (
+        <>
+          精确 MAML 保留 inner Jacobian，FOMAML 忽略它，Reptile
+          使用任务终点与起点的参数差；三者的学习率不能直接混用。
+        </>
+      ),
+    },
+  ];
+  return (
+    <SandboxFrame
+      title="MAML 的 support → inner loop → query → outer loop"
+      english="Few-shot meta-gradient walkthrough"
+      scope="两个一维回归任务；support estimate 含随 K 减小的固定采样误差。"
+      steps={steps}
+      controls={
+        <>
+          <Range
+            label="Inner learning rate α"
+            value={innerRate}
+            min={0.05}
+            max={0.45}
+            step={0.05}
+            digits={2}
+            hint="控制每一步从共享起点向 support optimum 移动多远。"
+            onChange={setInnerRate}
+          />
+          <Range
+            label="Support shots K"
+            value={shots}
+            min={1}
+            max={5}
+            step={1}
+            digits={0}
+            hint="K 越大，本例的 support estimate 越接近真实 task target。"
+            onChange={setShots}
+          />
+          <Range
+            label="Inner steps"
+            value={innerSteps}
+            min={1}
+            max={4}
+            step={1}
+            digits={0}
+            hint="部署只允许多少步，meta-training 就应使用相同预算。"
+            onChange={setInnerSteps}
+          />
+        </>
+      }
+      source={{
+        label: "Finn et al., Model-Agnostic Meta-Learning",
+        href: "https://arxiv.org/abs/1703.03400",
+      }}
+      onReset={() => {
+        setInnerRate(defaults.innerRate);
+        setShots(defaults.shots);
+        setInnerSteps(defaults.innerSteps);
+      }}
+    >
+      {(step) => (
+        <>
+          {step === 0 && (
+            <DataTable
+              caption="Task、support estimate 与独立 query target"
+              headings={[
+                "任务",
+                "共享 θ",
+                `Support estimate (K=${shots})`,
+                "Query target",
+                "隔离规则",
+              ]}
+              rows={result.tasks.map((task) => [
+                task.id,
+                number(result.theta),
+                number(task.supportEstimate),
+                number(task.target),
+                "query 不参与适配",
+              ])}
+            />
+          )}
+          {step === 1 && (
+            <DataTable
+              caption="每个任务的 inner-loop 参数轨迹"
+              headings={[
+                "任务",
+                "Support optimum",
+                ...Array.from({ length: result.innerSteps + 1 }, (_, index) =>
+                  index === 0 ? "θ₀" : `θ′ step ${index}`,
+                ),
+              ]}
+              rows={result.tasks.map((task) => [
+                task.id,
+                number(task.supportEstimate),
+                ...task.trace.map((value) => number(value)),
+              ])}
+            />
+          )}
+          {step === 2 && (
+            <>
+              <DataTable
+                caption="适配后才在 query 上求 loss 与 gradient"
+                headings={[
+                  "任务",
+                  "Adapted θ′",
+                  "Query target",
+                  "Query loss",
+                  "dLq/dθ′",
+                  "dθ′/dθ",
+                ]}
+                rows={result.tasks.map((task) => [
+                  task.id,
+                  number(task.adapted),
+                  number(task.target),
+                  number(task.queryLoss, 4),
+                  number(task.fomamlGradient),
+                  number((1 - 2 * innerRate) ** result.innerSteps, 4),
+                ])}
+              />
+              <Result>
+                平均 query loss：<strong>{number(result.queryLoss, 4)}</strong>
+                。Support loss 可以很低，但 outer loop 真正优化的是适配后的
+                query 泛化。
+              </Result>
+            </>
+          )}
+          {step === 3 && (
+            <>
+              <DataTable
+                caption="同一批任务上的三种 outer direction"
+                headings={["方法", "方向/梯度", "保留的信息", "一次示意更新"]}
+                rows={[
+                  [
+                    "MAML",
+                    number(result.exactGradient, 4),
+                    "保留 inner Jacobian",
+                    `θ ← ${number(result.nextTheta, 4)}`,
+                  ],
+                  [
+                    "FOMAML",
+                    number(result.fomamlGradient, 4),
+                    "令 dθ′/dθ≈I",
+                    "需单独选择 outer LR",
+                  ],
+                  [
+                    "Reptile",
+                    number(result.reptileDirection, 4),
+                    "θ′−θ 参数差",
+                    "θ 朝平均任务终点移动",
+                  ],
+                ]}
+              />
+              <Result>
+                MAML outer rate 固定为 {number(result.outerRate, 2)}，所以 θ 从{" "}
+                <strong>{number(result.theta)}</strong> 更新到
+                <strong>{number(result.nextTheta, 4)}</strong>。
+              </Result>
+            </>
+          )}
+        </>
+      )}
+    </SandboxFrame>
+  );
+}
+
 export const handCalculationLessonIds: readonly string[] = [
   "knn",
   "expectation-maximization",
   "attention",
   "ppo",
   "cohort-design",
+  "meta-learning-maml",
 ];
 
 export function HandCalculationSandbox({ lessonId }: { lessonId: string }) {
@@ -1445,6 +1652,8 @@ export function HandCalculationSandbox({ lessonId }: { lessonId: string }) {
       return <PPOSandbox />;
     case "cohort-design":
       return <CohortSandbox />;
+    case "meta-learning-maml":
+      return <MetaLearningSandbox />;
     default:
       return null;
   }

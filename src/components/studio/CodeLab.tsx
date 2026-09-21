@@ -50,6 +50,16 @@ export default function CodeLab({ query }: { query: string }) {
     () => codeLabMetrics(lab, dimensions),
     [lab, dimensions],
   );
+  const dimensionLabels: Record<string, string> =
+    lab.lessonId === "meta-learning-maml"
+      ? {
+          B: "tasks",
+          T: "samples/task",
+          D: "θ params",
+          H: "inner steps",
+          bytes: "bytes",
+        }
+      : { B: "B", T: "T", D: "D", H: "H", bytes: "bytes" };
   const shapeValid =
     lab.lessonId !== "attention" || dimensions.D % dimensions.H === 0;
 
@@ -227,7 +237,7 @@ export default function CodeLab({ query }: { query: string }) {
           <div className="dimension-inputs">
             {Object.entries(dimensions).map(([key, value]) => (
               <label key={key}>
-                <span>{key}</span>
+                <span>{dimensionLabels[key] || key}</span>
                 <input
                   type="number"
                   min="1"

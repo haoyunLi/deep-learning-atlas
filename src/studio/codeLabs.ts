@@ -345,7 +345,88 @@ const gnn = compactLab(
   `def forward(self, x, edge_index):\n    validate_edge_index(edge_index, x.size(0))\n    src, dst = add_self_loops(edge_index, x.size(0))\n    msg = self.msg(x[src])\n    agg = scatter_mean(msg, dst, dim=0, dim_size=x.size(0))\n    return self.head(self.norm(self.self_proj(x) + agg))\n# split by time/entity, audit reverse edges and isolated nodes`,
 );
 
-export const codeLabs: CodeLab[] = [attention, cnn, rnn, unet, gnn];
+const mamlBase = compactLab(
+  "meta-learning-maml",
+  "MAML：从 support 更新到 query meta-gradient",
+  "MAML inner and outer loops",
+  "任务内适配",
+  "tasks × {support, query}",
+  "adapted params θ′τ",
+  "mean query loss across tasks",
+  `theta = Parameter([0.2])\nouter_loss = 0\nfor task in task_batch:\n    support_loss = mse(predict(task.support_x, theta), task.support_y)\n    support_grad = grad(support_loss, theta, create_graph=True)\n    adapted = theta - inner_lr * support_grad\n    query_pred = predict(task.query_x, adapted)\n    outer_loss += mse(query_pred, task.query_y)\nouter_loss /= len(task_batch)\nmeta_grad = grad(outer_loss, theta)\ntheta -= outer_lr * meta_grad`,
+  `theta = torch.nn.Parameter(torch.tensor([0.2]))\nouter_loss = 0.0\nfor support_x, support_y, query_x, query_y in tasks:\n    support_loss = F.mse_loss(model(support_x, theta), support_y)\n    (g,) = torch.autograd.grad(support_loss, theta, create_graph=True)\n    adapted = theta - inner_lr * g\n    query_loss = F.mse_loss(model(query_x, adapted), query_y)\n    outer_loss = outer_loss + query_loss\nouter_loss = outer_loss / len(tasks)\noptimizer.zero_grad(set_to_none=True)\nouter_loss.backward()\noptimizer.step()`,
+  `def meta_step(self, task_batch):\n    query_losses = []\n    for task in task_batch:\n        support, query = validate_disjoint(task)\n        adapted = self.clone_parameters()\n        for _ in range(self.inner_steps):\n            loss = self.loss(support, adapted)\n            grads = torch.autograd.grad(loss, adapted, create_graph=not self.first_order)\n            adapted = tuple(p - self.inner_lr * g for p, g in zip(adapted, grads))\n        query_losses.append(self.loss(query, adapted))\n    outer = torch.stack(query_losses).mean()\n    assert torch.isfinite(outer)\n    return outer\n# split by task identity; log adaptation gain, gradient norm, time and memory`,
+);
+
+const maml: CodeLab = {
+  ...mamlBase,
+  dimensions: { B: 4, T: 10, D: 128, H: 2, bytes: 4 },
+  steps: [
+    {
+      id: "input",
+      title: "任务与数据边界",
+      english: "Task and split contract",
+      summary:
+        "固定 task batch，并在每个任务内部隔离 support 与 query；元测试任务不能出现在训练中。",
+      why: "query 提前进入 inner loop 会把适配后泛化变成同数据拟合。",
+      input: "B tasks × {support[T], query[T]}",
+      output: "互不重叠的 task episodes",
+      parameter: "0",
+      commonError: "先随机拆样本，再让同一任务或实体跨 meta split。",
+      lines: { scratch: [1, 3], pytorch: [1, 4], production: [1, 4] },
+    },
+    {
+      id: "transform",
+      title: "Support inner loop",
+      english: "Task-specific adaptation",
+      summary: "从共享 θ 复制任务参数，只用 support loss 走 H 次更新得到 θ′τ。",
+      why: "元学习优化的是一个容易被少量任务数据更新的共同起点。",
+      input: "θ, supportτ, inner LR α",
+      output: "adapted parameters θ′τ",
+      parameter: "D 个共享参数；每个任务产生临时副本",
+      commonError: "原地覆盖共享 θ，导致后一个任务从前一个任务的终点开始。",
+      lines: { scratch: [4, 6], pytorch: [5, 7], production: [5, 9] },
+    },
+    {
+      id: "output",
+      title: "Query outer objective",
+      english: "Post-adaptation evaluation",
+      summary: "用每个任务适配后的 θ′τ 计算隔离 query loss，再跨任务求平均。",
+      why: "outer objective 衡量少步适配后的新样本表现，而不是 support 拟合程度。",
+      input: "θ′τ, queryτ",
+      output: "mean query loss across B tasks",
+      parameter: "0",
+      commonError:
+        "用 support loss 做 outer objective，或让 query 标签参与适配。",
+      lines: { scratch: [7, 9], pytorch: [8, 10], production: [10, 11] },
+    },
+    {
+      id: "gradient",
+      title: "Meta-gradient 与更新",
+      english: "Differentiate through adaptation",
+      summary:
+        "沿 inner updates 把 query loss 的梯度传回共享 θ，并执行 outer update。",
+      why: "精确 MAML 保留 dθ′/dθ；FOMAML 则忽略这部分二阶依赖。",
+      input: "mean query loss, outer LR β",
+      output: "updated shared initialization θ",
+      parameter: "二阶图开销随 H、D 与 task batch 增长",
+      commonError: "意外 detach θ′，却仍把结果称为完整二阶 MAML。",
+      lines: {
+        scratch: [10, 11],
+        pytorch: [11, 13],
+        production: [12, 14],
+      },
+    },
+  ],
+  productionChecks: [
+    "按 task identity 划分 meta-train、meta-val 与 meta-test，并验证 support/query 无交集。",
+    "训练与部署保持相同 N-way、K-shot、inner steps 和可更新参数范围。",
+    "分别记录适配前后 query 指标、任务间方差、梯度范数、时间和峰值显存。",
+    "将二阶 MAML、FOMAML、ANIL、ProtoNet 与普通微调放在相同 episode 和预算下比较。",
+  ],
+};
+
+export const codeLabs: CodeLab[] = [attention, cnn, rnn, unet, gnn, maml];
 export const codeLabByLesson = new Map(
   codeLabs.map((lab) => [lab.lessonId, lab]),
 );
@@ -365,6 +446,17 @@ export function codeLabMetrics(lab: CodeLab, values: StudioDimensions) {
       flops,
       activationBytes,
       gradient: "Q/K/V 与输出投影均应得到有限梯度",
+    };
+  }
+  if (lab.lessonId === "meta-learning-maml") {
+    const params = D;
+    const flops = B * T * D * (6 * H + 4);
+    const activationBytes = B * T * D * (H + 1) * bytes;
+    return {
+      params,
+      flops,
+      activationBytes,
+      gradient: "query loss 应沿 H 次 inner update 回传到共享 θ",
     };
   }
   const params = D * D * 3;

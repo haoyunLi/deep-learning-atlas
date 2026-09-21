@@ -218,12 +218,28 @@ export const conceptPaths: ConceptPath[] = [
         why: "把每类只有少量 support examples 的任务写清楚，区分少样例微调与 prompt 内示例。",
       },
       {
+        lessonId: "episodic-meta-learning",
+        why: "先把 meta-train/val/test 与每个任务的 support/query 隔离正确，否则后续方法都可能泄漏。",
+      },
+      {
         lessonId: "prototypical-networks",
         why: "看 embedding 中每类 prototype 如何由 support set 形成，再用距离判断 query。",
       },
       {
+        lessonId: "matching-networks",
+        why: "不把同类压成一个中心，让 query 直接注意每个 support 并汇总其标签。",
+      },
+      {
+        lessonId: "relation-networks",
+        why: "当固定欧氏或余弦距离不足时，让小网络学习比较函数。",
+      },
+      {
         lessonId: "meta-learning-maml",
         why: "对比另一条路线：在多个训练任务上学一个能用少量梯度步快速适配的初始化。",
+      },
+      {
+        lessonId: "fomaml-reptile",
+        why: "理解一阶近似怎样省掉 Hessian，并与完整 MAML 做成本和质量对照。",
       },
       {
         lessonId: "transfer-lora",
@@ -472,6 +488,146 @@ export const conceptPaths: ConceptPath[] = [
       {
         lessonId: "data-leakage",
         why: "部署数据可用性与训练定义必须一致，防止离线特征在线不可获得。",
+      },
+    ],
+  },
+  {
+    id: "meta-learning-complete",
+    title: "Meta-Learning：从 Episode 到会适配的学习器",
+    description:
+      "先固定任务和 support/query 协议，再比较度量式、优化式、记忆式与策略式元学习，最后进入跨域压力测试。",
+    steps: [
+      {
+        lessonId: "episodic-meta-learning",
+        why: "定义 task、N-way K-shot、support/query 和三层 meta split。",
+      },
+      {
+        lessonId: "siamese-triplet",
+        why: "先学可迁移的距离空间，理解 pair/triplet 和采样。",
+      },
+      {
+        lessonId: "prototypical-networks",
+        why: "用类别均值建立最简 metric-based few-shot baseline。",
+      },
+      {
+        lessonId: "matching-networks",
+        why: "保留每个 support，用 attention 做标签汇总。",
+      },
+      {
+        lessonId: "relation-networks",
+        why: "再让比较函数本身可学习，观察容量与过拟合。",
+      },
+      {
+        lessonId: "meta-learning-maml",
+        why: "转入 optimization-based 路线：用 query 优化可快速更新的初始化。",
+      },
+      {
+        lessonId: "fomaml-reptile",
+        why: "比较二阶与一阶 meta update 的计算和近似。",
+      },
+      {
+        lessonId: "meta-sgd-anil",
+        why: "决定是学习逐参数更新规则，还是只让 head 快速适配。",
+      },
+      {
+        lessonId: "memory-augmented-meta-learning",
+        why: "用 episode state 快速绑定新标签，不在测试时更新权重。",
+      },
+      {
+        lessonId: "meta-reinforcement-learning",
+        why: "把快速适配推进到需要探索的新 MDP。",
+      },
+      {
+        lessonId: "cross-domain-few-shot",
+        why: "最后同时更换类别与数据域，检验是否真正学会适配。",
+      },
+    ],
+  },
+  {
+    id: "domain-adaptation-stack",
+    title: "从迁移学习到未知域与测试时适配",
+    description:
+      "按目标域信息何时可见来选方法：有标签少量适配、训练时无标签对齐、目标域完全不可见、上线后无标签微调。",
+    steps: [
+      {
+        lessonId: "transfer-learning-strategies",
+        why: "有少量目标标签时，从冻结 head 到逐层解冻建立基线。",
+      },
+      {
+        lessonId: "cross-domain-few-shot",
+        why: "目标域只有极少 support 时，限制适配容量并报告域差。",
+      },
+      {
+        lessonId: "domain-adaptation-dann",
+        why: "训练时可见无标签 target，则用 adversarial alignment。",
+      },
+      {
+        lessonId: "domain-generalization-irm",
+        why: "target 完全不可见时，只能利用多个 source environments 的稳定性。",
+      },
+      {
+        lessonId: "test-time-adaptation",
+        why: "部署输入到来后，用无标签 objective 小幅更新并设置回滚。",
+      },
+      {
+        lessonId: "online-learning-drift",
+        why: "标签延迟到达后进入真正的时间顺序更新与漂移闭环。",
+      },
+    ],
+  },
+  {
+    id: "data-efficient-learning",
+    title: "少标注学习：主动、半监督、课程与持续学习",
+    description:
+      "同样面对有限标注，分别决定标哪一笔、怎样使用无标签数据、先学什么，以及新数据到来后怎样不忘旧知识。",
+    steps: [
+      {
+        lessonId: "active-learning",
+        why: "标注者可循环参与时，选择信息量和代表性高的样本。",
+      },
+      {
+        lessonId: "semi-supervised-self-training",
+        why: "利用剩余无标签池，同时控制 pseudo-label 错误放大。",
+      },
+      {
+        lessonId: "curriculum-self-paced",
+        why: "通过样本进入顺序改善优化，但保证最终覆盖难例和少数群体。",
+      },
+      {
+        lessonId: "continual-learning",
+        why: "数据按任务顺序到来时，用 replay、正则或蒸馏控制遗忘。",
+      },
+      {
+        lessonId: "multi-task-learning",
+        why: "若多个监督同时可得，检查共享表示的正迁移与梯度冲突。",
+      },
+    ],
+  },
+  {
+    id: "automated-distributed-learning",
+    title: "学习系统：自动搜索、元优化与分布式协作",
+    description:
+      "把更新规则、超参数、架构和多客户端训练都视为外层设计问题，同时计算总预算、信息边界与部署约束。",
+    steps: [
+      {
+        lessonId: "learned-optimizers",
+        why: "让模型输出参数 update，并测试跨 optimizee 与长 horizon 泛化。",
+      },
+      {
+        lessonId: "hypernetworks-meta-gradients",
+        why: "按任务生成参数，理解展开与隐式 meta-gradient。",
+      },
+      {
+        lessonId: "automl-hpo-nas",
+        why: "系统搜索超参数和结构，并防止对 validation 过拟合。",
+      },
+      {
+        lessonId: "federated-learning",
+        why: "数据不能集中时，在 non-IID 客户端间本地更新和聚合。",
+      },
+      {
+        lessonId: "model-serving-monitoring",
+        why: "最后把成本、版本、漂移、回滚和反馈接入生产闭环。",
       },
     ],
   },

@@ -12,6 +12,7 @@ const files = [
   ["src/data/trainingLanguageExpansion.ts", "trainingLanguageExpansionLessons"],
   ["src/data/modelFamilyExpansion.ts", "modelFamilyExpansionLessons"],
   ["src/data/frontierSystemsExpansion.ts", "frontierSystemsExpansionLessons"],
+  ["src/data/metaLearningExpansion.ts", "metaLearningExpansionLessons"],
 ];
 const requiredText = [
   "id",

@@ -29,7 +29,14 @@ const PracticeHub = lazy(() => import("./components/PracticeHub"));
 const StudioPage = lazy(() => import("./components/studio/StudioPage"));
 
 const repoUrl = "https://github.com/haoyunLi/deep-learning-atlas";
-const codeLabLessonIds = new Set(["attention", "cnn", "rnn", "unet", "gnn"]);
+const codeLabLessonIds = new Set([
+  "attention",
+  "cnn",
+  "rnn",
+  "unet",
+  "gnn",
+  "meta-learning-maml",
+]);
 function scrollBehavior(): ScrollBehavior {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ? "auto"
@@ -373,7 +380,7 @@ function Home({
           </h2>
           <p>
             学习前诊断与掌握度地图 · 三层代码实验 · 五类 Tensor Shape Debugger ·
-            同切分算法竞技场 · 七个端到端项目
+            同切分算法竞技场 · 八个端到端项目
           </p>
         </div>
         <nav aria-label="学习工作台快捷入口">
@@ -474,7 +481,7 @@ function Home({
           <div>
             <strong>新：手算、练习与完整实践闭环</strong>
             <p>
-              五个逐步计算沙盘 · 每课两题 · 可复现选型案例 · 训练诊断树 · LM
+              六个逐步计算沙盘 · 每课两题 · 可复现选型案例 · 训练诊断树 · LM
               显存计算器
             </p>
           </div>

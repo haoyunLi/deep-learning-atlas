@@ -2,6 +2,7 @@ import { foundationsClassicalLabs } from "./foundationsClassical";
 import { visionSequenceLabs } from "./visionSequence";
 import { reinforcementRepresentationLabs } from "./reinforcementRepresentation";
 import { generativeDataLabs } from "./generativeData";
+import { metaAdaptationLabs } from "./metaAdaptation";
 import type { LabDefinition } from "./types";
 
 export const parameterLabs: Record<string, LabDefinition> = {
@@ -9,6 +10,7 @@ export const parameterLabs: Record<string, LabDefinition> = {
   ...visionSequenceLabs,
   ...reinforcementRepresentationLabs,
   ...generativeDataLabs,
+  ...metaAdaptationLabs,
 };
 export const legacyAnimationIds = ["attention", "diffusion", "ppo"];
 export const mechanismCount =

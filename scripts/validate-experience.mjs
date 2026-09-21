@@ -58,7 +58,11 @@ const { glossaryEntries, glossaryGroups, filterGlossary } = load(
 );
 const { guideTasks } = load("src/data/modelGuide.ts");
 
-assert.equal(glossaryEntries.length, 97, "Glossary keeps the audited 97 terms");
+assert.equal(
+  glossaryEntries.length,
+  112,
+  "Glossary keeps the audited 112 terms",
+);
 assert.equal(
   glossaryGroups.length,
   8,
@@ -90,11 +94,11 @@ for (const query of ["BN", "GQA", "KV cache", "Cohort", "OPE", "流匹配"])
     `Glossary query ${query} returns a term`,
   );
 
-assert.equal(guideTasks.length, 13, "Guide covers thirteen task families");
+assert.equal(guideTasks.length, 15, "Guide covers fifteen task families");
 assert.equal(
   guideTasks.reduce((sum, task) => sum + task.contexts.length, 0),
-  33,
-  "Guide keeps 33 contextual branches",
+  39,
+  "Guide keeps 39 contextual branches",
 );
 assert.equal(
   new Set(guideTasks.map((task) => task.id)).size,
@@ -446,6 +450,14 @@ const searchCases = [
   ["kv-cache", "KV cache"],
   ["batch-normalization", "batch normalization"],
   ["gradient-descent", "sgd gradient"],
+  ["meta-learning-maml", "metalearning"],
+  ["fomaml-reptile", "Reptile"],
+  ["episodic-meta-learning", "support query"],
+  ["domain-adaptation-dann", "GRL"],
+  ["continual-learning", "catastrophic forgetting"],
+  ["federated-learning", "FedAvg"],
+  ["semi-supervised-self-training", "FixMatch"],
+  ["automl-hpo-nas", "NAS"],
 ];
 for (const [id, query] of searchCases) {
   assert.ok(lessonById.has(id), `Search fixture uses a known course: ${id}`);

@@ -65,7 +65,7 @@ assert.match(
 );
 
 const { codeLabs, codeLabMetrics } = load("src/studio/codeLabs.ts");
-assert.equal(codeLabs.length, 5, "five code labs");
+assert.equal(codeLabs.length, 6, "six code labs");
 for (const lab of codeLabs) {
   assert.ok(lab.steps.length >= 4, `${lab.lessonId}: stepwise lab`);
   for (const mode of ["scratch", "pytorch", "production"]) {
@@ -137,7 +137,7 @@ for (const result of revealed.results) {
 const { studioProjects } = load("src/studio/projects.ts");
 const { lessons } = load("src/data/lessons.ts");
 const lessonIds = new Set(lessons.map((lesson) => lesson.id));
-assert.equal(studioProjects.length, 7, "seven end-to-end projects");
+assert.equal(studioProjects.length, 8, "eight end-to-end projects");
 for (const project of studioProjects) {
   assert.equal(
     project.stages.length,
@@ -190,6 +190,11 @@ const { default: StudioPage } = load("src/components/studio/StudioPage.tsx");
 for (const [path, query, title] of [
   ["/studio", "", "从看懂，到会做。"],
   ["/studio/code", "lesson=attention", "Attention：从公式到可靠实现"],
+  [
+    "/studio/code",
+    "lesson=meta-learning-maml",
+    "MAML：从 support 更新到 query meta-gradient",
+  ],
   ["/studio/shapes", "", "让每一条轴都有名字。"],
   ["/studio/arena", "", "同一数据，同一切分，同一预算。"],
   ["/studio/projects", "project=grounded-rag", "一个模型，不等于一个项目。"],
@@ -202,5 +207,5 @@ for (const [path, query, title] of [
 }
 
 console.log(
-  `Validated Studio: ${codeLabs.length} code labs, ${shapeDefinitions.length} shape debuggers, ${locked.results.length} trained arena models, ${studioProjects.length} projects, ${lessons.length} linked lessons, and five SSR routes.`,
+  `Validated Studio: ${codeLabs.length} code labs, ${shapeDefinitions.length} shape debuggers, ${locked.results.length} trained arena models, ${studioProjects.length} projects, ${lessons.length} linked lessons, and six SSR routes.`,
 );

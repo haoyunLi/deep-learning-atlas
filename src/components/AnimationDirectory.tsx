@@ -60,7 +60,7 @@ export default function AnimationDirectory() {
       <div className="practice-promo">
         <div>
           <strong>进一步：把每个中间数算出来</strong>
-          <p>五个逐步手算沙盘、每课两题，以及完整实验案例和 LM 显存计算器。</p>
+          <p>六个逐步手算沙盘、每课两题，以及完整实验案例和 LM 显存计算器。</p>
         </div>
         <a href="#/practice">打开实践工坊 →</a>
       </div>

@@ -48,6 +48,7 @@ const {
   calculateAttention,
   calculatePPO,
   calculateCohort,
+  calculateMetaLearning,
 } = math;
 
 close(calculateKNN(1, 1, 1).ranked[0].distance, 0, "A1 exact match");
@@ -298,6 +299,50 @@ for (const lookback of [15, 30, 90])
       checks += 3;
     }
 
+for (const alpha of [0.05, 0.2, 0.45])
+  for (const shots of [1, 2, 5])
+    for (const innerSteps of [1, 2, 4]) {
+      const meta = calculateMetaLearning(alpha, shots, innerSteps);
+      assert.equal(meta.tasks.length, 2);
+      close(
+        meta.queryLoss,
+        meta.tasks.reduce((sum, task) => sum + task.queryLoss, 0) / 2,
+        "meta query loss is task average",
+      );
+      meta.tasks.forEach((task) => {
+        assert.equal(task.trace.length, innerSteps + 1);
+        close(task.trace[0], meta.theta, "inner loop starts from shared theta");
+        for (let step = 1; step < task.trace.length; step++) {
+          const previous = task.trace[step - 1];
+          close(
+            task.trace[step],
+            previous - alpha * 2 * (previous - task.supportEstimate),
+            "inner update follows support gradient",
+          );
+        }
+        close(
+          task.queryLoss,
+          (task.adapted - task.target) ** 2,
+          "query remains tied to true task target",
+        );
+        close(
+          task.exactGradient,
+          task.fomamlGradient * (1 - 2 * alpha) ** innerSteps,
+          "MAML gradient keeps inner Jacobian",
+        );
+      });
+      assert.ok(
+        [
+          meta.queryLoss,
+          meta.exactGradient,
+          meta.fomamlGradient,
+          meta.reptileDirection,
+          meta.nextTheta,
+        ].every(Number.isFinite),
+      );
+      checks += 2;
+    }
+
 const { HandCalculationSandbox, handCalculationLessonIds } = loadTs(
   "src/components/HandCalculationSandbox.tsx",
 );
@@ -331,5 +376,5 @@ assert.equal(
   "unrelated lessons do not get placeholder sandboxes",
 );
 console.log(
-  `Validated five authored hand-calculation sandboxes: ${checks} numerical checks, EM convergence, PPO finite-difference gradients, cohort leakage invariants, and five accessible server renders.`,
+  `Validated ${handCalculationLessonIds.length} authored hand-calculation sandboxes: ${checks} numerical checks, EM convergence, PPO finite-difference gradients, cohort leakage invariants, meta-gradient recurrences, and accessible server renders.`,
 );

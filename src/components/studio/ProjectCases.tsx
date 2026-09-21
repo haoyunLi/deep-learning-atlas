@@ -38,7 +38,7 @@ export default function ProjectCases({ query }: { query: string }) {
       eyebrow="PROJECT CASES · 端到端项目"
       title="一个模型，不等于一个项目。"
       english="Ship evidence across the whole lifecycle."
-      intro="七个案例都按同一八阶段闭环推进。每一阶段给出问题、动作、应交证据、通过条件和典型失败；勾选只记录你已经拿出证据的阶段。"
+      intro="八个案例都按同一八阶段闭环推进。每一阶段给出问题、动作、应交证据、通过条件和典型失败；勾选只记录你已经拿出证据的阶段。"
     >
       <div className="project-layout">
         <aside className="project-list">

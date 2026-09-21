@@ -5,6 +5,7 @@ import { modelFamilyExercises } from "./exercisesModelFamilies";
 import { visionConceptExercises } from "./exercisesVisionConcepts";
 import { classicalRLExercises } from "./exercisesClassicalRL";
 import { frontierSystemsExercises } from "./exercisesFrontierSystems";
+import { metaLearningExercises } from "./exercisesMetaLearning";
 
 export const exerciseGroups: Record<string, Exercise[]>[] = [
   coreExercises,
@@ -13,6 +14,7 @@ export const exerciseGroups: Record<string, Exercise[]>[] = [
   visionConceptExercises,
   classicalRLExercises,
   frontierSystemsExercises,
+  metaLearningExercises,
 ];
 export const exercises: Record<string, Exercise[]> = Object.assign(
   {},

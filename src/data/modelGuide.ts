@@ -1112,4 +1112,249 @@ export const guideTasks: GuideTask[] = [
       "model-serving-monitoring",
     ],
   },
+  {
+    id: "few-shot-adaptation",
+    title: "少样本与新任务适配",
+    english: "Few-shot and task adaptation",
+    description:
+      "先说明新的是类别、用户、领域还是环境，再决定使用 prototype、梯度式 meta-learning 或普通迁移学习。",
+    question: "新任务到来时允许什么信息与更新？",
+    contexts: [
+      {
+        id: "no-gradient",
+        label: "只有少量 support，不能更新模型",
+        baseline: "先用冻结预训练 embedding 计算最近邻或每类 prototype。",
+        recommendationIds: ["prototypical-networks", "matching-networks"],
+      },
+      {
+        id: "few-steps",
+        label: "允许几步快速参数更新",
+        baseline: "先做预训练模型的 head-only 微调，再比较 MAML/FOMAML。",
+        recommendationIds: [
+          "meta-learning-maml",
+          "fomaml-reptile",
+          "meta-sgd-anil",
+        ],
+      },
+      {
+        id: "new-domain",
+        label: "新类别同时来自新领域",
+        baseline: "用强预训练冻结表示 + prototype，单独报告 cross-domain gap。",
+        recommendationIds: [
+          "cross-domain-few-shot",
+          "transfer-learning-strategies",
+        ],
+      },
+    ],
+    recommendations: [
+      {
+        lessonId: "prototypical-networks",
+        name: "Prototype",
+        role: "无梯度少样本基线",
+        reason:
+          "每类 support 均值透明、快速，并能直接暴露 embedding 是否有效。",
+        settings: [
+          "训练/测试按任务隔离类别。",
+          "先用平方欧氏距离并比较归一化 cosine。",
+        ],
+        limitation: "单中心难表达多峰类，跨域表示失配时距离会失效。",
+      },
+      {
+        lessonId: "matching-networks",
+        name: "Matching Networks",
+        role: "保留全部 support 的注意力分类",
+        reason:
+          "类别内部存在多个局部模式时，让 query 对每个 support 样本分配权重，比单一均值更灵活。",
+        settings: [
+          "固定 embedding 后先核对 attention 权重和预测概率之和。",
+          "限制 episode 的 way/shot，并比较 cosine 与温度缩放。",
+        ],
+        limitation:
+          "推理成本随 support 集增长，错误或离群 support 会直接影响预测。",
+      },
+      {
+        lessonId: "meta-learning-maml",
+        name: "MAML / FOMAML",
+        role: "少步梯度适配",
+        reason: "历史相关任务足够多时，可学习一个新任务容易更新的初始化。",
+        settings: [
+          "训练 episode 匹配部署 N/K 与 inner steps。",
+          "记录 inner/outer LR、二阶图和任务 batch。",
+        ],
+        limitation: "双层优化成本高，任务分布外不保证快速适配。",
+      },
+      {
+        lessonId: "fomaml-reptile",
+        name: "FOMAML / Reptile",
+        role: "低成本梯度式元学习",
+        reason:
+          "二阶 MAML 显存或时间过高时，可先验证一阶近似是否保留快速适配收益。",
+        settings: [
+          "与 MAML 使用相同 episode、inner steps 和评估预算。",
+          "分别记录 query 梯度与参数差方向，避免把两种近似混为一谈。",
+        ],
+        limitation: "忽略二阶项会改变更新方向，任务曲率差异大时近似可能变差。",
+      },
+      {
+        lessonId: "meta-sgd-anil",
+        name: "Meta-SGD / ANIL",
+        role: "控制适配参数与步长",
+        reason:
+          "可学习逐参数更新方向，或只适配 head，以检查快速适配到底需要多大容量。",
+        settings: [
+          "先跑 ANIL 的 head-only 基线，再逐层开放内循环参数。",
+          "约束或参数化 Meta-SGD 步长，监控极端值和符号变化。",
+        ],
+        limitation: "逐参数步长增加状态量，ANIL 在需要底层表示变化时会受限。",
+      },
+      {
+        lessonId: "cross-domain-few-shot",
+        name: "跨域适配",
+        role: "新类 + 新数据域",
+        reason:
+          "把同数据集 class split 推进到更接近上线的机构、设备或模态变化。",
+        settings: [
+          "完整目标域保持封闭。",
+          "从 head/prototype 到逐层解冻做容量阶梯。",
+        ],
+        limitation: "目标 support 太少时无法可靠重估底层表示与统计量。",
+      },
+      {
+        lessonId: "transfer-learning-strategies",
+        name: "Transfer learning ladder",
+        role: "普通迁移基线",
+        reason:
+          "强预训练加 linear probe、head 微调和逐层解冻常是元学习必须超过的实际基线。",
+        settings: [
+          "按冻结、head-only、顶部 block、全量微调逐级增加容量。",
+          "每一级分别调学习率并保留相同数据划分与 early stopping 预算。",
+        ],
+        limitation:
+          "单任务微调不会学习跨任务快速适配先验，极少样本时容易过拟合。",
+      },
+    ],
+    evaluation: [
+      "复用相同 meta-test episodes，报告均值、置信区间、适配时间和峰值显存。",
+      "query 不参与 prototype、梯度更新或超参数选择；同时报告 within-domain 与 cross-domain。",
+    ],
+    preparationIds: [
+      "episodic-meta-learning",
+      "few-shot-learning",
+      "data-leakage",
+    ],
+  },
+  {
+    id: "adaptive-systems",
+    title: "持续适应与分布变化",
+    english: "Adaptive learning systems",
+    description:
+      "根据目标数据何时可见、标签是否到达和历史数据能否保存，选择领域适配、测试时适配、在线或持续学习。",
+    question: "变化发生在训练前、测试时，还是带反馈的数据流中？",
+    contexts: [
+      {
+        id: "target-unlabeled",
+        label: "训练时可见无标签目标域",
+        baseline: "先比较 source-only 与简单 normalization adaptation。",
+        recommendationIds: [
+          "domain-adaptation-dann",
+          "semi-supervised-self-training",
+        ],
+      },
+      {
+        id: "test-stream",
+        label: "只在测试流看到无标签输入",
+        baseline: "保留不可变 source checkpoint，先做零更新与 AdaBN 对照。",
+        recommendationIds: ["test-time-adaptation", "online-learning-drift"],
+      },
+      {
+        id: "task-sequence",
+        label: "新任务连续到来且要保留旧能力",
+        baseline: "先测 naive fine-tune 的遗忘与 joint-training 上界。",
+        recommendationIds: ["continual-learning", "federated-learning"],
+      },
+    ],
+    recommendations: [
+      {
+        lessonId: "domain-adaptation-dann",
+        name: "DANN",
+        role: "训练时域对齐",
+        reason:
+          "有 source 标签与 target 无标签时，可用域对抗表示减少可区分性。",
+        settings: [
+          "λ 从 0 warm up。",
+          "监控 label loss、domain loss 与类条件错误。",
+        ],
+        limitation: "条件分布变化时全局对齐可能产生负迁移。",
+      },
+      {
+        lessonId: "semi-supervised-self-training",
+        name: "Self-training / FixMatch",
+        role: "伪标签利用目标数据",
+        reason:
+          "有可靠高置信预测时，可把弱增强伪标签用于强增强训练，直接利用目标域样本。",
+        settings: [
+          "先画置信度与准确率曲线，再设伪标签阈值。",
+          "记录每类接受率，防止多数类把未标注池全部占满。",
+        ],
+        limitation: "早期错误会被反复强化，未校准置信度会让阈值失去含义。",
+      },
+      {
+        lessonId: "test-time-adaptation",
+        name: "TENT / TTA",
+        role: "无标签线上微调",
+        reason: "只更新归一化状态或少量参数，可适配当前输入统计。",
+        settings: [
+          "每批一小步并限制参数白名单。",
+          "监控类别坍塌、漂移并可立即 reset。",
+        ],
+        limitation: "entropy 下降不保证准确率提升，错误会沿数据流累积。",
+      },
+      {
+        lessonId: "online-learning-drift",
+        name: "Online learning + drift monitor",
+        role: "带时间顺序的数据流更新",
+        reason:
+          "标签延迟到达时，可以把漂移检测、更新触发与回滚放在同一套流式评估中。",
+        settings: [
+          "按事件时间保存 prequential 指标并模拟真实标签延迟。",
+          "为更新频率、窗口长度、告警阈值和回滚条件做联合回放。",
+        ],
+        limitation:
+          "输入漂移不一定造成任务性能下降，短窗口告警也可能只是噪声。",
+      },
+      {
+        lessonId: "continual-learning",
+        name: "Replay / EWC",
+        role: "新旧知识平衡",
+        reason: "标签任务顺序到来时，可用有限 memory 或重要参数约束减少遗忘。",
+        settings: [
+          "固定总 memory 字节。",
+          "每个任务后更新完整 accuracy matrix。",
+        ],
+        limitation: "隐私与存储限制 replay；正则约束多任务后会累积。",
+      },
+      {
+        lessonId: "federated-learning",
+        name: "FedAvg",
+        role: "数据不能集中时的协作训练",
+        reason:
+          "各节点保留本地数据并上传更新，适合机构或设备间受治理约束的联合建模。",
+        settings: [
+          "按本地样本数加权聚合，并记录客户端参与率与 local steps。",
+          "模拟非独立同分布客户端、掉线和不同算力，再测最坏客户端表现。",
+        ],
+        limitation:
+          "客户端漂移、通信成本与隐私攻击仍需单独处理，平均模型不保证群体公平。",
+      },
+    ],
+    evaluation: [
+      "保持真实时间顺序和标签延迟，比较不更新、定期重训与在线方案。",
+      "同时报告当前性能、历史遗忘、最坏群体、更新成本和回滚次数。",
+    ],
+    preparationIds: [
+      "domain-shift",
+      "model-evaluation",
+      "model-serving-monitoring",
+    ],
+  },
 ];

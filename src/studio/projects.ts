@@ -656,6 +656,101 @@ const offlineRl: StudioProject = {
   ]),
 };
 
+const fewShotAdaptation: StudioProject = {
+  id: "few-shot-adaptation",
+  title: "跨机构少样本适配",
+  english: "Cross-domain few-shot adaptation",
+  summary:
+    "用严格的 task split 和 support/query episode，比冻结表示、ProtoNet、ANIL 与 MAML，回答新机构只有少量标签时怎样适配。",
+  task: "新实验室到来时，每类仅 1–5 个标注样本，识别此前未见的细胞类型。",
+  input: "多实验室显微图像、实验室 ID、物种/批次信息和每类少量 support 标签。",
+  output: "query 类别概率、拒答标记、适配耗时和任务级不确定性。",
+  baseline: "冻结预训练 encoder + 每类 support prototype",
+  primaryMetric: "mean query macro-F1 across unseen-lab episodes",
+  guardrail: "worst-lab recall、ECE、适配时间与每任务显存",
+  split:
+    "按实验室×类别隔离 meta-train/meta-val/meta-test；每个 episode 内 support/query 不重叠。",
+  settings: [
+    "5-way 1/5-shot episodes",
+    "inner steps 1–5",
+    "inner LR 0.001–0.1",
+    "prototype distance / temperature",
+    "head-only 与后层解冻",
+  ],
+  relatedLessons: [
+    "episodic-meta-learning",
+    "prototypical-networks",
+    "meta-learning-maml",
+    "cross-domain-few-shot",
+    "calibration-uncertainty",
+  ],
+  stages: makeStages([
+    {
+      question: "真正的新任务是什么？",
+      action: "写清新实验室、新类别、可用 support 数、允许更新步数与拒答成本。",
+      evidence: "task contract、episode schema 与上线适配时序图。",
+      pass: "query 标签只在评分后可见。",
+      failure: "把新图片而非新机构/新类别误称为新任务。",
+    },
+    {
+      question: "机构、类别和实体是否泄漏？",
+      action:
+        "按实验室、批次、物种与近重复图像审计，统计每任务可用 support/query。",
+      evidence: "task-level cohort flow、重复簇与域差异报告。",
+      pass: "同一细胞、批次和目标机构不跨 meta split。",
+      failure: "随机按图片切分造成风格和实体泄漏。",
+    },
+    {
+      question: "简单冻结表示能达到什么水平？",
+      action:
+        "固定同一批 meta-test episodes，比较 kNN、prototype 和 linear head。",
+      evidence: "1/5-shot 任务级分布与 bootstrap CI。",
+      pass: "所有方法复用同一 support/query。",
+      failure: "每种方法抽到不同的容易任务。",
+    },
+    {
+      question: "梯度式适配是否超过低方差基线？",
+      action:
+        "只用 meta-train/val 调 MAML/FOMAML 的 inner LR、步数、层范围和 outer LR。",
+      evidence: "适配前后 query 曲线、时间、显存与 gradient norm。",
+      pass: "多种未见实验室上稳定超过 prototype。",
+      failure: "support loss 降低却 query 退化。",
+    },
+    {
+      question: "收益来自 episode、初始化还是适配层？",
+      action:
+        "分别去掉 episodic training、换随机初始化、改 head-only、移除域增广。",
+      evidence: "同预算消融表和 task-level paired difference。",
+      pass: "关键组件的提升跨任务一致。",
+      failure: "同时改变 backbone、episode 与训练 token。",
+    },
+    {
+      question: "哪些任务适配失败？",
+      action: "按实验室、类别、support 噪声和域距离检查高置信错误与负适配。",
+      evidence: "失败 episode gallery、support attention/距离与标注复核。",
+      pass: "区分表示失配、support 噪声和 inner overfit。",
+      failure: "只看平均准确率掩盖单个机构崩溃。",
+    },
+    {
+      question: "封闭目标机构是否仍然成立？",
+      action:
+        "冻结方法和超参数，在完整未见实验室一次评估 1-shot、5-shot 与缺类 episode。",
+      evidence: "macro-F1、worst-lab recall、ECE、CI 和适配资源。",
+      pass: "主指标、最差域和资源 guardrails 同时通过。",
+      failure: "看 target test 后改 support 采样或 inner steps。",
+    },
+    {
+      question: "怎样安全处理新任务 support？",
+      action:
+        "版本化 support、校验标签/类覆盖，限制更新参数和步数，并保存 source fallback。",
+      evidence:
+        "adaptation audit log、drift dashboard、回滚演练和人工复核队列。",
+      pass: "每次适配可复现、可隔离、可回滚。",
+      failure: "跨机构复用 optimizer/memory state 造成信息串线。",
+    },
+  ]),
+};
+
 export const studioProjects: StudioProject[] = [
   readmission,
   segmentation,
@@ -664,6 +759,7 @@ export const studioProjects: StudioProject[] = [
   forecasting,
   recommendation,
   offlineRl,
+  fewShotAdaptation,
 ];
 export const studioProjectById = new Map(
   studioProjects.map((project) => [project.id, project]),

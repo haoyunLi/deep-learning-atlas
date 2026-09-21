@@ -6,6 +6,7 @@ import { visionLanguageLessons } from "./visionLanguage";
 import { trainingLanguageExpansionLessons } from "./trainingLanguageExpansion";
 import { modelFamilyExpansionLessons } from "./modelFamilyExpansion";
 import { frontierSystemsExpansionLessons } from "./frontierSystemsExpansion";
+import { metaLearningExpansionLessons } from "./metaLearningExpansion";
 
 export type Lesson = {
   id: string;
@@ -86,6 +87,12 @@ export const categories = [
     label: "更多架构",
     englishLabel: "More Architectures",
     description: "图网络、参数高效微调与专家模型。",
+  },
+  {
+    id: "adaptation",
+    label: "元学习与适应",
+    englishLabel: "Learning to Adapt",
+    description: "从 few-shot episode、元优化到领域变化、持续学习与联邦协作。",
   },
 ] as const;
 
@@ -1921,6 +1928,7 @@ export const lessons: Lesson[] = [
   ...trainingLanguageExpansionLessons,
   ...modelFamilyExpansionLessons,
   ...frontierSystemsExpansionLessons,
+  ...metaLearningExpansionLessons,
 ].sort(
   (a, b) =>
     categories.findIndex((category) => category.id === a.category) -

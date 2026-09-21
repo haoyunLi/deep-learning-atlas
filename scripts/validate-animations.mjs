@@ -54,6 +54,7 @@ const groups = [
   ["visionSequence", "visionSequenceLabs"],
   ["reinforcementRepresentation", "reinforcementRepresentationLabs"],
   ["generativeData", "generativeDataLabs"],
+  ["metaAdaptation", "metaAdaptationLabs"],
 ].map(([file, name]) => loadTs(`src/components/labs/${file}.tsx`)[name]);
 const groupKeys = groups.flatMap(Object.keys);
 assert.equal(
@@ -285,6 +286,49 @@ for (const t of [0.05, 1, 3]) {
 }
 close(g.ganToy(0).fakeProbability, 0.5, "GAN discriminator midpoint");
 assert.ok(g.ganToy(2).generatorLoss < g.ganToy(-2).generatorLoss);
+
+const { metaAdaptationCalculations: m } = loadTs(
+  "src/components/labs/metaAdaptation.tsx",
+);
+for (const shots of [1, 3, 5]) {
+  const episode = m.episode(shots);
+  assert.equal(episode.support, episode.ways * shots);
+  assert.equal(episode.total, episode.support + episode.query);
+}
+for (const alpha of [0.05, 0.2, 0.45]) {
+  const firstOrder = m.firstOrder(alpha);
+  close(
+    firstOrder.adapted,
+    firstOrder.theta - alpha * firstOrder.supportGradient,
+    "meta inner update",
+  );
+  close(
+    firstOrder.exactMamlGradient,
+    firstOrder.fomamlGradient * (1 - 2 * alpha),
+    "MAML keeps one-step Jacobian",
+  );
+}
+for (const budget of [1, 3, 5]) {
+  const active = m.active(budget);
+  assert.equal(active.selected.length, budget);
+  active.selected
+    .slice(1)
+    .forEach((point, index) =>
+      assert.ok(point.entropy <= active.selected[index].entropy),
+    );
+}
+for (const steps of [1, 3, 5]) {
+  const federated = m.federated(steps);
+  const weighted = federated.clientWeights.reduce(
+    (sum, weight, index) =>
+      sum +
+      (federated.sampleCounts[index] /
+        federated.sampleCounts.reduce((a, b) => a + b, 0)) *
+        weight,
+    0,
+  );
+  close(federated.aggregate, weighted, "FedAvg sample weighting");
+}
 
 console.log(
   `Validated ${lessons.length} lesson walkthroughs (${flowRenders} step renders), ${mechanismCount} mechanism diagrams, ${groupKeys.length} parameter labs (${svgRenders} SVG renders), and numeric invariants.`,

@@ -381,3 +381,62 @@ export function calculateCohort(
       .reduce((sum, r) => sum + r.leaked.length, 0),
   };
 }
+
+export function calculateMetaLearning(
+  innerRate: number,
+  shots: number,
+  innerSteps: number,
+) {
+  const theta = 0.2;
+  const k = Math.max(1, Math.round(shots));
+  const steps = Math.max(1, Math.round(innerSteps));
+  const tasks = [
+    { id: "τA", target: -1, supportNoise: 0.8 },
+    { id: "τB", target: 3, supportNoise: -0.3 },
+  ].map((task) => {
+    const supportEstimate = task.target + task.supportNoise / k;
+    const trace = [theta];
+    let adapted = theta;
+    for (let step = 0; step < steps; step++) {
+      const gradient = 2 * (adapted - supportEstimate);
+      adapted -= innerRate * gradient;
+      trace.push(adapted);
+    }
+    const supportLoss = (adapted - supportEstimate) ** 2;
+    const queryLoss = (adapted - task.target) ** 2;
+    const fomamlGradient = 2 * (adapted - task.target);
+    const jacobian = (1 - 2 * innerRate) ** steps;
+    const exactGradient = fomamlGradient * jacobian;
+    return {
+      ...task,
+      supportEstimate,
+      trace,
+      adapted,
+      supportLoss,
+      queryLoss,
+      fomamlGradient,
+      exactGradient,
+      reptileDirection: adapted - theta,
+    };
+  });
+  const average = (values: number[]) =>
+    values.reduce((sum, value) => sum + value, 0) / values.length;
+  const queryLoss = average(tasks.map((task) => task.queryLoss));
+  const exactGradient = average(tasks.map((task) => task.exactGradient));
+  const fomamlGradient = average(tasks.map((task) => task.fomamlGradient));
+  const reptileDirection = average(tasks.map((task) => task.reptileDirection));
+  const outerRate = 0.25;
+  return {
+    theta,
+    shots: k,
+    innerRate,
+    innerSteps: steps,
+    outerRate,
+    tasks,
+    queryLoss,
+    exactGradient,
+    fomamlGradient,
+    reptileDirection,
+    nextTheta: theta - outerRate * exactGradient,
+  };
+}
