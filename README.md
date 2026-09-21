@@ -20,6 +20,8 @@
 
 还包括关键词搜索、分类筛选、两算法并排比较、按数据结构选起点的指南、关键概念路径、术语表，以及保存在本机浏览器的阅读进度。每篇课程都链接到原始论文或官方文档。
 
+Attention、Diffusion 和 PPO 课程配有四步动效图，可自动播放、暂停或手动跳步。示意图对齐课程机制步骤，同时标出教学示例数值与真实训练输出的区别；系统设置为减少动态效果时会暂停自动播放。
+
 关键概念路径把课程按问题串起来：prediction head 与 attention head 的不同位置；zero-shot、few-shot、linear probe、原型网络与元学习；GPT 的 in-context learning、chain-of-thought 与偏好训练；cohort 定义、数据泄漏、分布漂移、外部验证与校准。每一步说明为什么要接着学下一步，并链接到完整课程。独立课程中的机制拆解仍按步骤展开，附有配置起点与调整信号。
 
 > 阅读时要区分不同层次：CNN、RNN、Transformer 和 GNN 是模型架构；EM 是处理潜变量的一种优化框架；kNN、随机森林等是非深度学习基线；对比学习和强化学习描述学习目标或训练范式；SGD、AdamW 是更新参数的优化方法。不同层次的方法常常能够组合。
@@ -50,7 +52,10 @@ npm run preview
 - [`src/data/dataConcepts.ts`](src/data/dataConcepts.ts)：cohort、数据泄漏、分布变化与可信评估课程。
 - [`src/data/conceptPaths.ts`](src/data/conceptPaths.ts)：把模型课与概念课串成四条逐步学习路径。
 - [`src/App.tsx`](src/App.tsx)：课程图谱、详情、对比、选型与术语交互。
+- [`src/components/AnimatedExplainer.tsx`](src/components/AnimatedExplainer.tsx)：动效步骤、播放控制和课程说明。
+- [`src/components/AttentionAnimation.tsx`](src/components/AttentionAnimation.tsx)、[`src/components/DiffusionAnimation.tsx`](src/components/DiffusionAnimation.tsx)、[`src/components/PPOAnimation.tsx`](src/components/PPOAnimation.tsx)：三张算法机制动效图。
 - [`src/styles.css`](src/styles.css)：响应式视觉系统。
+- [`src/animation.css`](src/animation.css)：动效图与首页入口样式。
 - [`scripts/validate-content.mjs`](scripts/validate-content.mjs)：构建时检查课程字段、来源、分类、唯一 ID 和比较链接。
 - [`design/concept-home.png`](design/concept-home.png)、[`design/concept-lesson.png`](design/concept-lesson.png)：首页和课程详情的设计参考。
 

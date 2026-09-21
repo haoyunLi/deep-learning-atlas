@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { categories, lessons, type Lesson } from "./data/lessons";
 import { conceptPaths } from "./data/conceptPaths";
+import AnimatedExplainer, {
+  animationSpecs,
+} from "./components/AnimatedExplainer";
 
 const repoUrl = "https://github.com/haoyunLi/deep-learning-atlas";
 
@@ -321,6 +324,45 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
         <a href="#/concepts">
           探索关键概念路径 <ArrowIcon />
         </a>
+      </section>
+
+      <section
+        className="animation-promo page-gutter"
+        aria-labelledby="animation-promo-title"
+      >
+        <div className="animation-promo-heading">
+          <h2 id="animation-promo-title">跟着动效，看懂算法的每一步。</h2>
+          <span>Interactive walkthroughs · 可暂停、可逐步查看</span>
+        </div>
+        <div className="animation-promo-grid">
+          {[
+            {
+              id: "attention",
+              number: "01 / ATTENTION",
+              title: "注意力如何汇总信息",
+              description: "从 Q/K/V、mask、softmax 到加权求和",
+            },
+            {
+              id: "diffusion",
+              number: "02 / DIFFUSION",
+              title: "扩散如何从噪声生成",
+              description: "从训练时加噪到生成时多步去噪",
+            },
+            {
+              id: "ppo",
+              number: "03 / PPO",
+              title: "PPO 如何控制更新",
+              description: "跟着概率比理解 clipped surrogate",
+            },
+          ].map((item) => (
+            <a key={item.id} href={`#/lesson/${item.id}`}>
+              <span>{item.number}</span>
+              <strong>{item.title}</strong>
+              <small>{item.description}</small>
+              <ArrowIcon diagonal />
+            </a>
+          ))}
+        </div>
       </section>
 
       <section className="atlas-section page-gutter" id="atlas">
@@ -824,6 +866,9 @@ function Detail({ id }: { id: string }) {
         <nav className="detail-toc">
           {[
             ["intuition", "直觉 Intuition"],
+            ...(animationSpecs[lesson.id]
+              ? [["animation", "动效 Walkthrough"]]
+              : []),
             ["mechanics", "步骤 Mechanics"],
             ["usage", "选型与上手 Use"],
             ["tuning", "配置与调参 Settings"],
@@ -871,7 +916,11 @@ function Detail({ id }: { id: string }) {
           </h2>
           <p>{lesson.intuition}</p>
         </section>
-        <MechanismDiagram lesson={lesson} />
+        {animationSpecs[lesson.id] ? (
+          <AnimatedExplainer key={lesson.id} lessonId={lesson.id} />
+        ) : (
+          <MechanismDiagram lesson={lesson} />
+        )}
         <section className="detail-section" id="mechanics">
           <h2>
             机制拆解 <span>How it works</span>
