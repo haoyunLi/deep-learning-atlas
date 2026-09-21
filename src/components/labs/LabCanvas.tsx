@@ -11,7 +11,8 @@ export function LabCanvas({
     <div
       className="lab-canvas-scroll"
       tabIndex={0}
-      aria-label="可横向滚动的机制图"
+      role="region"
+      aria-label={`${label}（可横向滚动）`}
     >
       <svg
         className="lab-canvas"

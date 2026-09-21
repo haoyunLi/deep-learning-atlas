@@ -233,7 +233,13 @@ const coreLessons: Lesson[] = [
         adjust: "某一项梯度主导训练时重新缩放或调权重，避免只看总 loss。",
       },
     ],
-    compareTo: ["model-evaluation", "regularization"],
+    compareTo: [
+      "model-evaluation",
+      "regularization",
+      "prediction-heads",
+      "class-imbalance",
+      "calibration-uncertainty",
+    ],
   },
   {
     id: "backpropagation",
@@ -278,10 +284,10 @@ const coreLessons: Lesson[] = [
     example:
       "预测值是 3、目标是 2；误差往回传播，使推动预测升高的权重得到正梯度，梯度下降会把它调小。",
     mechanicsSteps: [
-      "前向计算图记录每个算子及求局部导数需要的中间张量。",
+      "在本轮 backward 前清空旧梯度；前向计算图记录每个算子及求局部导数需要的中间张量。若做梯度累积，只在这一组 micro-batch 开始时清零。",
       "从标量 loss 开始设定输出梯度，按链式法则反向传播到各层输入。",
       "一条参数路径上的局部导数相乘，多条汇入路径的梯度相加，得到每个参数的 ∂L/∂θ。",
-      "在 optimizer step 前清理或有意累积梯度；检查梯度范数、数值有限性和参数是否真的更新。",
+      "backward 完成后检查或裁剪梯度，再执行 optimizer.step()；这两步之间不能 zero_grad，否则会清掉刚算出的更新信号。",
     ],
     limits: [
       "离散采样或硬选择通常没有普通可用梯度，需要 surrogate、重参数化或策略梯度等办法。",
@@ -291,7 +297,7 @@ const coreLessons: Lesson[] = [
       {
         name: "梯度清零",
         start:
-          "每次独立更新前调用 zero_grad；仅在有意 gradient accumulation 时延后。",
+          "每轮首次 backward 前调用 zero_grad；累积期间保留梯度，完成 optimizer.step 后再开始下一轮。",
         adjust: "梯度异常变大先排查意外累加和 loss 的 reduction。",
       },
       {
@@ -306,7 +312,12 @@ const coreLessons: Lesson[] = [
         adjust: "频繁触发裁剪通常提示学习率、初始化或数值稳定性需要一起检查。",
       },
     ],
-    compareTo: ["gradient-descent", "neural-networks"],
+    compareTo: [
+      "gradient-descent",
+      "neural-networks",
+      "gradient-clipping",
+      "mixed-precision",
+    ],
   },
   {
     id: "gradient-descent",
@@ -380,7 +391,7 @@ const coreLessons: Lesson[] = [
           "谷底附近反复摆动时加 momentum 或降低后期学习率；不要只凭训练速度判优。",
       },
     ],
-    compareTo: ["adamw", "backpropagation"],
+    compareTo: ["adamw", "backpropagation", "learning-rate-schedules"],
   },
   {
     id: "adamw",
@@ -454,7 +465,12 @@ const coreLessons: Lesson[] = [
         adjust: "梯度噪声或数值不稳时才检查动量时间尺度与 ε，并一次只改一项。",
       },
     ],
-    compareTo: ["gradient-descent", "regularization"],
+    compareTo: [
+      "gradient-descent",
+      "regularization",
+      "learning-rate-schedules",
+      "mixed-precision",
+    ],
   },
   {
     id: "regularization",
@@ -600,7 +616,13 @@ const coreLessons: Lesson[] = [
         adjust: "召回不足可下调阈值并检查精度代价；概率需可信时做校准评估。",
       },
     ],
-    compareTo: ["loss-functions", "regularization"],
+    compareTo: [
+      "loss-functions",
+      "regularization",
+      "data-leakage",
+      "external-validation",
+      "language-model-evaluation",
+    ],
   },
   {
     id: "cnn",
@@ -674,7 +696,7 @@ const coreLessons: Lesson[] = [
         adjust: "训练好验证差时检查增强和域偏移；增强伤害语义时立即收窄。",
       },
     ],
-    compareTo: ["resnet", "transformer"],
+    compareTo: ["resnet", "transformer", "batch-normalization"],
   },
   {
     id: "resnet",
@@ -894,7 +916,12 @@ const coreLessons: Lesson[] = [
           "远期指标差时增历史或用 attention；显存/延迟过高时缩短并检查损失。",
       },
     ],
-    compareTo: ["rnn", "attention"],
+    compareTo: [
+      "rnn",
+      "attention",
+      "time-series-forecasting",
+      "gradient-clipping",
+    ],
   },
   {
     id: "attention",
@@ -969,7 +996,13 @@ const coreLessons: Lesson[] = [
           "证据被截断时加长或分块；显存超预算时比较局部/稀疏或精确省内存实现。",
       },
     ],
-    compareTo: ["transformer", "lstm-gru"],
+    compareTo: [
+      "transformer",
+      "lstm-gru",
+      "attention-heads",
+      "positional-encoding",
+      "grouped-query-attention",
+    ],
   },
   {
     id: "transformer",
@@ -1016,7 +1049,7 @@ const coreLessons: Lesson[] = [
     example:
       "做长文档分类：使用 encoder 读完整段落，输出 pooled representation，再接分类头。",
     mechanicsSteps: [
-      "把 token 映射到向量并加入位置表示；没有位置表示的纯 self-attention 无法区分输入排列。",
+      "把 token 映射到向量并加入位置机制；既无位置机制也无顺序 mask 时，self-attention 对输入重排只会相应重排输出，不会自行获知绝对位置。",
       "在每个 block 中计算多头 self-attention，让各 token 交换信息，再经逐位置 MLP 变换通道；两段都配残差与归一化。",
       "按任务选可见性：双向 encoder、因果 decoder，或加 cross-attention 的 encoder–decoder；构造对应的 padding/causal mask。",
       "根据下游任务接分类、序列标注或生成头，训练时监测梯度、验证指标和随长度变化的显存/延迟。",
@@ -1044,7 +1077,13 @@ const coreLessons: Lesson[] = [
           "初期损失抖动或发散时降峰值学习率或延长 warmup；长期欠拟合时检查优化强度。",
       },
     ],
-    compareTo: ["attention", "encoder-models", "decoder-models"],
+    compareTo: [
+      "attention",
+      "encoder-models",
+      "decoder-models",
+      "layer-normalization",
+      "positional-encoding",
+    ],
   },
   {
     id: "encoder-models",
@@ -1142,7 +1181,7 @@ const coreLessons: Lesson[] = [
       "可利用大量无标签序列做自监督预训练时。",
     ],
     howToUse: [
-      "训练时对 token 做右移目标，确保 causal mask 和 padding mask 正确。",
+      "显式对齐输入与下一 token 标签，例如输入 [A,B,C] 对应标签 [B,C,EOS]；若模型内部完成标签位移，就不要手动再移一次。",
       "推理时设 max tokens、停止条件、temperature 与 top-p。",
       "需要事实正确时加入检索、工具或人工审查流程，并单独评估可靠性。",
       "用固定提示集分别测试 greedy 与采样解码，并记录长度、错误类型和 token 成本。",
@@ -1163,7 +1202,7 @@ const coreLessons: Lesson[] = [
     example:
       "代码补全：把光标前代码作为上下文，decoder 按序生成后续代码；低 temperature 可提高稳定性。",
     mechanicsSteps: [
-      "把文本 token 化，将前缀作为输入、下一 token 作为目标右移一位；padding 位置不参与 loss。",
+      "把文本 token 化，位置 t 的输出监督目标为 xₜ₊₁：输入 [A,B,C] 对应标签 [B,C,EOS]。也可把标签序列右移后作为 decoder 输入；padding 标签不参与 loss。",
       "每层用 causal self-attention 只读当前位置及更早 token，再经 MLP 产生新 hidden state。",
       "训练时所有位置的 next-token loss 可并行计算；推理时逐 token 生成，用 KV cache 保存历史 key/value。",
       "按任务验证输出质量、事实性、停止率、长度和推理延迟，并分别调 sampling 与模型适配参数。",
@@ -1192,7 +1231,13 @@ const coreLessons: Lesson[] = [
           "显存或延迟超标时缩短历史、降低并发或采用缓存管理；关键证据丢失时改检索/摘要。",
       },
     ],
-    compareTo: ["encoder-models", "encoder-decoder", "transformer"],
+    compareTo: [
+      "encoder-models",
+      "encoder-decoder",
+      "transformer",
+      "autoregressive-inference",
+      "kv-cache",
+    ],
   },
   {
     id: "encoder-decoder",
@@ -1217,7 +1262,7 @@ const coreLessons: Lesson[] = [
     ],
     howToUse: [
       "分别设置 source/target tokenization 与最大长度。",
-      "训练时对 target 右移并做因果 mask；推理时使用 greedy、beam search 或 sampling。",
+      "将目标序列右移后作为 decoder 输入，例如输入 [BOS,A,B] 对应标签 [A,B,EOS]，并使用因果 mask；推理时采用 greedy、beam search 或 sampling。",
       "用任务指标及人工样本检查遗漏、重复和忠实度。",
       "把同一批验证样本用 teacher-forced loss 和真实自回归解码都测一遍，检查两者差距。",
     ],
@@ -1340,7 +1385,7 @@ const coreLessons: Lesson[] = [
         adjust: "生成模糊或误差尺度不合理时核对似然假设与输入预处理。",
       },
     ],
-    compareTo: ["gan", "diffusion"],
+    compareTo: ["gan", "diffusion", "latent-diffusion"],
   },
   {
     id: "gan",
@@ -1489,7 +1534,7 @@ const coreLessons: Lesson[] = [
           "提示更准但图像重复、失真或饱和时降低 guidance 并检查训练条件。",
       },
     ],
-    compareTo: ["gan", "autoencoder-vae"],
+    compareTo: ["gan", "autoencoder-vae", "ddpm", "ddim", "flow-matching"],
   },
   {
     id: "gnn",
@@ -1561,7 +1606,7 @@ const coreLessons: Lesson[] = [
         adjust: "子群表现异常时查稀疏节点、错误边和训练/验证间信息泄漏。",
       },
     ],
-    compareTo: ["cnn", "attention"],
+    compareTo: ["cnn", "attention", "gcn", "graphsage", "gat"],
   },
   {
     id: "contrastive-learning",
@@ -1580,7 +1625,8 @@ const coreLessons: Lesson[] = [
     intuition:
       "同一张照片的两种裁剪应该被认作一类；不同照片通常应分开。模型不需先知道对象名字，也能从“谁和谁相似”学到表示。",
     core: "Encoder 把输入映射到向量；InfoNCE 类目标提高正样本相似度，降低与负样本的相似度。关键设计是正例定义、增强方式、负例来源与 temperature。错误的正负关系会直接塑造错误的 embedding 几何。",
-    equation: "Lᵢ = −log[exp(sim(zᵢ,zᵢ⁺)/τ) / Σⱼ exp(sim(zᵢ,zⱼ)/τ)]",
+    equation:
+      "Lᵢ=−log[exp(sim(zᵢ,zᵢ⁺)/τ)/Σⱼ∈A(i)exp(sim(zᵢ,zⱼ)/τ)];  A(i) 含正例与负例，但不含 anchor 自身",
     whenToUse: [
       "标签少，但可构造同一对象的不同视图时。",
       "图文检索、语义搜索、去重或聚类需要可比较向量时。",
@@ -1633,7 +1679,13 @@ const coreLessons: Lesson[] = [
         adjust: "假负例多或 batch 受限时考虑 MoCo、BYOL、VICReg 等替代目标。",
       },
     ],
-    compareTo: ["encoder-models", "autoencoder-vae"],
+    compareTo: [
+      "encoder-models",
+      "autoencoder-vae",
+      "infonce",
+      "supervised-contrastive",
+      "retrieval-augmented-generation",
+    ],
   },
   {
     id: "transfer-lora",

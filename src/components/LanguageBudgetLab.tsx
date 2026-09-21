@@ -111,7 +111,12 @@ export default function LanguageBudgetLab() {
         <h3>
           {phase === "prefill" ? "一起读完 prompt" : "接着读一个新 token"}
         </h3>
-        <div className="practice-table">
+        <div
+          className="practice-table"
+          tabIndex={0}
+          role="region"
+          aria-label={`${phase === "prefill" ? "Prefill" : "Decode"} 张量形状与含义（可横向滚动）`}
+        >
           <table>
             <thead>
               <tr>

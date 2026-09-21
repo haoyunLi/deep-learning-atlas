@@ -758,9 +758,12 @@
 .animation-directory a:focus-visible,
 .animation-mode-tabs button:focus-visible,
 .animation-utilities button:focus-visible,
-.lab-canvas-scroll:focus-visible {
+.animated-explainer [role="region"]:focus-visible {
   outline: 3px solid #98c0f5;
   outline-offset: 3px;
+}
+.animated-explainer [role="region"] {
+  overscroll-behavior-x: contain;
 }
 @media (max-width: 1100px) {
   .animation-directory-intro {

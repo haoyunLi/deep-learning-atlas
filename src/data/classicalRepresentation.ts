@@ -316,10 +316,10 @@ export const classicalRepresentationLessons: Lesson[] = [
     intuition:
       "从斜着铺开的点云里转动坐标轴，第一根轴沿着点云最长的方向，下一根沿剩下变化最大的方向。",
     core: "PCA 对中心化数据寻找方差最大的正交投影，常由 SVD 实现。它不利用标签，保留方差也不等于保留任务所需的信息；与 nonlinear autoencoder 的表达能力不同。",
-    equation: "z=X_centered W_d,  W_d=top d eigenvectors of XᵀX",
+    equation: "Xc=X−μtrain;  Z=XcW_d;  W_d 为 XcᵀXc 的前 d 个单位正交特征向量",
     mechanicsSteps: [
       "划分数据后只在训练集估计均值，量纲差异大时同时估计缩放参数。",
-      "对中心化训练矩阵做 SVD，按奇异值大小选前 d 个相互正交的方向。",
+      "设训练 X 为 [n,p]，按列中心化为 Xc 后做 SVD；取前 d 个右奇异向量作 W_d:[p,d]，投影 Z:[n,d]。不能用未经中心化的 XᵀX 代替。",
       "把训练、验证和测试样本投影到同一组方向，并检查解释方差与下游表现。",
       "把 PCA 与预处理器一起保存，部署时只 transform 新数据，不重新 fit。",
     ],
@@ -587,7 +587,7 @@ export const classicalRepresentationLessons: Lesson[] = [
     modifications: [
       "有标签时可用 supervised contrastive objective，把同类样本都视作 positive。",
       "无可靠负样本时比较 BYOL 或 Barlow Twins。",
-      "多正例场景可改写分子为正例集合或使用 SupCon，避免其余真阳性落入分母负项。",
+      "多正例场景可改为正例概率之和或使用 SupCon 的逐正例平均；两种目标不等价。其他正例仍可出现在归一化分母中，关键是同时赋予它们正例监督。",
     ],
     pitfalls: [
       "假负例会把应接近的样本推远。",
@@ -893,7 +893,13 @@ export const classicalRepresentationLessons: Lesson[] = [
     ],
     example:
       "在物种图像库里搜索‘长红色喙的鸟’；先把图片和文本都编码，再按余弦相似度检索并人工审查前几名。",
-    compareTo: ["simclr", "infonce", "encoder-models"],
+    compareTo: [
+      "simclr",
+      "infonce",
+      "encoder-models",
+      "zero-shot-learning",
+      "linear-probe",
+    ],
   },
   {
     id: "byol",
@@ -1341,7 +1347,7 @@ export const classicalRepresentationLessons: Lesson[] = [
     ],
     example:
       "预测客户是否流失：先用经过训练集拟合的编码器处理表格特征，再训练逻辑回归；与随机森林比较 AUROC 和校准曲线。",
-    compareTo: ["svm", "random-forest", "neural-networks"],
+    compareTo: ["svm", "random-forest", "neural-networks", "xgboost"],
   },
   {
     id: "random-forest",
@@ -1416,7 +1422,7 @@ export const classicalRepresentationLessons: Lesson[] = [
     ],
     example:
       "用年龄、实验室指标等表格数据做分类；先比较逻辑回归与随机森林，再决定是否值得训练更复杂的网络。",
-    compareTo: ["logistic-regression", "svm", "neural-networks"],
+    compareTo: ["logistic-regression", "svm", "neural-networks", "xgboost"],
   },
   {
     id: "supervised-contrastive",
@@ -1434,13 +1440,13 @@ export const classicalRepresentationLessons: Lesson[] = [
       "有标签时，不必只把同一实例的两个视图当正例；同类别样本也可聚在一起。",
     intuition:
       "SimCLR 只知道‘两张裁剪来自同一张图’。SupCon 还知道‘这两张不同图片都是猫’，所以把同类样本拉近、异类样本推远。",
-    core: "对每个 anchor，batch 内所有同类别样本构成 positive set；损失对这些 positive 的 log probability 求平均。它需要可靠标签和每类足够的 batch 样本，与自监督 SimCLR 的实例级配对不同。训练后可接分类头或直接用 embedding 检索。",
+    core: "对每个 anchor，batch 内除自身外的同类别视图构成 positive set；损失对这些 positive 的 log probability 求平均。分母包含除 anchor 自身外的所有候选，包括正例和负例。它需要可靠标签和足够正例，与自监督 SimCLR 的实例级配对不同。训练后可接分类头或直接用 embedding 检索。",
     equation:
       "Lᵢ=−(1/|P(i)|)Σ_{p∈P(i)} log[exp(sim(zᵢ,zₚ)/τ)/Σ_{a≠i}exp(sim(zᵢ,zₐ)/τ)]",
     mechanicsSteps: [
       "按可信类别标签构造 batch，让每个 anchor 至少有一个同类 positive 与异类候选。",
       "对每个样本做保标签增强，经 encoder 与 projection head 得到归一化 embedding。",
-      "对每个 anchor 平均所有同类 positive 的 log-softmax 项；异类作为分母候选。",
+      "对每个 anchor 平均所有同类 positive 的 log-softmax 项；分母包含该 batch 中除 anchor 自身外的全部正负候选。",
       "训练 encoder 后单独训练分类头或做检索，检查少数类与细粒度类是否被过度合并。",
     ],
     limits: [

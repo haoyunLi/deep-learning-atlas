@@ -17,7 +17,7 @@ export const learningConceptLessons: Lesson[] = [
       "Backbone 产生通用特征，prediction head 把它们变成任务需要的 logits、数值或像素标签。",
     intuition:
       "同一本百科可以接不同的答题纸：BERT 读完句子后，分类 head 给整句打标签；token head 给每个词打标签；LM head 给每个位置的词表打分。head 是输出接口，不等于网络的全部能力。",
-    core: "先定义预测单位，再选择聚合方式和输出维度：sequence classification 通常取 pooled/CLS 表示，token classification 保留每个 token，segmentation 保留空间网格，causal LM 在每个位置投影到 vocabulary。Head 常是线性层，也可以是小 MLP 或解码器。输出 logits 通常交给对应 loss；是否冻结 backbone 决定线性探针还是联合微调。不要把 prediction head 与 multi-head attention 中的 attention head 混为一谈。",
+    core: "先定义预测单位，再选择聚合方式和输出维度：sequence classification 通常取 pooled/CLS 表示，token classification 保留每个 token，segmentation 保留空间网格，causal LM 在每个位置投影到 vocabulary。Head 常是线性层，也可以是小 MLP 或解码器。输出 logits 通常交给对应 loss；冻结 backbone 并只训练线性 head 才是 linear probe；冻结后训练 MLP 是非线性特征探针，解冻 backbone 则是微调。不要把 prediction head 与 multi-head attention 中的 attention head 混为一谈。",
     equation:
       "h = backbone(x);  z = W·pool(h)+b（句级）；zₜ = W·hₜ+b（token/像素级）",
     mechanicsSteps: [
@@ -146,7 +146,13 @@ export const learningConceptLessons: Lesson[] = [
     ],
     example:
       "d_model=512、h=8 时，常规等宽实现每头 64 维；8 个 64 维结果拼接回 512 维，再经 WO 混合。",
-    compareTo: ["attention", "transformer", "prediction-heads"],
+    compareTo: [
+      "attention",
+      "transformer",
+      "prediction-heads",
+      "grouped-query-attention",
+      "kv-cache",
+    ],
   },
   {
     id: "zero-shot-learning",
@@ -246,11 +252,11 @@ export const learningConceptLessons: Lesson[] = [
       "给模型三份‘输入→正确输出’示范，然后问第四题，属于 few-shot prompting。把那三份用来更新一个分类器则也是 few-shot 适配，但机制完全不同。",
     core: "Few-shot 只描述目标任务示例少，不能替代方法名。LLM in-context few-shot 把 demonstrations 放在上下文，推理时权重不更新；metric 方法用 N-way K-shot support set 计算新类原型；gradient 方法在少量标注上更新参数。必须报告 K、类别数 N、抽样次数、是否更新权重以及测试集划分。原论文 GPT-3 的 few-shot 设置无梯度更新，不能推广到所有 few-shot 方法。",
     equation:
-      "N-way K-shot：每个 episode 有 N 个类、每类 K 个 support；query 仅用于评估",
+      "N-way K-shot：每个 episode 有 N 个类、每类 K 个 support；meta-test 的 query 标签仅用于评估",
     mechanicsSteps: [
       "定义新任务与示例预算：N-way K-shot 或 prompt 内 K 个演示，并保证 query/test 不进入 support。",
       "选适配机制：直接放进上下文、用冻结 embedding 算 prototype/训线性层，或做少步参数更新。",
-      "在每个任务上仅用允许的 support 形成决策规则，再对隔离的 query 预测。",
+      "在新任务测试时只用允许的 support 适配，再对隔离的 query 预测；ProtoNet/MAML 的 meta-training 则会用训练任务的 query loss 更新共享表示或初始化。",
       "重复多个随机任务/示例抽样，报告均值、波动和 zero-shot 基线，记录每次使用的模型与样例。",
     ],
     whenToUse: [
@@ -381,6 +387,7 @@ export const learningConceptLessons: Lesson[] = [
       "zero-shot-learning",
       "chain-of-thought-prompting",
       "transfer-lora",
+      "retrieval-augmented-generation",
     ],
   },
   {

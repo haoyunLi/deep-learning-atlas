@@ -1,0 +1,245 @@
+.study-summary {
+  background: #f6f8fb;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 22px var(--gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.study-summary strong {
+  font-size: 15px;
+}
+.study-summary p {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 8px 0 0;
+  line-height: 1.8;
+}
+.study-summary-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--blue);
+}
+.study-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+  margin: 28px 0;
+}
+.study-metrics > div {
+  padding: 23px;
+  border-right: 1px solid var(--line);
+}
+.study-metrics > div:last-child {
+  border: 0;
+}
+.study-metrics strong {
+  display: block;
+  font-size: 28px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.study-metrics span {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+.study-note {
+  font-size: 12px;
+  line-height: 1.85;
+  color: var(--muted);
+}
+.study-resume {
+  display: block;
+  color: var(--blue);
+  padding: 18px 0;
+  font-weight: 600;
+  line-height: 1.8;
+}
+.study-review h2 {
+  margin-top: 40px;
+  font-family: var(--serif);
+}
+.study-review h2 span {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--muted);
+  display: block;
+  margin-top: 8px;
+}
+.study-review-list {
+  display: grid;
+  gap: 18px;
+}
+.study-review-list article,
+.study-empty {
+  border: 1px solid var(--line);
+  padding: 24px;
+  border-radius: 6px;
+}
+.study-review-list h3 {
+  margin: 0 0 20px;
+  font-size: 19px;
+}
+.study-review-list article > div {
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.9;
+}
+.study-review-list p,
+.study-empty p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.study-review-list article > a,
+.study-empty a {
+  color: var(--blue);
+  font-size: 13px;
+}
+.study-read-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.study-read-list a {
+  border-bottom: 1px solid var(--line);
+  padding: 13px 0;
+}
+.lesson-mobile-toc {
+  display: none;
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 16px;
+  z-index: 100;
+  padding: 12px 18px;
+  background: white;
+  border: 2px solid var(--blue);
+  transform: translateY(-160%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+.search-status-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.search-status-select select {
+  max-width: 130px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 7px;
+  color: var(--ink);
+}
+.search-reset {
+  border: 0;
+  background: none;
+  color: var(--blue);
+  text-decoration: underline;
+  font-size: 12px;
+}
+.comparison-course-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  margin: 20px 0;
+  color: var(--blue);
+}
+.comparison-same {
+  padding: 20px;
+  border: 1px solid #d5c5aa;
+  background: #fffaf1;
+  line-height: 1.8;
+  font-size: 14px;
+}
+.page-loading {
+  min-height: 55vh;
+  padding-top: 64px;
+}
+.route-announce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+:where(a, button, input, select):focus-visible {
+  outline: 3px solid #9e5e37;
+  outline-offset: 3px;
+}
+@media (max-width: 1000px) {
+  .study-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+@media (max-width: 760px) {
+  .study-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .study-metrics > div {
+    border-bottom: 1px solid var(--line);
+    padding: 18px;
+  }
+  .study-metrics > div:nth-child(2) {
+    border-right: 0;
+  }
+  .study-metrics > div:nth-child(3) {
+    border-bottom: 0;
+  }
+  .study-read-list {
+    grid-template-columns: 1fr;
+  }
+  .lesson-mobile-toc {
+    display: block;
+    margin: 24px 0;
+    padding: 15px;
+    background: #f1f5fa;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .lesson-mobile-toc summary {
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .lesson-mobile-toc nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .lesson-mobile-toc button {
+    border: 1px solid var(--line);
+    background: white;
+    border-radius: 4px;
+    padding: 10px 8px;
+    text-align: left;
+    color: var(--ink);
+    font-size: 12px;
+  }
+  .study-summary {
+    gap: 15px;
+  }
+  .study-summary-links {
+    gap: 13px;
+  }
+  .study-metrics strong {
+    font-size: 25px;
+  }
+}

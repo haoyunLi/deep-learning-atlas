@@ -18,7 +18,7 @@
 
 每节进一步提供至少 4 步的算法运行过程、2 条适用边界，以及至少 3 个具体设置项。设置项分别说明从哪里开始、观察到什么信号后怎样调整；这些是实验起点，仍要依据数据、验证集和资源预算决定。
 
-还包括关键词搜索、分类筛选、两算法并排比较、按数据结构选起点的指南、关键概念路径、术语表，以及保存在本机浏览器的阅读进度。每篇课程都链接到原始论文或官方文档。
+还包括兼容常用缩写的关键词搜索、分类与学习状态筛选、可分享的两算法对比、关键概念路径，以及保存在本机浏览器的阅读与答题记录。85 项中英术语都能跳到相关课程；选型指南从 10 类任务的 27 种具体情境出发，给出可比较的基线、第一轮设置、适用边界和评估方法。每篇课程都链接到原始论文或官方文档。
 
 全部 126 节课程都有步骤动效；其中 48 节配有专属机制图，45 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
 
@@ -30,7 +30,7 @@
 
 ## 手算、练习与实践工坊
 
-全部 126 节课各有一题机制题和一题选型/排错题，共 252 题；提交后显示解释，可重新作答。题目逐课编写，答案只保存在当前页面状态。
+全部 126 节课各有一题机制题和一题选型/排错题，共 252 题；提交后显示解释，可重新作答。最近一次答案保存在当前浏览器，“学习记录与错题复习”页会汇总阅读标记、作答情况和待复习题目；课程题目修订后，旧答案不会误算进新题。
 
 [实践工坊](https://haoyunli.github.io/deep-learning-atlas/#/practice) 包含：
 
@@ -70,7 +70,10 @@ npm run preview
 - [`src/components/HandCalculationSandbox.tsx`](src/components/HandCalculationSandbox.tsx)、[`src/components/sandboxMath.ts`](src/components/sandboxMath.ts)：五个沙盘及纯数值计算。
 - [`src/components/PracticeHub.tsx`](src/components/PracticeHub.tsx)：完整实验案例、诊断与 LM 预算工坊。
 - [`src/data/conceptPaths.ts`](src/data/conceptPaths.ts)：把模型课与概念课串成八条逐步学习路径。
-- [`src/App.tsx`](src/App.tsx)：课程图谱、详情、对比、选型与术语交互。
+- [`src/data/glossary.ts`](src/data/glossary.ts)、[`src/data/modelGuide.ts`](src/data/modelGuide.ts)：85 项术语及 10 类任务的情境化选型数据。
+- [`src/App.tsx`](src/App.tsx)：课程图谱、详情、可分享筛选、对比与路由。
+- [`src/components/GlossaryPage.tsx`](src/components/GlossaryPage.tsx)、[`src/components/ModelGuide.tsx`](src/components/ModelGuide.tsx)、[`src/components/StudyReview.tsx`](src/components/StudyReview.tsx)：术语、选型和学习复习页面。
+- [`src/lib/studyState.ts`](src/lib/studyState.ts)、[`src/lib/search.ts`](src/lib/search.ts)、[`src/lib/routing.ts`](src/lib/routing.ts)：本机学习记录、缩写搜索和可分享 URL 状态。
 - [`src/components/AnimatedExplainer.tsx`](src/components/AnimatedExplainer.tsx)：动效步骤、参数控制、播放速度、可见性与减少动画设置。
 - [`src/components/AnimationDirectory.tsx`](src/components/AnimationDirectory.tsx)：可搜索筛选的动效实验室。
 - [`src/components/CourseWalkthrough.tsx`](src/components/CourseWalkthrough.tsx)：由课程机制生成的完整步骤导览。
@@ -79,8 +82,9 @@ npm run preview
 - [`src/styles.css`](src/styles.css)：响应式视觉系统。
 - [`src/animation.css`](src/animation.css)：动效图与首页入口样式。
 - [`scripts/validate-content.mjs`](scripts/validate-content.mjs)：构建时检查课程字段、来源、分类、唯一 ID 和比较链接。
-- [`scripts/validate-animations.mjs`](scripts/validate-animations.mjs)：构建时检查动效覆盖、参数端点、540 组 SVG 渲染及梯度、EM、概率归一化和 RL 目标等数值不变量；可单独运行 `npm run validate:animations`。
+- [`scripts/validate-animations.mjs`](scripts/validate-animations.mjs)：构建时检查动效覆盖、每个滑块刻度的 4,716 组 SVG 渲染，以及梯度、EM、概率归一化和 RL 目标等数值不变量；可单独运行 `npm run validate:animations`。
 - [`scripts/validate-sandboxes.mjs`](scripts/validate-sandboxes.mjs)、[`scripts/validate-practice.mjs`](scripts/validate-practice.mjs)：构建时核查 EM 单调性、PPO 梯度、cohort 时间窗、案例切分/拟合/指标、KV 公式与逐课练习覆盖；可单独运行 `npm run validate:practice`。
+- [`scripts/validate-experience.mjs`](scripts/validate-experience.mjs)：构建时核查术语与选型链接、损坏/旧版学习记录恢复、存储不可用时的降级、题目签名、搜索别名、路由参数和轻量动效目录；可单独运行 `npm run validate:experience`。
 - [`design/concept-home.png`](design/concept-home.png)、[`design/concept-lesson.png`](design/concept-lesson.png)：首页和课程详情的设计参考。
 
 添加课程时给出唯一的 `id`、所属 `category`，填写课程各字段，特别是 `mechanicsSteps`、`limits` 与 `settings`，并确保 `compareTo` 引用已有课程 ID。为新课在练习文件中添加 `mechanism` 与 `decision` 各一题，注册到 `exercises.ts`；新课程文件也需注册到内容校验脚本。生产构建会检查这三组内容的最低条目数和设置项字段。项目采用 hash 路由，因此课程链接可在 GitHub Pages 上直接打开或分享。

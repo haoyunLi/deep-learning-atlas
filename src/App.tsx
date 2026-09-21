@@ -8,13 +8,23 @@ import {
 } from "react";
 import { categories, lessons, type Lesson } from "./data/lessons";
 import { conceptPaths } from "./data/conceptPaths";
-import AnimatedExplainer from "./components/AnimatedExplainer";
 import AnimationDirectory from "./components/AnimationDirectory";
-import { mechanismCount, parameterLabs } from "./components/labs";
-import HandCalculationSandbox, {
+import {
+  mechanismCount,
+  animationCatalog,
   handCalculationLessonIds,
-} from "./components/HandCalculationSandbox";
-import LessonExercises from "./components/LessonExercises";
+} from "./data/animationCatalog";
+import RouteErrorBoundary from "./components/RouteErrorBoundary";
+const LessonInteractive = lazy(() => import("./components/LessonInteractive"));
+import { useStudyState, toggleCompleted, visitLesson } from "./lib/studyState";
+import { matchesLesson } from "./lib/search";
+import { hashParts, replaceHash } from "./lib/routing";
+import "./study.css";
+import "./practice.css";
+import "./animation.css";
+const StudyReview = lazy(() => import("./components/StudyReview"));
+const GlossaryPage = lazy(() => import("./components/GlossaryPage"));
+const ModelGuide = lazy(() => import("./components/ModelGuide"));
 const PracticeHub = lazy(() => import("./components/PracticeHub"));
 
 const repoUrl = "https://github.com/haoyunLi/deep-learning-atlas";
@@ -231,27 +241,70 @@ function NetworkDiagram() {
   );
 }
 
-function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
-  const [sort, setSort] = useState<"route" | "az">("route");
-  const [completed, setCompleted] = useState<string[]>(readProgress);
+function Home({
+  initialSection,
+  routeQuery = "",
+}: {
+  initialSection?: "path" | "atlas";
+  routeQuery?: string;
+}) {
+  const params = new URLSearchParams(routeQuery);
+  const [query, setQuery] = useState(params.get("q") || "");
+  const [category, setCategory] = useState(params.get("category") || "all");
+  const [sort, setSort] = useState<"route" | "az">(
+    params.get("sort") === "az" ? "az" : "route",
+  );
+  const [status, setStatus] = useState(params.get("status") || "all");
+  const study = useStudyState();
+  const completed = study.completed;
+  const last = lessons.find((lesson) => lesson.id === study.lastLesson);
+  useEffect(() => {
+    const next = new URLSearchParams(routeQuery);
+    setQuery(next.get("q") || "");
+    setCategory(
+      categories.some((c) => c.id === next.get("category"))
+        ? next.get("category")!
+        : "all",
+    );
+    setSort(next.get("sort") === "az" ? "az" : "route");
+    setStatus(
+      ["done", "todo"].includes(next.get("status") || "")
+        ? next.get("status")!
+        : "all",
+    );
+  }, [routeQuery]);
+  function filterChange(
+    patch: Partial<{
+      q: string;
+      category: string;
+      sort: string;
+      status: string;
+    }>,
+  ) {
+    const next = { q: query, category, sort, status, ...patch };
+    setQuery(next.q);
+    setCategory(next.category);
+    setSort(next.sort === "az" ? "az" : "route");
+    setStatus(next.status);
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(next))
+      if (value && value !== "all" && !(key === "sort" && value === "route"))
+        params.set(key, value);
+    replaceHash("/atlas", params);
+  }
   const filtered = useMemo(
     () =>
       lessons
         .filter((lesson) => {
           const matchesCategory =
             category === "all" || lesson.category === category;
-          const text = [
-            lesson.title,
-            lesson.englishTitle,
-            lesson.summary,
-            lesson.id,
-          ]
-            .join(" ")
-            .toLocaleLowerCase();
           return (
-            matchesCategory && text.includes(query.trim().toLocaleLowerCase())
+            matchesCategory &&
+            matchesLesson(lesson, query) &&
+            (status === "all" ||
+              (status === "done"
+                ? completed.includes(lesson.id)
+                : !completed.includes(lesson.id)))
           );
         })
         .sort((a, b) =>
@@ -259,27 +312,15 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
             ? a.englishTitle.localeCompare(b.englishTitle)
             : lessons.indexOf(a) - lessons.indexOf(b),
         ),
-    [query, category, sort],
+    [query, category, sort, status, completed],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (initialSection)
-      window.setTimeout(
-        () =>
-          document
-            .getElementById(initialSection)
-            ?.scrollIntoView({ behavior: scrollBehavior() }),
-        40,
-      );
+      document
+        .getElementById(initialSection)
+        ?.scrollIntoView({ behavior: "instant" });
   }, [initialSection]);
-
-  function toggleComplete(id: string) {
-    const next = completed.includes(id)
-      ? completed.filter((item) => item !== id)
-      : [...completed, id];
-    setCompleted(next);
-    localStorage.setItem("dla-progress", JSON.stringify(next));
-  }
 
   return (
     <main>
@@ -301,6 +342,22 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
         <NetworkDiagram />
       </section>
 
+      <section className="study-summary" aria-label="我的学习进度">
+        <div>
+          <strong>
+            已标记 {completed.length} / {lessons.length} 节课程
+          </strong>
+          <p>
+            {study.storageUnavailable
+              ? "浏览器暂时无法保存，记录仅在本次打开期间有效。"
+              : "阅读和答题分别记录，保存在当前浏览器。"}
+          </p>
+        </div>
+        <div className="study-summary-links">
+          {last && <a href={`#/lesson/${last.id}`}>继续：{last.title} →</a>}
+          <a href="#/review">学习记录与错题复习 →</a>
+        </div>
+      </section>
       <section className="route-section page-gutter" id="path">
         <div className="section-intro">
           <h2>学习路径</h2>
@@ -312,7 +369,7 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
               className="route-item"
               key={item.id}
               onClick={() => {
-                setCategory(item.id);
+                filterChange({ category: item.id });
                 document
                   .getElementById("atlas")
                   ?.scrollIntoView({ behavior: scrollBehavior() });
@@ -353,7 +410,7 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
           <h2 id="animation-promo-title">跟着动效，看懂算法的每一步。</h2>
           <a className="animation-all-link" href="#/animations">
             {lessons.length} 节步骤动效 · {mechanismCount} 张机制图 ·{" "}
-            {Object.keys(parameterLabs).length} 个参数实验　浏览全部 →
+            {Object.keys(animationCatalog).length} 个参数实验　浏览全部 →
           </a>
         </div>
         <div className="animation-promo-grid">
@@ -408,7 +465,7 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
               <SearchIcon />
               <input
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => filterChange({ q: e.target.value })}
                 placeholder="搜索算法或概念，如 BERT、zero-shot、cohort"
                 aria-label="搜索算法或概念"
               />
@@ -417,7 +474,8 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
               <div className="filters">
                 <button
                   className={category === "all" ? "selected" : ""}
-                  onClick={() => setCategory("all")}
+                  aria-pressed={category === "all"}
+                  onClick={() => filterChange({ category: "all" })}
                 >
                   全部
                 </button>
@@ -425,7 +483,8 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
                   <button
                     key={item.id}
                     className={category === item.id ? "selected" : ""}
-                    onClick={() => setCategory(item.id)}
+                    aria-pressed={category === item.id}
+                    onClick={() => filterChange({ category: item.id })}
                   >
                     {item.label}
                   </button>
@@ -435,7 +494,7 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
                 排序{" "}
                 <select
                   value={sort}
-                  onChange={(e) => setSort(e.target.value as "route" | "az")}
+                  onChange={(e) => filterChange({ sort: e.target.value })}
                 >
                   <option value="route">学习路径</option>
                   <option value="az">A–Z</option>
@@ -444,7 +503,35 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
             </div>
           </div>
         </div>
-        <div className="results-count">
+        <div className="filter-row">
+          <label className="search-status-select">
+            学习状态
+            <select
+              value={status}
+              onChange={(e) => filterChange({ status: e.target.value })}
+            >
+              <option value="all">全部进度</option>
+              <option value="todo">尚未标记</option>
+              <option value="done">已学课程</option>
+            </select>
+          </label>
+          {(query || category !== "all" || status !== "all") && (
+            <button
+              className="search-reset"
+              onClick={() =>
+                filterChange({
+                  q: "",
+                  category: "all",
+                  status: "all",
+                  sort: "route",
+                })
+              }
+            >
+              清除搜索与筛选
+            </button>
+          )}
+        </div>
+        <div className="results-count" aria-live="polite">
           {filtered.length} 个主题 · 已学完 {completed.length}/{lessons.length}
         </div>
         <div className="lesson-list">
@@ -473,7 +560,7 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
                       ? "progress-control done"
                       : "progress-control"
                   }
-                  onClick={() => toggleComplete(lesson.id)}
+                  onClick={() => toggleCompleted(lesson.id)}
                   aria-label={`${completed.includes(lesson.id) ? "取消完成" : "标记完成"} ${lesson.title}`}
                   title={
                     completed.includes(lesson.id) ? "取消完成" : "标记已学"
@@ -516,15 +603,6 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
   );
 }
 
-function readProgress(): string[] {
-  try {
-    const value = JSON.parse(localStorage.getItem("dla-progress") || "[]");
-    return Array.isArray(value) ? value : [];
-  } catch {
-    return [];
-  }
-}
-
 function TextList({ items }: { items: string[] }) {
   return (
     <ul className="editorial-list">
@@ -539,20 +617,28 @@ function Detail({
   id,
   showAnimation = false,
   showSandbox = false,
+  showExercise = false,
 }: {
   id: string;
   showAnimation?: boolean;
   showSandbox?: boolean;
+  showExercise?: boolean;
 }) {
   const lesson = lessons.find((item) => item.id === id);
-  const [completed, setCompleted] = useState<string[]>(readProgress);
+  const study = useStudyState();
+  const completed = study.completed;
+  useEffect(() => {
+    visitLesson(id);
+  }, [id]);
   useLayoutEffect(() => {
     window.scrollTo({ top: 0 });
-    if (!showAnimation && !showSandbox) return;
+    if (!showAnimation && !showSandbox && !showExercise) return;
     document
-      .getElementById(showSandbox ? "sandbox" : "animation")
+      .getElementById(
+        showExercise ? "exercises" : showSandbox ? "sandbox" : "animation",
+      )
       ?.scrollIntoView({ behavior: "instant" });
-  }, [id, showAnimation, showSandbox]);
+  }, [id, showAnimation, showSandbox, showExercise]);
   if (!lesson)
     return (
       <div className="not-found page-gutter">
@@ -565,21 +651,32 @@ function Detail({
   const index = lessons.indexOf(lesson);
   const related = lesson.compareTo
     .map((other) => lessons.find((item) => item.id === other))
-    .filter((item): item is Lesson => Boolean(item))
-    .slice(0, 3);
+    .filter((item): item is Lesson => Boolean(item));
   const pathways = conceptPaths
     .map((path) => ({
       path,
       step: path.steps.find((step) => step.lessonId === lesson.id),
     }))
     .filter((item) => Boolean(item.step));
-  function toggle() {
-    const next = completed.includes(lesson!.id)
-      ? completed.filter((item) => item !== lesson!.id)
-      : [...completed, lesson!.id];
-    setCompleted(next);
-    localStorage.setItem("dla-progress", JSON.stringify(next));
-  }
+  const sections = [
+    ["intuition", "直觉 Intuition"],
+    ["animation", "动效 Walkthrough"],
+    ...(handCalculationLessonIds.includes(lesson.id)
+      ? [["sandbox", "手算 Calculate"]]
+      : []),
+    ["mechanics", "步骤 Mechanics"],
+    ["usage", "选型与上手 Use"],
+    ["tuning", "配置与调参 Settings"],
+    ["modify", "怎么改 Modify"],
+    ["pitfalls", "常见问题 Pitfalls"],
+    ["exercises", "练习 Check"],
+    ["related", "对比 Compare"],
+  ];
+  const jump = (section: string) =>
+    document
+      .getElementById(section)
+      ?.scrollIntoView({ behavior: scrollBehavior() });
+
   return (
     <main className="detail-layout">
       <aside className="detail-left">
@@ -614,20 +711,7 @@ function Detail({
         <div className="aside-rule" />
         <strong className="aside-title">本节内容</strong>
         <nav className="detail-toc">
-          {[
-            ["intuition", "直觉 Intuition"],
-            ["animation", "动效 Walkthrough"],
-            ...(handCalculationLessonIds.includes(lesson.id)
-              ? [["sandbox", "手算 Calculate"]]
-              : []),
-            ["mechanics", "步骤 Mechanics"],
-            ["usage", "选型与上手 Use"],
-            ["tuning", "配置与调参 Settings"],
-            ["modify", "怎么改 Modify"],
-            ["pitfalls", "常见问题 Pitfalls"],
-            ["exercises", "练习 Check"],
-            ["related", "对比 Compare"],
-          ].map(([section, label]) => (
+          {sections.map(([section, label]) => (
             <button
               key={section}
               onClick={() =>
@@ -652,7 +736,7 @@ function Detail({
             className={
               completed.includes(lesson.id) ? "mark-button done" : "mark-button"
             }
-            onClick={toggle}
+            onClick={() => toggleCompleted(lesson.id)}
           >
             {completed.includes(lesson.id) ? "✓ 已完成" : "○ 标记已学"}
           </button>
@@ -662,17 +746,38 @@ function Detail({
           <span>{lesson.englishTitle}</span>
         </h1>
         <p className="detail-summary">{lesson.summary}</p>
+        <details className="lesson-mobile-toc">
+          <summary>本节目录 · 跳到原理、设置或练习</summary>
+          <nav aria-label="手机课程目录">
+            {sections.map(([section, label]) => (
+              <button key={section} onClick={() => jump(section)}>
+                {label}
+              </button>
+            ))}
+          </nav>
+        </details>
         <section className="detail-section intuition-section" id="intuition">
           <h2>
             一句话直觉 <span>Intuition</span>
           </h2>
           <p>{lesson.intuition}</p>
         </section>
-        <AnimatedExplainer key={lesson.id} lesson={lesson} />
-        <HandCalculationSandbox
-          key={`sandbox-${lesson.id}`}
-          lessonId={lesson.id}
-        />
+        <Suspense
+          fallback={
+            <section className="detail-section" role="status">
+              正在载入互动图解…
+            </section>
+          }
+        >
+          <LessonInteractive
+            key={`visual-${lesson.id}`}
+            lesson={lesson}
+            part="visual"
+            jump={
+              showSandbox ? "sandbox" : showAnimation ? "animation" : undefined
+            }
+          />
+        </Suspense>
         <div className="practice-promo">
           <div>
             <strong>把原理带进完整实验</strong>
@@ -755,7 +860,20 @@ function Detail({
           </h2>
           <TextList items={lesson.pitfalls} />
         </section>
-        <LessonExercises key={`exercises-${lesson.id}`} lessonId={lesson.id} />
+        <Suspense
+          fallback={
+            <section className="detail-section" role="status">
+              正在载入本课练习…
+            </section>
+          }
+        >
+          <LessonInteractive
+            key={`quiz-${lesson.id}`}
+            lesson={lesson}
+            part="quiz"
+            jump={showExercise ? "exercises" : undefined}
+          />
+        </Suspense>
         <section className="detail-section" id="related">
           <h2>
             放在一起看 <span>Compare nearby ideas</span>
@@ -834,7 +952,10 @@ function Detail({
               <p>{setting.start}</p>
             </div>
           ))}
-          <a href="#/compare" className="notes-link">
+          <a
+            href={`#/compare?a=${lesson.id}&b=${related[0]?.id || "neural-networks"}`}
+            className="notes-link"
+          >
             对比其他算法 <ArrowIcon />
           </a>
         </div>
@@ -886,6 +1007,20 @@ const compareRows: {
 ];
 
 const comparisonInsights: Record<string, string> = {
+  "batch-normalization|layer-normalization":
+    "BatchNorm 对指定通道跨 batch/空间求统计，通常在 eval 使用 running statistics；LayerNorm 对每个样本/token 的特征轴现算统计。先核对输入形状、统计轴与预训练架构；梯度累积不会合并 BN 每次 forward 的统计量。",
+  "random-forest|xgboost":
+    "随机森林用 bootstrap 与特征随机性训练多棵树并平均，XGBoost 顺序添加新树来修正当前目标的梯度。表格任务先比较两种基线，固定数据切分、缺失值处理与搜索预算；XGBoost 的学习率、深度和轮数需要联合控制。",
+  "gcn|graphsage":
+    "GCN 使用归一化邻接聚合；GraphSAGE 强调邻居采样和共享的聚合函数，适合大图上的批量训练与新节点表示。归纳能力还取决于特征、可见边和评估设计，不能仅靠模型名称判断是否泄漏。",
+  "ddim|ddpm":
+    "DDPM 常采用随机反向采样；DDIM 可复用相同噪声预测训练目标，用不同的路径与时间子序列生成。η=0 时，固定初始噪声与条件的 DDIM 轨迹是确定的；减少步数后仍需评估质量和实际延迟。",
+  "flow-matching|latent-diffusion":
+    "Latent diffusion 说明去噪在压缩的 latent 表示中进行；flow matching 说明以速度场为训练目标并通过积分生成。两者描述不同设计轴，flow matching 也可以在 latent 空间中工作，不能把它们视作完全互斥的家族。",
+  "retrieval-augmented-generation|transfer-lora":
+    "RAG 在推理时检索外部资料，再据此生成；LoRA 通过低秩参数更新改变模型行为。知识需要更新、追溯来源时先检查检索，输出格式或任务行为需稳定适配时比较微调；两种方式可以组合，并分别评估检索与生成错误。",
+  "off-policy-evaluation|offline-rl":
+    "Offline RL 从固定日志学习策略；OPE 估计指定策略的预期回报，是评估工具。两者都受日志覆盖影响；没有 action support 或可信行为概率时，重要性采样不能凭空补齐缺失证据。",
   "attention-heads|prediction-heads":
     "Attention head 是注意力模块里的并行 Q/K/V 分支，用来从不同表示子空间汇聚上下文；prediction head 是 backbone 后接的任务输出模块，把表示转成类别、数值、token 或 mask。它们可以同时出现在一个模型中，但位置与作用不同。",
   "few-shot-learning|zero-shot-learning":
@@ -922,9 +1057,22 @@ const comparisonInsights: Record<string, string> = {
     "SGD 按梯度与全局学习率更新，可加入 momentum；AdamW 用梯度一、二阶动量做参数级自适应更新，并把 weight decay 解耦。两者都要认真调学习率和调度。",
 };
 
-function Compare() {
-  const [first, setFirst] = useState("rnn");
-  const [second, setSecond] = useState("transformer");
+function Compare({ routeQuery = "" }: { routeQuery?: string }) {
+  const params = new URLSearchParams(routeQuery);
+  const valid = (id: string | null, fallback: string) =>
+    lessons.some((l) => l.id === id) ? id! : fallback;
+  const [first, setFirst] = useState(valid(params.get("a"), "rnn"));
+  const [second, setSecond] = useState(valid(params.get("b"), "transformer"));
+  useEffect(() => {
+    const next = new URLSearchParams(routeQuery);
+    setFirst(valid(next.get("a"), "rnn"));
+    setSecond(valid(next.get("b"), "transformer"));
+  }, [routeQuery]);
+  function pick(left: string, right: string) {
+    setFirst(left);
+    setSecond(right);
+    replaceHash("/compare", new URLSearchParams({ a: left, b: right }));
+  }
   const a = lessons.find((item) => item.id === first),
     b = lessons.find((item) => item.id === second);
   const insight = comparisonInsights[[first, second].sort().join("|")];
@@ -955,12 +1103,26 @@ function Compare() {
           ["few-shot-learning", "in-context-learning", "Few-shot ↔ ICL"],
           ["cohort-design", "data-leakage", "Cohort ↔ Leakage"],
           ["domain-shift", "external-validation", "Shift ↔ 外部验证"],
+          [
+            "batch-normalization",
+            "layer-normalization",
+            "BatchNorm ↔ LayerNorm",
+          ],
+          ["random-forest", "xgboost", "Random Forest ↔ XGBoost"],
+          ["gcn", "graphsage", "GCN ↔ GraphSAGE"],
+          ["ddpm", "ddim", "DDPM ↔ DDIM"],
+          [
+            "latent-diffusion",
+            "flow-matching",
+            "Latent diffusion ↔ Flow matching",
+          ],
+          ["retrieval-augmented-generation", "transfer-lora", "RAG ↔ LoRA"],
+          ["offline-rl", "off-policy-evaluation", "Offline RL ↔ OPE"],
         ].map(([left, right, label]) => (
           <button
             key={label}
             onClick={() => {
-              setFirst(left);
-              setSecond(right);
+              pick(left, right);
             }}
           >
             {label}
@@ -970,19 +1132,29 @@ function Compare() {
       <div className="comparison-pickers">
         <label>
           算法 A
-          <select value={first} onChange={(e) => setFirst(e.target.value)}>
+          <select value={first} onChange={(e) => pick(e.target.value, second)}>
             <LessonOptions />
           </select>
         </label>
         <label>
           算法 B
-          <select value={second} onChange={(e) => setSecond(e.target.value)}>
+          <select value={second} onChange={(e) => pick(first, e.target.value)}>
             <LessonOptions />
           </select>
         </label>
       </div>
       {a && b && (
         <>
+          <div className="comparison-course-links">
+            <a href={`#/lesson/${first}`}>阅读 A：{a.title} →</a>
+            <a href={`#/lesson/${second}`}>阅读 B：{b.title} →</a>
+            <span>当前地址可直接分享这一组对比。</span>
+          </div>
+          {first === second && (
+            <p className="comparison-same" role="status">
+              当前两侧选择了同一课程。更换一侧可以查看不同方法的差异。
+            </p>
+          )}
           {insight && (
             <div className="comparison-insight">
               <strong>差别与选择 / Key distinction</strong>
@@ -991,10 +1163,10 @@ function Compare() {
           )}
           {a.category !== b.category && (
             <p className="comparison-axis-note">
-              这两项属于不同层次：
+              学习方向：
               {categories.find((c) => c.id === a.category)?.label} 与{" "}
               {categories.find((c) => c.id === b.category)?.label}
-              。它们可能组合使用，先看各自解决什么问题。
+              。比较前请对齐任务、数据和指标，再判断它们各自的作用与组合方式。
             </p>
           )}
           <div className="comparison-table" role="table">
@@ -1041,150 +1213,6 @@ function LessonOptions() {
   ));
 }
 
-const guideOptions = [
-  {
-    id: "classical",
-    title: "小数据或快速基线",
-    en: "Small data & baselines",
-    category: "classical",
-    reason:
-      "先用 kNN、聚类、PCA 等低成本方法检验特征与任务，再判断深层模型是否值得投入。",
-  },
-  {
-    id: "image",
-    title: "图像与空间数据",
-    en: "Images & spatial patterns",
-    category: "vision",
-    reason:
-      "从 CNN 和 ResNet 理解局部特征，再根据数据规模与任务比较视觉 Transformer。",
-  },
-  {
-    id: "segmentation",
-    title: "图像分割",
-    en: "Image segmentation",
-    keywords: /u-net|unet|deeplab|segmentation/i,
-    reason:
-      "需要逐像素预测时，比较 U-Net 的跳接、DeepLab 的多尺度上下文和 nnU-Net 的自动配置。",
-  },
-  {
-    id: "sequence",
-    title: "文本与序列",
-    en: "Text & sequences",
-    category: "sequence",
-    reason:
-      "先看 RNN、attention 和 Transformer 的信息流，再按理解或生成任务选择 BERT 或自回归 LM。",
-  },
-  {
-    id: "graph",
-    title: "关系与网络",
-    en: "Graphs & relations",
-    keywords: /graph|gnn|gcn/i,
-    reason: "样本由节点和边组成，让相邻实体交换信息更自然。",
-  },
-  {
-    id: "generate",
-    title: "生成新样本",
-    en: "Generate new samples",
-    keywords: /diffusion|gan|vae|autoencoder/i,
-    reason: "先明确质量、采样速度、潜变量结构和训练稳定性的优先级。",
-  },
-  {
-    id: "representation",
-    title: "少标签与表示学习",
-    en: "Few labels & representations",
-    category: "representation",
-    reason:
-      "利用无标签数据学习 embedding；重点比较正负样本、增强方式与是否需要动量编码器。",
-  },
-  {
-    id: "reinforcement",
-    title: "决策与反馈",
-    en: "Decisions & feedback",
-    category: "reinforcement",
-    reason:
-      "先明确状态、动作、奖励和数据来源，再比较 value-based、policy-based、on-policy 与 off-policy 方法。",
-  },
-  {
-    id: "general",
-    title: "普通预测任务",
-    en: "Prediction baseline",
-    keywords: /mlp|backprop|neural network|optimization|knn/i,
-    reason: "先用简单基线弄清损失函数、数据规模和评估方法，再增加结构复杂度。",
-  },
-];
-
-function Guide() {
-  const [choice, setChoice] = useState(guideOptions[0].id);
-  const selected = guideOptions.find((option) => option.id === choice)!;
-  const recommended = lessons
-    .filter((item) =>
-      "category" in selected
-        ? item.category === selected.category
-        : selected.keywords.test(`${item.id} ${item.englishTitle}`),
-    )
-    .sort(
-      (a, b) =>
-        ["入门", "进阶", "高级"].indexOf(a.level) -
-        ["入门", "进阶", "高级"].indexOf(b.level),
-    )
-    .slice(0, 5);
-  return (
-    <main className="utility-page guide-page page-gutter">
-      <div className="utility-heading">
-        <a href="#/atlas">← 算法图谱</a>
-        <h1>从你的问题出发。</h1>
-        <p>
-          Choose by problem, then tune by evidence ·
-          先看数据长什么样，再决定模型。
-        </p>
-      </div>
-      <div className="guide-layout">
-        <div>
-          <h2>你想解决什么问题？</h2>
-          <div className="choice-list">
-            {guideOptions.map((option) => (
-              <button
-                key={option.id}
-                className={choice === option.id ? "active" : ""}
-                onClick={() => setChoice(option.id)}
-              >
-                <span>
-                  <strong>{option.title}</strong>
-                  <em>{option.en}</em>
-                </span>
-                <ArrowIcon />
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="guide-result">
-          <span className="result-label">
-            推荐起点 / Suggested starting point
-          </span>
-          <h2>{selected.title}</h2>
-          <p>{selected.reason}</p>
-          <ol>
-            {recommended.map((item) => (
-              <li key={item.id}>
-                <a href={`#/lesson/${item.id}`}>
-                  <span>
-                    {item.title}
-                    <em>{item.englishTitle}</em>
-                  </span>
-                  <ArrowIcon />
-                </a>
-              </li>
-            ))}
-          </ol>
-          <p className="guide-caveat">
-            这是一条起步路径，不是自动选型结论。用验证集指标、错误分析、延迟和预算决定最终方案。
-          </p>
-        </div>
-      </div>
-    </main>
-  );
-}
-
 function Concepts({ selectedPath }: { selectedPath?: string }) {
   useEffect(() => {
     if (!selectedPath) return;
@@ -1201,6 +1229,9 @@ function Concepts({ selectedPath }: { selectedPath?: string }) {
         <a href="#/atlas">← 算法图谱</a>
         <h1>从一个概念，走到完整方法。</h1>
         <p>Connected ideas · 用逐步路径看清相邻概念如何组合、在哪一步分叉。</p>
+        <a className="study-resume" href="#/review">
+          查看我的学习记录 →
+        </a>
       </div>
       <nav className="concept-index" aria-label="关键概念路径">
         {conceptPaths.map((path, index) => (
@@ -1249,128 +1280,6 @@ function Concepts({ selectedPath }: { selectedPath?: string }) {
   );
 }
 
-const glossary = [
-  [
-    "张量 Tensor",
-    "带有形状（shape）的多维数值数组；模型的输入、权重和输出通常都是张量。",
-  ],
-  ["参数 Parameter", "训练时通过梯度更新的数值，例如权重和偏置。"],
-  [
-    "超参数 Hyperparameter",
-    "训练前或训练中由人设定的选择，例如学习率、批大小、层数。",
-  ],
-  ["损失函数 Loss", "衡量预测与目标差距的函数；训练的直接优化目标。"],
-  ["梯度 Gradient", "损失对参数的局部变化率，指示小步调整的方向。"],
-  ["反向传播 Backpropagation", "用链式法则高效计算各层参数梯度的方法。"],
-  ["泛化 Generalization", "模型在没见过的数据上仍能表现良好的能力。"],
-  ["过拟合 Overfitting", "训练集表现很好，但验证集或真实数据表现变差。"],
-  ["注意力 Attention", "根据当前查询对不同信息分配权重，再汇总成上下文表示。"],
-  ["嵌入 Embedding", "把离散对象映射为可学习的连续向量。"],
-  ["潜变量 Latent variable", "模型内部用于表达隐藏因素的压缩表示。"],
-  ["微调 Fine-tuning", "从预训练参数出发，继续用特定任务数据训练。"],
-  ["基线 Baseline", "先运行的简单方法，给复杂模型一个值得超过的参照。"],
-  ["后验 Posterior", "给定观测后，对隐藏变量或参数的概率判断。"],
-  ["软分配 Soft assignment", "给一个样本属于各组的概率，而非只指定唯一组别。"],
-  ["分割 Segmentation", "对图像的像素或区域逐一预测类别或目标掩码。"],
-  [
-    "跳接 Skip connection",
-    "把较早层的特征直接送到后面的层，保留细节或改善优化。",
-  ],
-  ["Token", "语言模型处理的文本单位，可以是词、子词或字符片段。"],
-  [
-    "因果掩码 Causal mask",
-    "限制当前 token 只能读取已出现的 token，便于逐步生成。",
-  ],
-  ["正样本 Positive pair", "训练时希望表示更接近的一对样本或增强视图。"],
-  ["负样本 Negative pair", "训练时希望模型区分开的一对样本或增强视图。"],
-  [
-    "数据增强 Augmentation",
-    "对训练输入作保留关键信息的变换，增加可学习的变化。",
-  ],
-  ["策略 Policy", "强化学习中从状态选择动作的规则，常记作 π(a|s)。"],
-  ["价值函数 Value function", "估计状态或动作未来累计回报的函数。"],
-  ["On-policy", "主要用当前策略采集的数据更新这个策略的学习方式。"],
-  ["Off-policy", "可以利用其他策略产生的数据学习目标策略的方式。"],
-  ["奖励模型 Reward model", "从人类或其他偏好反馈学习打分信号的模型。"],
-  [
-    "预测头 Prediction head",
-    "接在 backbone 表示之后的任务输出模块；分类输出 logits，回归输出数值，分割可输出像素级结果。",
-  ],
-  [
-    "注意力头 Attention head",
-    "多头注意力中的一组 Q/K/V 投影及其加权汇聚分支；与任务的 prediction head 不是同一个部件。",
-  ],
-  [
-    "零样本 Zero-shot",
-    "目标任务没有可供适配的标注示例，依靠预训练知识、任务描述或类别语义进行预测；评估须说清训练中见过什么。",
-  ],
-  [
-    "少样本 Few-shot",
-    "目标任务只有少量示例；示例可放进 prompt、用于训练浅层分类器或用于快速参数适配。",
-  ],
-  [
-    "上下文学习 In-context learning",
-    "在 prompt 中给任务说明或示例，让模型在不更新权重的推理过程中条件化输出。",
-  ],
-  [
-    "思维链提示 Chain-of-thought",
-    "在提示或示例中使用中间推理步骤，帮助某些多步问题；输出的推理文本仍要核验。",
-  ],
-  [
-    "队列 Cohort",
-    "按纳排条件、起始时点和观察窗口定义的一组研究对象；预测研究中应明确每人的特征可用时间与结局窗口。",
-  ],
-  [
-    "数据泄漏 Data leakage",
-    "训练或评估使用了预测时不可得的信息，或训练与测试之间出现不该共享的实体、处理统计量等。",
-  ],
-  [
-    "分布漂移 Domain shift",
-    "训练数据与目标环境的数据分布或输入和目标的关系发生变化。",
-  ],
-  [
-    "外部验证 External validation",
-    "将冻结的模型放到独立时间、地点或来源的数据上评估，检验其泛化表现。",
-  ],
-  [
-    "校准 Calibration",
-    "预测概率和实际发生频率的一致程度；例如预测为 0.2 的组若长期约有 20% 事件则该组较校准。",
-  ],
-];
-
-function Glossary() {
-  const [query, setQuery] = useState("");
-  const filtered = glossary.filter(([title, definition]) =>
-    `${title} ${definition}`.toLowerCase().includes(query.toLowerCase()),
-  );
-  return (
-    <main className="utility-page glossary-page page-gutter">
-      <div className="utility-heading">
-        <a href="#/atlas">← 算法图谱</a>
-        <h1>术语，讲人话。</h1>
-        <p>Glossary · 读懂深度学习常见词汇。</p>
-      </div>
-      <label className="search-field glossary-search">
-        <SearchIcon />
-        <input
-          aria-label="搜索术语"
-          placeholder="搜索术语"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </label>
-      <dl className="glossary-list">
-        {filtered.map(([title, definition]) => (
-          <div key={title}>
-            <dt>{title}</dt>
-            <dd>{definition}</dd>
-          </div>
-        ))}
-      </dl>
-    </main>
-  );
-}
-
 function Footer() {
   return (
     <footer className="site-footer page-gutter">
@@ -1389,60 +1298,128 @@ function App() {
   const [route, setRoute] = useState(
     () => window.location.hash.slice(1) || "/",
   );
+  const { path, params } = hashParts(route);
+  const routeQuery = params.toString();
   useEffect(() => {
     const update = () => {
-      setRoute(window.location.hash.slice(1) || "/");
-      window.scrollTo({ top: 0 });
+      const next = window.location.hash.slice(1) || "/";
+      setRoute((previous) => {
+        const before = hashParts(previous).path,
+          after = hashParts(next).path;
+        if (
+          before !== after &&
+          !(
+            ["/", "/path", "/atlas"].includes(before) &&
+            ["/", "/path", "/atlas"].includes(after)
+          )
+        )
+          window.scrollTo({ top: 0, behavior: "instant" });
+        return next;
+      });
     };
     window.addEventListener("hashchange", update);
     return () => window.removeEventListener("hashchange", update);
   }, []);
-  let page;
-  if (route.startsWith("/lesson/")) {
-    const [rawId, query = ""] = route.slice(8).split("?");
-    let id = rawId;
+  let lessonId = "";
+  if (path.startsWith("/lesson/")) {
     try {
-      id = decodeURIComponent(rawId);
+      lessonId = decodeURIComponent(path.slice(8));
     } catch {
-      /* The not-found page handles malformed paths. */
+      lessonId = path.slice(8);
     }
+  }
+  const pageNames: Record<string, string> = {
+    "/": "学习首页",
+    "/atlas": "算法图谱",
+    "/path": "学习路径",
+    "/animations": "动效实验室",
+    "/practice": "实践工坊",
+    "/compare": "算法对比",
+    "/guide": "选型指南",
+    "/glossary": "术语表",
+    "/review": "学习记录",
+  };
+  const routeTitle = path.startsWith("/lesson/")
+    ? lessons.find((l) => l.id === lessonId)?.title || "课程未找到"
+    : path.startsWith("/concepts")
+      ? "关键概念路径"
+      : pageNames[path] || "页面未找到";
+  useEffect(() => {
+    document.title = `${routeTitle} · 深度学习图谱`;
+  }, [routeTitle]);
+  let page;
+  if (path.startsWith("/lesson/"))
     page = (
       <Detail
-        id={id}
-        showAnimation={new URLSearchParams(query).get("animation") === "1"}
-        showSandbox={new URLSearchParams(query).get("sandbox") === "1"}
+        id={lessonId}
+        showAnimation={params.get("animation") === "1"}
+        showSandbox={params.get("sandbox") === "1"}
+        showExercise={params.get("exercise") === "1"}
       />
     );
-  } else if (route === "/animations") page = <AnimationDirectory />;
-  else if (route === "/practice")
-    page = (
-      <Suspense
-        fallback={
-          <main className="practice-page page-gutter" role="status">
-            正在打开实践工坊…
-          </main>
-        }
-      >
-        <PracticeHub />
-      </Suspense>
-    );
-  else if (route === "/compare") page = <Compare />;
-  else if (route === "/guide") page = <Guide />;
-  else if (route.startsWith("/concepts"))
-    page = <Concepts selectedPath={route.split("/")[2]} />;
-  else if (route === "/glossary") page = <Glossary />;
-  else
+  else if (path === "/animations") page = <AnimationDirectory />;
+  else if (path === "/practice") page = <PracticeHub />;
+  else if (path === "/compare") page = <Compare routeQuery={routeQuery} />;
+  else if (path === "/guide") page = <ModelGuide />;
+  else if (path === "/glossary") page = <GlossaryPage />;
+  else if (path === "/review") page = <StudyReview />;
+  else if (
+    path === "/concepts" ||
+    (path.startsWith("/concepts/") &&
+      conceptPaths.some((p) => p.id === path.split("/")[2]))
+  )
+    page = <Concepts selectedPath={path.split("/")[2]} />;
+  else if (["/", "/path", "/atlas"].includes(path))
     page = (
       <Home
         initialSection={
-          route === "/path" ? "path" : route === "/atlas" ? "atlas" : undefined
+          path === "/path" ? "path" : path === "/atlas" ? "atlas" : undefined
         }
+        routeQuery={routeQuery}
       />
+    );
+  else
+    page = (
+      <main className="utility-page page-gutter">
+        <h1>这个页面没有找到</h1>
+        <p>地址可能有误，或页面已调整。</p>
+        <a className="study-resume" href="#/atlas">
+          返回算法图谱 →
+        </a>
+      </main>
     );
   return (
     <>
-      <Header route={route} />
-      {page}
+      <a
+        href="#main-content"
+        className="skip-link"
+        onClick={(event) => {
+          event.preventDefault();
+          document.getElementById("main-content")?.focus();
+          document
+            .getElementById("main-content")
+            ?.scrollIntoView({ behavior: "instant" });
+        }}
+      >
+        跳到主要内容
+      </a>
+      <Header route={path} />
+      <div className="route-announce" role="status" aria-live="polite">
+        {routeTitle}
+      </div>
+      <div id="main-content" tabIndex={-1}>
+        <RouteErrorBoundary route={path}>
+          <Suspense
+            fallback={
+              <main className="page-loading page-gutter" role="status">
+                正在打开{routeTitle}…
+              </main>
+            }
+          >
+            {page}
+          </Suspense>
+        </RouteErrorBoundary>
+      </div>
       <Footer />
     </>
   );

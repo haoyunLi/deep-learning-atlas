@@ -184,6 +184,8 @@ export default function DiffusionAnimation({ step }: DiffusionAnimationProps) {
     <div
       className="diffusion-animation-scroll"
       tabIndex={0}
+      role="region"
+      aria-label="扩散模型机制图（可横向滚动）"
       style={{ width: "100%", minWidth: 0, overflowX: "auto" }}
     >
       <svg

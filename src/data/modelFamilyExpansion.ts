@@ -17,7 +17,7 @@ export const modelFamilyExpansionLessons: Lesson[] = [
       "逐轮增加小树，用损失的一阶、二阶信息决定怎么分裂，并用正则化限制每次修正。",
     intuition:
       "先给所有样本一个粗略预测，再派一棵小树寻找哪些样本被共同高估或低估。后续树接着修正已有预测。Random forest 让许多树各自预测再平均；boosting 则让后一棵树的任务依赖前面累积的结果。",
-    core: "这里讨论 XGBoost 的 tree booster。每轮对当前预测处的损失做二阶展开，累加叶内梯度 G 与 Hessian H，得到叶分数 −G/(H+λ)。比较分裂前后的目标下降，再扣除新增叶的代价 γ。η 缩小新树贡献；分类累加的是 raw margin，二分类最后经过 sigmoid 才成为概率。",
+    core: "这里讨论 XGBoost 的 tree booster。每轮对当前预测处的损失做二阶展开，累加叶内梯度 G 与 Hessian H；只用 L2 正则且无额外叶分数约束时，最优叶分数为 −G/(H+λ)，下式采用这一设定。比较分裂前后的目标下降，再扣除新增叶的代价 γ。η 缩小新树贡献；分类累加的是 raw margin，二分类最后经过 sigmoid 才成为概率。",
     equation:
       "Fₜ(x)=Fₜ₋₁(x)+ηfₜ(x);  wⱼ*=−Gⱼ/(Hⱼ+λ);  gain=½[Gᴸ²/(Hᴸ+λ)+Gᴿ²/(Hᴿ+λ)−G²/(H+λ)]−γ",
     mechanicsSteps: [

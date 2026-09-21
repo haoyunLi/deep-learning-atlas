@@ -64,8 +64,13 @@ function PracticalCase() {
         ].join(","),
       )
       .join("\n");
-  const showRows = (rows: CaseRow[]) => (
-    <div className="practice-table">
+  const showRows = (rows: CaseRow[], label: string) => (
+    <div
+      className="practice-table"
+      tabIndex={0}
+      role="region"
+      aria-label={`${label}（可横向滚动）`}
+    >
       <table>
         <thead>
           <tr>
@@ -151,7 +156,7 @@ function PracticalCase() {
                 保存 seed=2026、split 边界、模型设置、搜索 seed=41 与实验记录。
               </li>
             </ol>
-            {showRows(caseSplit.train.slice(0, 5))}
+            {showRows(caseSplit.train.slice(0, 5), "训练样本与预测概率")}
             <a
               className="practice-button"
               download="atlas-cohort-case.csv"
@@ -168,7 +173,12 @@ function PracticalCase() {
               Logistic Regression，并加入标准化后的 kNN。这里的概率基线用于 log
               loss；按 0.5 阈值分类时等价于多数类预测。
             </p>
-            <div className="practice-table">
+            <div
+              className="practice-table"
+              tabIndex={0}
+              role="region"
+              aria-label="基线模型的训练与验证指标（可横向滚动）"
+            >
               <table>
                 <thead>
                   <tr>
@@ -211,7 +221,12 @@ function PracticalCase() {
               最小者；你可以检查其他候选。固定 350
               步是本例的计算预算，真实训练还要检查收敛。
             </p>
-            <div className="practice-table">
+            <div
+              className="practice-table"
+              tabIndex={0}
+              role="region"
+              aria-label="选择实验并比较验证损失（可横向滚动）"
+            >
               <table>
                 <thead>
                   <tr>
@@ -319,7 +334,7 @@ function PracticalCase() {
                 </strong>
               </div>
             </div>
-            {showRows(mistakes.slice(0, 8))}
+            {showRows(mistakes.slice(0, 8), "验证集误分类样本")}
             <p>
               显示前 {Math.min(8, mistakes.length)} / {mistakes.length}{" "}
               个验证错误。进一步按

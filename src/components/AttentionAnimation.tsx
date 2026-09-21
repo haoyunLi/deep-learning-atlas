@@ -14,7 +14,10 @@ const amber = "#a76b13";
 
 /** A single-query, causal self-attention example. Scores are chosen for teaching. */
 export default function AttentionAnimation({ step }: AttentionAnimationProps) {
-  const current = Math.max(0, Math.min(3, Math.round(step)));
+  const current = Math.max(
+    0,
+    Math.min(3, Math.round(Number.isFinite(step) ? step : 0)),
+  );
   const stage = (index: number) => ({
     className: "attn-viz-stage",
     style: { opacity: current === index ? 1 : 0 },
@@ -25,6 +28,8 @@ export default function AttentionAnimation({ step }: AttentionAnimationProps) {
     <div
       className="attn-viz-scroll"
       tabIndex={0}
+      role="region"
+      aria-label="注意力机制图（可横向滚动）"
       style={{ width: "100%", overflowX: "auto" }}
     >
       <svg

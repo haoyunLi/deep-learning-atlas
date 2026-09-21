@@ -340,7 +340,7 @@ const pairs: Pair[] = [
       "2",
       "1",
       "4",
-      "同类的两个 A 都属于 positive set，目标通常平均它们的 log probabilities。候选分母仍包含其他类；自身一般排除。",
+      "同类的两个 A 都属于 positive set，目标平均它们的 log probabilities。候选分母包含这两个正例和 B、C 两个负例，但排除 anchor 自身。",
     ],
     [
       "每个 batch 每类只有一个样本且没有额外视图，监督对比损失为什么难以有效计算？",
@@ -421,7 +421,7 @@ const pairs: Pair[] = [
   [
     "double-dqn",
     [
-      "下一状态 online Q=[5,4]、target Q=[2,6]，r=0、γ=1，Double DQN 的 target 是多少？",
+      "非终止 transition 的下一状态 online Q=[5,4]、target Q=[2,6]，r=0、γ=1，Double DQN 的 target 是多少？",
       "2",
       "6",
       "5",
@@ -442,7 +442,7 @@ const pairs: Pair[] = [
       "[4,2]",
       "[5,3]",
       "[2,0]",
-      "Advantage 均值为 1，所以 Q=3+[2,0]−1=[4,2]。减均值明确 V 与 A 的组合约定，避免任意相反平移造成不可辨识。",
+      "原始 A 分支均值为 1，所以 Q=3+[2,0]−1=[4,2]。此时 V=3 是各动作 Q 的算术均值，不是最大 Q=4，也不等于任意策略的 Vπ；原始 A 整体平移仍会被减均值抵消。",
     ],
     [
       "许多状态中不同动作价值接近，想更有效共享‘状态好坏’估计，可以怎样做？",
@@ -472,7 +472,7 @@ const pairs: Pair[] = [
   [
     "reinforce",
     [
-      "REINFORCE 中某动作的 return G=2，状态 baseline b=3，按策略梯度上升，它的 log-prob 更新信号是什么？",
+      "REINFORCE 采用 γ=1，某动作的 return G=2，状态 baseline b=3，按策略梯度上升，它的 log-prob 更新信号是什么？",
       "系数为 −1，倾向降低该已采动作在此状态的概率",
       "系数为 +1，倾向提高该动作概率",
       "因为 return 为正，所以一定提高动作概率",

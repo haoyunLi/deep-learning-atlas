@@ -13,6 +13,7 @@ const require = createRequire(import.meta.url);
 const cache = new Map();
 function loadTs(input) {
   let file = resolve(input);
+  if (extname(file) === ".css") return {};
   if (!extname(file))
     file = [file + ".ts", file + ".tsx", file + "/index.ts"].find(existsSync);
   assert.ok(file, `Cannot resolve ${input}`);
@@ -97,7 +98,17 @@ for (const [id, lab] of Object.entries(parameterLabs)) {
     p.min < p.max && p.initial >= p.min && p.initial <= p.max && p.step > 0,
     `${id}: range`,
   );
-  for (const value of [p.min, p.initial, p.max])
+  // Every slider stop matters: discrete windows, exact kinks, and rank changes
+  // are missed by checking only minimum / initial / maximum values.
+  const values = new Set([
+    p.initial,
+    p.max,
+    ...Array.from(
+      { length: Math.floor((p.max - p.min) / p.step + 1e-8) + 1 },
+      (_, index) => Number((p.min + index * p.step).toFixed(8)),
+    ),
+  ]);
+  for (const value of values)
     for (let step = 0; step < lab.steps.length; step++) {
       assert.ok(
         lab.steps[step].title && lab.steps[step].explanation,
@@ -107,6 +118,11 @@ for (const [id, lab] of Object.entries(parameterLabs)) {
         React.createElement(lab.render, { value, step }),
       );
       assert.ok(html.includes('role="img"'), `${id}: accessible SVG`);
+      assert.match(
+        html,
+        /role="region" aria-label="[^"]+"/,
+        `${id}: named keyboard-accessible scrolling region`,
+      );
       assert.ok(
         !/NaN|Infinity/.test(html),
         `${id}: finite geometry at ${value}/${step}`,
@@ -124,6 +140,51 @@ for (const [id, lab] of Object.entries(parameterLabs)) {
     render(p.max),
     `${id}: slider must affect output`,
   );
+}
+
+for (const file of [
+  "AttentionAnimation",
+  "PPOAnimation",
+  "DiffusionAnimation",
+]) {
+  const { default: Visualization } = loadTs(`src/components/${file}.tsx`);
+  for (const step of [0, 1, 2, 3, -1, 4, Number.NaN]) {
+    const html = renderToStaticMarkup(
+      React.createElement(Visualization, { step }),
+    );
+    assert.ok(html.includes('role="img"'), `${file}: accessible SVG`);
+    assert.match(
+      html,
+      /role="region" aria-label="[^"]+"/,
+      `${file}: named scrolling region`,
+    );
+    assert.ok(!/NaN|undefined/.test(html), `${file}: valid step state`);
+  }
+}
+
+const { default: AnimatedExplainer } = loadTs(
+  "src/components/AnimatedExplainer.tsx",
+);
+for (const id of ["attention", "knn", "expectation-maximization"]) {
+  const html = renderToStaticMarkup(
+    React.createElement(AnimatedExplainer, {
+      lesson: lessons.find((lesson) => lesson.id === id),
+    }),
+  );
+  assert.ok(
+    html.includes('aria-label="动效播放控制"'),
+    `${id}: renders without browser globals`,
+  );
+  if (parameterLabs[id]) {
+    assert.ok(
+      html.includes(`aria-describedby="lab-${id}-hint"`),
+      `${id}: slider hint is associated`,
+    );
+    assert.ok(
+      html.includes(`id="lab-${id}-hint"`),
+      `${id}: slider hint exists`,
+    );
+  }
 }
 
 const f = loadTs("src/components/labs/foundationsClassical.tsx");

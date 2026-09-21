@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react";
 import { categories, lessons } from "../data/lessons";
-import { animationKind, mechanismCount, parameterLabs } from "./labs";
+import {
+  animationKind,
+  mechanismCount,
+  animationCatalog,
+} from "../data/animationCatalog";
+import { matchesLesson } from "../lib/search";
 
 const kindLabels = {
   parameter: "参数实验",
@@ -15,13 +20,11 @@ export default function AnimationDirectory() {
   const filtered = useMemo(
     () =>
       lessons.filter((lesson) => {
-        const lab = parameterLabs[lesson.id];
+        const lab = animationCatalog[lesson.id];
         return (
           (category === "all" || lesson.category === category) &&
           (kind === "all" || animationKind(lesson.id) === kind) &&
-          `${lesson.title} ${lesson.englishTitle} ${lesson.id} ${lab?.parameter.label ?? ""}`
-            .toLowerCase()
-            .includes(query.trim().toLowerCase())
+          matchesLesson(lesson, query, lab?.label || "")
         );
       }),
     [query, category, kind],
@@ -49,7 +52,7 @@ export default function AnimationDirectory() {
             <dd>专属机制图</dd>
           </div>
           <div>
-            <dt>{Object.keys(parameterLabs).length}</dt>
+            <dt>{Object.keys(animationCatalog).length}</dt>
             <dd>可调参数实验</dd>
           </div>
         </dl>
@@ -123,7 +126,7 @@ export default function AnimationDirectory() {
       </p>
       <div className="animation-library-grid">
         {filtered.map((lesson, index) => {
-          const lab = parameterLabs[lesson.id],
+          const lab = animationCatalog[lesson.id],
             type = animationKind(lesson.id);
           return (
             <a
@@ -140,12 +143,12 @@ export default function AnimationDirectory() {
               <h2>{lesson.title}</h2>
               <p className="animation-card-english">{lesson.englishTitle}</p>
               <p className="animation-card-description">
-                {lab ? lab.parameter.hint : lesson.summary}
+                {lab ? lab.hint : lesson.summary}
               </p>
               <div className="animation-card-bottom">
                 <span>
                   {lab
-                    ? `调节：${lab.parameter.label}`
+                    ? `调节：${lab.label}`
                     : `${lesson.mechanicsSteps.length} 个课程步骤`}
                 </span>
                 <b aria-hidden="true">↗</b>

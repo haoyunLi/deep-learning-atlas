@@ -111,6 +111,8 @@ export default function PPOAnimation({ step }: PPOAnimationProps) {
     <div
       className="ppo-animation-scroll"
       tabIndex={0}
+      role="region"
+      aria-label="PPO 机制图（可横向滚动）"
       style={{ width: "100%", minWidth: 0, overflowX: "auto" }}
     >
       <svg

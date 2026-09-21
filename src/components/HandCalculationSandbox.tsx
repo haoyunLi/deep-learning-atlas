@@ -135,7 +135,7 @@ function SandboxFrame({
       <div className="sandbox-stage" id={`${id}-stage`}>
         <div
           className="sandbox-explanation"
-          aria-live="polite"
+          aria-live={playing ? "off" : "polite"}
           aria-atomic="true"
         >
           <strong>{steps[step].title}</strong>
@@ -296,14 +296,14 @@ function KNNSandbox() {
   const [k, setK] = useState(3);
   const result = calculateKNN(x, y, k);
   const selected = new Set(result.selected.map((p) => p.id));
-  const sx = (value: number) => 34 + value * 46;
-  const sy = (value: number) => 199 - value * 27;
+  const sx = (value: number) => 44 + value * 42;
+  const sy = (value: number) => 292 - value * 42;
   const closest = result.ranked[0];
   const steps: SandboxStep[] = [
     {
       title: "摆放查询点",
       english: "Query & data",
-      explanation: `七个带标签的点固定不动。查询 q = (${number(x, 1)}, ${number(y, 1)})；移动 q 会改变它到每个训练点的欧氏距离。横纵坐标使用相同的数值单位，图中为适应版面使用不同显示比例。`,
+      explanation: `七个带标签的点固定不动。查询 q = (${number(x, 1)}, ${number(y, 1)})；移动 q 会改变它到每个训练点的欧氏距离。横纵坐标使用相同的数值单位和显示比例，图上的距离与计算一致。`,
     },
     {
       title: "计算距离并排序",
@@ -373,7 +373,7 @@ function KNNSandbox() {
         <>
           <svg
             className="sandbox-plot"
-            viewBox="0 0 360 240"
+            viewBox="0 0 360 335"
             role="img"
             aria-label={`查询点位于 ${x}, ${y}；最近 ${k} 个点为 ${result.selected.map((p) => p.id).join("、")}`}
           >
@@ -382,22 +382,22 @@ function KNNSandbox() {
               <g key={tick}>
                 <line
                   x1={sx(tick)}
-                  y1="37"
+                  y1={sy(6)}
                   x2={sx(tick)}
-                  y2="199"
+                  y2={sy(0)}
                   className="sandbox-grid-line"
                 />
                 <line
-                  x1="34"
+                  x1={sx(0)}
                   y1={sy(tick)}
-                  x2="310"
+                  x2={sx(6)}
                   y2={sy(tick)}
                   className="sandbox-grid-line"
                 />
-                <text x={sx(tick)} y="215" textAnchor="middle">
+                <text x={sx(tick)} y="312" textAnchor="middle">
                   {tick}
                 </text>
-                <text x="20" y={sy(tick) + 4} textAnchor="middle">
+                <text x="26" y={sy(tick) + 4} textAnchor="middle">
                   {tick}
                 </text>
               </g>
@@ -443,13 +443,13 @@ function KNNSandbox() {
             <text x={sx(x) + 10} y={sy(y) + 17} fontWeight="700">
               q
             </text>
-            <text x="34" y="18">
+            <text x="44" y="18">
               ● A 类　■ B 类　◇ 查询 q
             </text>
-            <text x="330" y="204">
+            <text x="323" y="297">
               q₁
             </text>
-            <text x="9" y="23">
+            <text x="15" y="27">
               q₂
             </text>
           </svg>
@@ -742,7 +742,7 @@ function AttentionSandbox() {
     {
       title: "对 V 加权求和",
       english: "Weighted output",
-      explanation: `输出 O = ΣᵢαᵢVᵢ = ${vector(result.output)}。降低温度会放大已有分数差距；提高温度会使可见 token 的权重更接近。被屏蔽的 C 权重严格为 0。`,
+      explanation: `输出 O = ΣᵢαᵢVᵢ = ${vector(result.output)}。降低温度会放大已有分数差距；提高温度会使可见 token 的权重更接近。${causal ? "被屏蔽的 C 权重严格为 0。" : "当前没有掩码，三个 token 都参与加权求和。"}`,
     },
   ];
   return (
@@ -829,7 +829,13 @@ function AttentionSandbox() {
           {step === 1 && (
             <DataTable
               caption="分数逐项计算 / Score calculation"
-              headings={["token", "Q·Kᵢ", "除以 √dₖ", "再除以 τ", "掩码后"]}
+              headings={[
+                "token",
+                "Q·Kᵢ",
+                scaled ? "除以 √dₖ" : "不缩放（除以 1）",
+                "再除以 τ",
+                "掩码后",
+              ]}
               rows={result.rows.map((r) => [
                 r.name,
                 number(r.dot),

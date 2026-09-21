@@ -101,7 +101,10 @@ const visualizations: Record<string, ComponentType<{ step: number }>> = {
 };
 
 function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 }
 
 export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
@@ -137,7 +140,14 @@ export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
       if (media.matches) setPlaying(false);
     };
     media.addEventListener("change", sync);
-    return () => media.removeEventListener("change", sync);
+    const pauseWhenHidden = () => {
+      if (document.hidden) setPlaying(false);
+    };
+    document.addEventListener("visibilitychange", pauseWhenHidden);
+    return () => {
+      media.removeEventListener("change", sync);
+      document.removeEventListener("visibilitychange", pauseWhenHidden);
+    };
   }, []);
 
   useEffect(() => {
@@ -235,12 +245,14 @@ export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
             max={lab.parameter.max}
             step={lab.parameter.step}
             value={value}
+            aria-describedby={`lab-${lesson.id}-hint`}
+            aria-valuetext={`${Number(value.toFixed(3))}${lab.parameter.unit ? ` ${lab.parameter.unit}` : ""}`}
             onChange={(e) => {
               setValue(Number(e.target.value));
               setPlaying(false);
             }}
           />
-          <p>{lab.parameter.hint}</p>
+          <p id={`lab-${lesson.id}-hint`}>{lab.parameter.hint}</p>
         </div>
       )}
       <div className="animated-explainer-stage">
@@ -274,6 +286,7 @@ export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
             onClick={() => setPlaying((v) => !v)}
             disabled={reducedMotion}
             aria-label={playing ? "暂停动效" : "播放动效"}
+            aria-pressed={playing}
             title={
               reducedMotion ? "系统已启用减少动画，可手动切换步骤" : undefined
             }

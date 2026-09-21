@@ -18,7 +18,8 @@ export const visionLanguageLessons: Lesson[] = [
     intuition:
       "像先缩小地图认出哪块是道路，再把路的轮廓画回原图。缩小时丢掉的精细位置，由同尺度的 skip features 补回来。",
     core: "对称的下采样与上采样路径构成 U 形；每一级 decoder 把上采样特征与对应 encoder 特征拼接，再卷积融合。输出为逐像素分类 logits。原论文针对生物图像并强调强数据增强；现代实现可替换 backbone 与卷积块。",
-    equation: "Dₗ = Conv([Upsample(Dₗ₊₁), Eₗ]);  ŷ₍ᵢⱼ₎ = softmax(D₀₍ᵢⱼ₎)",
+    equation:
+      "Dₗ=Conv([Upsample(Dₗ₊₁), Eₗ]);  z=Conv₁×₁(D₀);  pᵢⱼ=softmax类(zᵢⱼ)（多类）或 sigmoid(zᵢⱼ)（单 logit 二分类）",
     mechanicsSteps: [
       "输入图像经重复卷积与下采样，空间尺寸下降、通道与语义上下文增加；记录每级 encoder 特征 Eₗ。",
       "瓶颈层处理最大视野的特征；decoder 每级先上采样，再与同尺度 Eₗ 在通道维拼接。",
@@ -244,10 +245,11 @@ export const visionLanguageLessons: Lesson[] = [
     intuition:
       "识别道路需要看远处的场景，同时画边界时又要看近处细节；不同 dilation rate 像用不同大小的窗口同时观察。",
     core: "Backbone 产出特征；ASPP 使用并行的 atrous convolution 以不同采样间距汇聚上下文；轻量 decoder 融合低层特征改善边缘。相较 U-Net，更强调多尺度感受野与 output stride 的控制。",
-    equation: "ASPP(F) = concat(Convᵣ₁(F), Convᵣ₂(F), Convᵣ₃(F), pool(F))",
+    equation:
+      "ASPP(F)=Project₁×₁(concat(Conv₁×₁(F), Convᵣ₁(F), Convᵣ₂(F), Convᵣ₃(F), Up(Conv₁×₁(GAP(F)))))",
     mechanicsSteps: [
       "backbone 产生高层语义特征及低层高分辨率特征；空洞卷积以间隔采样而不继续下采样。",
-      "ASPP 并行使用多个 dilation rate 与全局池化分支，汇总不同尺度上下文。",
+      "ASPP 并行使用 1×1、多个 dilation rate 的 3×3 卷积与全局平均池化分支；池化分支经投影后上采样回同一空间尺寸，再拼接并投影融合。",
       "高层输出上采样，和降通道后的低层特征拼接；decoder 卷积恢复边界信息。",
       "逐像素分类训练，推理将 logits 上采样回原图尺寸，再按类别取预测并检查细小结构。",
     ],
@@ -673,7 +675,13 @@ export const visionLanguageLessons: Lesson[] = [
     ],
     example:
       "用预训练 ViT 分类病理切片 patch，检查所需局部纹理是否被 patch size 保留。",
-    compareTo: ["cnn", "convnext", "swin-transformer"],
+    compareTo: [
+      "cnn",
+      "convnext",
+      "swin-transformer",
+      "mae",
+      "positional-encoding",
+    ],
   },
   {
     id: "swin-transformer",
@@ -872,7 +880,7 @@ export const visionLanguageLessons: Lesson[] = [
       "准备输入/输出 tokenizer 与起止 token；训练时常用 teacher forcing。",
       "推理逐步解码，用 greedy 或 beam search，并设置最大长度。",
       "与 Transformer encoder-decoder baseline 比较质量和延迟。",
-      "核对源端与目标端 tokenization、起止符、padding mask 和目标右移一位。",
+      "核对源端与目标端 tokenization、起止符、padding mask；右移的是送入 decoder 的目标前缀，监督标签保持原目标顺序。",
       "用完整输出的任务指标与错误案例验证，而不只看 teacher-forced loss。",
     ],
     tuning: [
@@ -964,7 +972,12 @@ export const visionLanguageLessons: Lesson[] = [
     ],
     example:
       "预测下一小时用电量：只用过去几天读数，TCN 通过扩张卷积聚合近远期趋势。",
-    compareTo: ["rnn", "bidirectional-rnn", "transformer"],
+    compareTo: [
+      "rnn",
+      "bidirectional-rnn",
+      "transformer",
+      "time-series-forecasting",
+    ],
   },
   {
     id: "word2vec",
@@ -990,7 +1003,7 @@ export const visionLanguageLessons: Lesson[] = [
       "下游将向量作为词级输入，可固定或继续微调，并与随机初始化、上下文 embedding 对照。",
     ],
     limits: [
-      "一个词仅有一组静态向量，无法区分“银行”的金融与河岸上下文；歧义任务优先 BERT 类表示。",
+      "一个词仅有一组静态向量，无法区分英文 bank 的金融机构与河岸两种词义；歧义任务可比较 BERT 类上下文表示。",
       "OOV、错别字和领域新词受词表限制；可用 subword 变体或重新训练词表。",
     ],
     settings: [
@@ -1037,7 +1050,7 @@ export const visionLanguageLessons: Lesson[] = [
     ],
     example:
       "用领域语料训练词向量，观察“肿瘤”和“癌症”是否接近，再用于小型分类模型。",
-    compareTo: ["bert", "roberta", "contrastive-learning"],
+    compareTo: ["bert", "roberta", "contrastive-learning", "tokenization"],
   },
   {
     id: "bert",
@@ -1208,7 +1221,7 @@ export const visionLanguageLessons: Lesson[] = [
     equation: "p(x₁:ₙ) = ∏ₜ p(xₜ | x₍<ₜ₎)",
     mechanicsSteps: [
       "tokenizer 把上下文变为 token 序列，decoder 各层的 causal mask 使位置 t 只能注意 ≤t 的 token。",
-      "训练目标把目标序列右移一位，逐位置预测下一个 token，并对有效 token 求交叉熵。",
+      "逐位置预测下一个 token：输入 [A,B,C] 对应标签 [B,C,EOS]，只对有效目标求交叉熵。若框架在 loss 内位移 logits/labels，不再手动重复位移。",
       "推理从 prompt 计算下一个 token 概率，按 greedy 或采样策略选 token，再不断追加直到 stop／长度上限。",
       "KV cache 保存已处理 token 的 key/value，减少重复计算，但上下文与并发仍消耗显存。",
     ],
@@ -1262,7 +1275,13 @@ export const visionLanguageLessons: Lesson[] = [
     ],
     example:
       "代码注释补全：给定函数前文，让模型逐 token 生成注释，并用人工与自动检查结果。",
-    compareTo: ["bert", "t5", "decoder-models", "reward-model"],
+    compareTo: [
+      "bert",
+      "t5",
+      "decoder-models",
+      "reward-model",
+      "autoregressive-inference",
+    ],
   },
   {
     id: "t5",
@@ -1614,7 +1633,7 @@ export const visionLanguageLessons: Lesson[] = [
     howToUse: [
       "使用匹配的 tokenizer/checkpoint，准备输入与目标文本。",
       "微调设置输入/输出长度和解码策略，验证事实一致性。",
-      "核查 tokenizer、decoder 起始 token、目标右移及 attention mask。",
+      "核查 tokenizer、decoder 起始 token、作为 decoder 输入的目标前缀位移及 attention mask；监督标签保留原目标序列。",
       "在事实一致性、覆盖率和长度上对输出抽样评估，不能只用 ROUGE。",
     ],
     tuning: [

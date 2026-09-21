@@ -927,8 +927,8 @@ function KMeansLab({ step, value }: LabProps) {
   const n = toyKMeans(Math.round(value));
   const centers = step >= 2 ? n.after : n.initial;
   const memberships = step === 3 ? n.finalAssignments : n.assignments;
-  const px = (x: number) => 45 + x * 85,
-    py = (y: number) => 305 - y * 52;
+  const px = (x: number) => 115 + x * 50,
+    py = (y: number) => 305 - y * 50;
   const inertia = clusterPoints.reduce(
     (s, p, i) =>
       s +
@@ -939,10 +939,10 @@ function KMeansLab({ step, value }: LabProps) {
   return (
     <LabCanvas label="K-means 的硬分配与质心均值更新">
       <PlotFrame
-        x={45}
-        y={53}
-        width={425}
-        height={252}
+        x={115}
+        y={55}
+        width={250}
+        height={250}
         xlabel="feature 1"
         ylabel="feature 2"
       />
@@ -1010,8 +1010,7 @@ function KMeansLab({ step, value }: LabProps) {
         一个点只属于一个簇
       </VizText>
       <VizText x={45} y={340} size={12}>
-        显示一次 assign → update →
-        reassign；确定性初始化便于比较，不代表已收敛。
+        两轴等比例；一次 assign → update → reassign，不代表已收敛。
       </VizText>
     </LabCanvas>
   );

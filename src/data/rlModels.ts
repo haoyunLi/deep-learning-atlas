@@ -72,7 +72,11 @@ export const rlLessons: Lesson[] = [
     ],
     example:
       "在三个标题之间分配展示流量；bandit 边试边把更多流量给表现较好的标题。",
-    compareTo: ["q-learning", "reinforcement-learning"],
+    compareTo: [
+      "q-learning",
+      "reinforcement-learning",
+      "off-policy-evaluation",
+    ],
   },
   {
     id: "q-learning",
@@ -90,7 +94,8 @@ export const rlLessons: Lesson[] = [
     intuition:
       "给地图上每个位置和动作记一个分数：现在走一步得到的奖励，加上下一站最有希望的未来。反复修正后，选最高分动作。",
     core: "Q-learning 用实际执行的动作收集数据，却用下一状态的最大 Q 值构造目标，因此是 off-policy value-based 方法。有限状态/动作可用表格；大状态空间需函数近似。",
-    equation: "Q(s,a) ← Q(s,a)+α[r+γ maxₐ′ Q(s′,a′)−Q(s,a)]",
+    equation:
+      "Q(s,a)←Q(s,a)+α[r+γ(1−d)maxₐ′Q(s′,a′)−Q(s,a)];  d=1 仅表示任务真正终止",
     mechanicsSteps: [
       "建离散 Q(s,a) 表并只允许合法动作；未访问状态用一致的初值。",
       "用 ε-greedy 行为策略取 a，环境返回 r、s′、terminated 与 truncated。",
@@ -161,7 +166,8 @@ export const rlLessons: Lesson[] = [
     intuition:
       "Q-learning 问‘下一站最佳情况下怎样’，SARSA 问‘按我现在还会探索的习惯怎样’。后者会把探索可能造成的风险算进来。",
     core: "名字来自 State–Action–Reward–State–Action。SARSA 是 on-policy temporal-difference control：下一步 a′ 必须从当前行为策略中取，再用于更新 Q(s,a)。",
-    equation: "Q(s,a) ← Q(s,a)+α[r+γQ(s′,a′)−Q(s,a)]",
+    equation:
+      "Q(s,a)←Q(s,a)+α[r+γ(1−d)Q(s′,a′)−Q(s,a)];  d=1 时目标为 r，无需采 a′",
     mechanicsSteps: [
       "初始化 Q 和当前行为策略 π，例如 ε-greedy(Q)。",
       "在 s 采样并执行 a，观察 r、s′；若未终止，再按同一 π 在 s′ 采样 a′。",
@@ -233,7 +239,8 @@ export const rlLessons: Lesson[] = [
     intuition:
       "像 Q 表的压缩版：相似画面共享特征，不必为每张图单独存一个格子；但网络一边学习一边改变目标，所以要把目标网络暂时冻结。",
     core: "DQN 是 off-policy、value-based、model-free。经验回放打散相邻样本相关性，目标网络让 bootstrap target 在一段时间内较稳定；原方法适合有限离散动作。",
-    equation: "L = E[(Qθ(s,a) − (r + γ maxₐ′ Qθ⁻(s′,a′)))²]",
+    equation:
+      "y=r+γ(1−d)maxₐ′Qθ⁻(s′,a′);  L=E[(Qθ(s,a)−stopgrad(y))²];  d=1 表示真正终止",
     mechanicsSteps: [
       "online Q 网络输出每个离散动作的估值；ε-greedy 选动作并写入 replay。",
       "从 replay 随机抽 transition，明确 terminated 与 time-limit truncated 的不同 bootstrap 语义。",
@@ -306,7 +313,7 @@ export const rlLessons: Lesson[] = [
     intuition:
       "若同一个人既挑最高分答案又给它打分，随机误差会被‘取最大’放大；换另一个人评估能减少这种偏差。",
     core: "Double DQN 沿用 DQN 的 replay 与 target network，只改 bootstrap target。它仍是离散动作、off-policy、value-based；‘Double’ 不意味着训练两套完全独立的策略。",
-    equation: "y = r + γ Qtarget(s′, argmaxₐ Qonline(s′,a))",
+    equation: "y=r+γ(1−d)Qtarget(s′,argmaxₐQonline(s′,a));  d=1 表示真正终止",
     mechanicsSteps: [
       "沿用 DQN 的 online、target 网络与 replay。",
       "在 s′ 用 online 网络 argmax 选择 a*，不要在此步读 target 的最大值。",
@@ -376,8 +383,8 @@ export const rlLessons: Lesson[] = [
     summary: "把 Q 拆成 state value V 与 action advantage A 两条网络分支。",
     intuition:
       "在危险路段，先知道‘这个位置很糟’比立刻精确比较每个转向更重要。Dueling 让网络分别学位置本身和动作间的细微差异。",
-    core: "共享特征后分成 V(s) 与 A(s,a)，再组合成 Q(s,a)。减去所有动作 advantage 的均值，处理 V 和 A 可任意平移的不可辨识性。它是网络架构改造，可叠加 DQN 或 Double DQN。",
-    equation: "Q(s,a) = V(s) + A(s,a) − meanₐ′ A(s,a′)",
+    core: "共享特征后分成 V(s) 与 A(s,a)，再组合成 Q(s,a)。减去所有动作 advantage 的均值，处理 V 和 A 可任意平移的不可辨识性。采用此均值中心化时，V 等于各动作 Q 的算术均值，不应直接当成任意策略的 Vπ；原始 A 分支也不是已经中心化的优势。它是网络架构改造，可叠加 DQN 或 Double DQN。",
+    equation: "Q(s,a)=V(s)+A(s,a)−meanₐ′A(s,a′);  因而 V(s)=meanₐQ(s,a)",
     mechanicsSteps: [
       "共享 encoder 提取状态表征，之后分为标量 V(s) 和动作向量 A(s,·)。",
       "对动作维度中心化 advantage，再组合 Q(s,a)=V+A−mean A。",
@@ -425,7 +432,7 @@ export const rlLessons: Lesson[] = [
       "有动作 mask 时只在合法动作上选择与评估。",
     ],
     pitfalls: [
-      "直接令 Q=V+A 而无约束，会让分解不唯一。",
+      "把原始 A 分支当成真实 Aπ，或把均值中心化得到的 V 当成 maxₐQ；训练直接约束的是组合后的 Q。",
       "误以为 dueling 是两个智能体对抗。",
     ],
     example: "棋盘上暂时无论走哪步都差不多时，V 先学会‘当前局面对我有利’。",
@@ -518,11 +525,11 @@ export const rlLessons: Lesson[] = [
     intuition:
       "一次游戏赢了，就让过程中做过的动作更可能出现；输了则反向调整。但这很粗糙：一次赢可能只是运气，所以梯度方差大。",
     core: "REINFORCE 是 on-policy、policy-based、Monte Carlo 方法。用 log-probability trick 估计 policy gradient，通常等一个 episode 结束才能算完整回报；减去不依赖动作的 baseline 可降方差。",
-    equation: "∇θJ ≈ Σₜ ∇θ log πθ(aₜ|sₜ) · (Gₜ − b(sₜ))",
+    equation: "J=E[Σₜγᵗrₜ], Gₜ=Σₖ≥ₜγᵏ⁻ᵗrₖ;  ∇θJ≈Σₜγᵗ∇θlogπθ(aₜ|sₜ)·(Gₜ−b(sₜ))",
     mechanicsSteps: [
       "从当前 πθ 采完整轨迹并保存每步 log πθ(a|s)、reward 与有效动作 mask。",
       "从后向前算每一步 action 后的 return-to-go Gt，而不是所有步共用整局总回报。",
-      "用 (Gt−b(st)) 乘 log-prob 构造负损失；baseline 必须不依赖当前动作。",
+      "把 γᵗ(Gₜ−b(sₜ)) 当作固定权重乘 log-prob 构造负损失；baseline 不依赖当前动作，actor loss 对该权重 stop-gradient，另行拟合 baseline。",
       "按 batch 轨迹更新策略，立即废弃旧 on-policy 轨迹并独立评估。",
     ],
     limits: [
@@ -570,7 +577,7 @@ export const rlLessons: Lesson[] = [
     ],
     pitfalls: [
       "用旧策略数据直接重复很多轮当作标准 on-policy REINFORCE。",
-      "把整局总回报给每一步，忽略 action 后才发生的奖励。",
+      "把整局总回报版本误判为数学上无效：它也是合法的 score-function 估计，但过去奖励增加无用噪声，return-to-go 通常更合适。",
     ],
     example:
       "智能体学习走迷宫：成功轨迹上的动作整体被提高概率，但最开始会很不稳定。",
@@ -745,7 +752,7 @@ export const rlLessons: Lesson[] = [
       "做有限 minibatch epoch，监控 KL/clip fraction；随后重新采样而非无限重用旧轨迹。",
     ],
     limits: [
-      "on-policy 需要持续环境交互；固定日志上的学习应看 offline RL 或 DPO。",
+      "on-policy 需要按当前策略持续采样；固定环境轨迹应比较 offline RL。语言模型的固定偏好对是另一种数据设定，可比较 DPO。",
       "clipping 只限制 surrogate 激励，不是 KL 或回报的硬保证。",
     ],
     settings: [
@@ -879,11 +886,12 @@ export const rlLessons: Lesson[] = [
     intuition:
       "如果 Actor 总是去找 Critic 最乐观的漏洞，两个评分者取较保守的值，可以少被偶然高估带偏。",
     core: "TD3 是 off-policy、确定性 actor-critic，继承 DDPG 的 replay。三项关键改动是 clipped double-Q、delayed policy updates、target policy smoothing；原方法面向连续动作。",
-    equation: "y = r + γ minᵢ Qtarget,i(s′, μtarget(s′)+clipped noise)",
+    equation:
+      "ã=clip动作(μtarget(s′)+clip(ε,−c,c));  y=r+γ(1−d)minᵢQtarget,i(s′,ã);  d=1 表示真正终止",
     mechanicsSteps: [
       "在 DDPG 基础上维护两个独立 critic，写入 replay 的动作含执行探索噪声。",
       "下一 target action 加裁剪后的平滑噪声，再限制在合法动作范围。",
-      "target 用两个 target Q 的较小值，分别训练两个 critic。",
+      "非终止 transition 的 target 用两个 target Q 的较小值；真正终止时 y=r。停止 target 梯度后分别训练两个 critic，外部时间截断通常仍保留 bootstrap。",
       "隔若干 critic 更新才训练 Actor，并在 Actor 更新后软更新所有 target。",
     ],
     limits: [
@@ -1216,7 +1224,13 @@ export const rlLessons: Lesson[] = [
     ],
     example:
       "让机械臂模仿人工抓取示范，之后在真实闭环里检验是否能从轻微偏差中恢复。",
-    compareTo: ["ppo", "rlhf", "reinforcement-learning"],
+    compareTo: [
+      "ppo",
+      "rlhf",
+      "reinforcement-learning",
+      "offline-rl",
+      "decision-transformer",
+    ],
   },
   {
     id: "offline-rl",
@@ -1237,7 +1251,7 @@ export const rlLessons: Lesson[] = [
     equation: "D = {(s,a,r,s′)} 固定；学习 π 时不向环境请求新 transition",
     mechanicsSteps: [
       "冻结日志数据，审计每条 transition 的 reward、终止标志、行为策略与覆盖范围。",
-      "以 BC 作为可解释下限，并区分训练集动作分布与候选策略动作分布。",
+      "以 BC 作为监督学习基线，并区分日志动作分布与候选策略动作分布；BC 不是其他离线算法的性能下限，复杂方法也可能更差。",
       "选择保守 Q、行为约束或序列建模方法；不要将未观测动作的 Q 当可靠事实。",
       "用独立环境或可信 off-policy evaluation 加不确定性区间评估，再考虑受控部署。",
     ],
@@ -1288,7 +1302,12 @@ export const rlLessons: Lesson[] = [
     ],
     example:
       "医院有历史治疗决策记录却不能任意在线试错，可先离线研究候选策略并严格评估。",
-    compareTo: ["cql", "decision-transformer", "behavior-cloning"],
+    compareTo: [
+      "cql",
+      "decision-transformer",
+      "behavior-cloning",
+      "off-policy-evaluation",
+    ],
   },
   {
     id: "cql",
@@ -1377,7 +1396,8 @@ export const rlLessons: Lesson[] = [
     intuition:
       "像语言模型根据前文续写下一个词：给它‘希望总回报有多高’和先前经历，让它续写下一个动作。",
     core: "Decision Transformer 属于 offline RL 的 sequence-modeling 路线。训练时对轨迹中的 return-to-go、state、action 做因果序列建模，用监督损失预测动作；没有显式 Bellman backup。目标回报条件不保证模型能做出数据中不存在的高回报行为。",
-    equation: "aₜ ~ πθ(aₜ | Rtarget, s₁,a₁,…,sₜ)",
+    equation:
+      "πθ(aₜ | R₁,s₁,a₁,…,Rₜ,sₜ);  Rₜ=Σₖ≥ₜrₖ（训练）；Rₜ₊₁=Rₜ−rₜ（推理时更新目标）",
     mechanicsSteps: [
       "保留完整离线轨迹，逐步计算 return-to-go，并只用可见历史组成 causal context。",
       "按 (RTG,state,action) 顺序输入 Transformer；仅对目标 action token/向量计算监督损失。",

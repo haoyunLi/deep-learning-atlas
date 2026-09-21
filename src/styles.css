@@ -1346,10 +1346,7 @@ svg {
     padding-right: 34px;
   }
 }
-@media (max-width: 760px) {
-  :root {
-    --gutter: 20px;
-  }
+@media (max-width: 880px) {
   .site-header {
     height: 62px;
   }
@@ -1393,6 +1390,11 @@ svg {
   .nav a {
     height: 43px;
     border-bottom: 1px solid #e9eef4;
+  }
+}
+@media (max-width: 760px) {
+  :root {
+    --gutter: 20px;
   }
   .hero {
     grid-template-columns: 1fr;

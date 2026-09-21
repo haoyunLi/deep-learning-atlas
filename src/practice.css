@@ -108,6 +108,10 @@
   min-width: 520px;
   font-size: 13px;
 }
+.practice-table[tabindex]:focus-visible {
+  outline: 3px solid #245fbd;
+  outline-offset: 3px;
+}
 .practice-table th {
   text-align: left;
   background: #edf2f7;

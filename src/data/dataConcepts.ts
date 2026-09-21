@@ -161,7 +161,13 @@ export const dataConceptLessons: Lesson[] = [
     ],
     example:
       "同一台设备每分钟生成日志，若随机按行分割，训练与测试几乎是相邻片段。按设备 ID 切分后准确率下降，反而更接近新设备上的真实表现。",
-    compareTo: ["cohort-design", "model-evaluation", "external-validation"],
+    compareTo: [
+      "cohort-design",
+      "model-evaluation",
+      "external-validation",
+      "time-series-forecasting",
+      "retrieval-augmented-generation",
+    ],
   },
   {
     id: "domain-shift",
@@ -339,11 +345,12 @@ export const dataConceptLessons: Lesson[] = [
       "Calibration 检查预测概率和实际频率是否匹配；它与分类正确率、排序能力和对未知输入的认识不同。",
     intuition:
       "天气预报若每次说“九成会下雨”，长期看这批日子也应约九成下雨。模型的 confidence 数字同样需要被核验；能把样本排对顺序，不代表概率可信。",
-    core: "校准关注 P(Y=1 | p̂≈p)≈p。可用 reliability diagram、Brier score、log loss 和 ECE 作互补诊断；ECE 依赖分箱方式，不能独立作为真理。温度缩放在固定模型的验证集上拟合 T>0，再对 logits/T 做 softmax，能调整置信度而不改变多类 argmax 排序。校准不等于 epistemic uncertainty 或 OOD 检测，分布变化后需重新验证。",
-    equation: "p̂_T = softmax(z/T);  Brier = (1/n)Σ(p̂ᵢ−yᵢ)²",
+    core: "二分类正类概率的校准关注 P(Y=1 | p̂≈p)≈p；top-label 校准则比较最大预测概率与预测类别的正确率。可用 reliability diagram、Brier score、log loss 和 ECE 作互补诊断；ECE 依赖分箱方式，不能独立作为真理。温度缩放在固定模型的验证集上拟合 T>0，再对 logits/T 做 softmax，能调整置信度而不改变每个样本的 argmax 类别；多类场景中跨样本按某一类别概率的排序未必保持。校准不等于 epistemic uncertainty 或 OOD 检测，分布变化后需重新验证。",
+    equation:
+      "p̂_T=softmax(z/T), T>0;  二分类 Brier=(1/n)Σ(p̂ᵢ−yᵢ)²；多类形式再对各类误差求和",
     mechanicsSteps: [
       "训练并冻结分类器，用独立验证集取得 logits 和真实标签，先检查准确率与置信度分布。",
-      "将相近预测概率分组，比较每组平均置信度与实际正确率；同时看 Brier/log loss，注意分箱及子群样本量。",
+      "先确定校准对象：二分类正类概率分箱后比较平均概率与阳性率；top-label 则按最大概率分箱后比较与预测正确率。Brier/log loss 衡量整体概率质量，不能单独分离校准误差。",
       "如需改善概率，用验证 logits 拟合正温度 T 以最小化 NLL，再固定 T 应用到独立测试或部署数据。",
       "在时间、地点和关键子群上复查校准；若目标域改变，区分模型重训、再校准与阈值改变各自的作用。",
     ],
