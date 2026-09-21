@@ -380,7 +380,7 @@ const maml: CodeLab = {
       title: "Support inner loop",
       english: "Task-specific adaptation",
       summary: "从共享 θ 复制任务参数，只用 support loss 走 H 次更新得到 θ′τ。",
-      why: "元学习优化的是一个容易被少量任务数据更新的共同起点。",
+      why: "Meta-Learning 优化的是一个容易被少量任务数据更新的共同起点。",
       input: "θ, supportτ, inner LR α",
       output: "adapted parameters θ′τ",
       parameter: "D 个共享参数；每个任务产生临时副本",

@@ -126,10 +126,8 @@ export default function GlossaryPage() {
                       ?.label
                   }
                 </span>
-                <strong>{entry.chinese}</strong>
-                <span lang="en" className="guidance-term-english">
-                  {entry.english}
-                </span>
+                <strong lang="en">{entry.english}</strong>
+                <span className="guidance-term-english">{entry.chinese}</span>
               </dt>
               <dd>
                 <p>{entry.definition}</p>
@@ -138,7 +136,7 @@ export default function GlossaryPage() {
                 </p>
                 <div
                   className="guidance-lesson-links"
-                  aria-label={`${entry.chinese}相关课程`}
+                  aria-label={`${entry.english} 相关课程`}
                 >
                   {entry.lessonIds.map((id) => (
                     <a href={`#/lesson/${id}`} key={id}>

@@ -362,7 +362,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       },
     ],
     modifications: [
-      "冻结 image encoder，只训练 adapter 或 decoder 做领域适配。",
+      "冻结 Image Encoder，只训练 Adapter 或 Decoder 做 Domain Adaptation。",
       "接分类器或文本对齐模型给 masks 赋语义。",
     ],
     pitfalls: [
@@ -920,7 +920,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
     whenToUse: [
       "质量与不确定性重要，能承担多倍训练/推理。",
       "需要强稳健基线比较 Bayesian 近似。",
-      "主动学习或人工复核需要 disagreement 信号。",
+      "Active Learning 或人工复核需要 Disagreement 信号。",
     ],
     limits: [
       "成员共享数据和架构，可能对同一系统性偏差一致自信。",
@@ -1448,7 +1448,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
     ],
     limits: [
       "没有及时标签时只能监控 proxy，不能直接知道准确率。",
-      "分布统计正常也可能发生概念漂移或系统性偏差。",
+      "分布统计正常也可能发生 Concept Drift 或系统性偏差。",
     ],
     howToUse: [
       "先写 serving contract 与 SLO。",

@@ -544,7 +544,8 @@ export const guideTasks: GuideTask[] = [
       {
         id: "labeled",
         label: "少量类别或相似性标签",
-        baseline: "冻结已有表示后训练线性头，并在独立查询集上测近邻检索。",
+        baseline:
+          "冻结已有表示后训练 Linear Head，并在独立 Query Set 上测近邻检索。",
         recommendationIds: ["linear-probe", "supervised-contrastive"],
       },
     ],
@@ -556,7 +557,7 @@ export const guideTasks: GuideTask[] = [
         reason: "用固定特征与低容量头测表示是否已经提供目标任务需要的信息。",
         settings: [
           "冻结编码器与归一化状态，只训练线性头。",
-          "固定数据量、正则搜索范围与划分，保留检索查询集。",
+          "固定数据量、正则搜索范围与划分，保留检索 Query Set。",
         ],
         limitation:
           "线性任务头成绩只覆盖一种可读出方式，不能代表所有下游任务。",
@@ -1114,10 +1115,10 @@ export const guideTasks: GuideTask[] = [
   },
   {
     id: "few-shot-adaptation",
-    title: "少样本与新任务适配",
+    title: "Few-Shot 与 Task Adaptation",
     english: "Few-shot and task adaptation",
     description:
-      "先说明新的是类别、用户、领域还是环境，再决定使用 prototype、梯度式 meta-learning 或普通迁移学习。",
+      "先说明新的是类别、用户、Domain 还是 Environment，再决定使用 Prototype、Gradient-Based Meta-Learning 或普通 Transfer Learning。",
     question: "新任务到来时允许什么信息与更新？",
     contexts: [
       {
@@ -1186,7 +1187,7 @@ export const guideTasks: GuideTask[] = [
       {
         lessonId: "fomaml-reptile",
         name: "FOMAML / Reptile",
-        role: "低成本梯度式元学习",
+        role: "低成本 Gradient-Based Meta-Learning",
         reason:
           "二阶 MAML 显存或时间过高时，可先验证一阶近似是否保留快速适配收益。",
         settings: [
@@ -1202,7 +1203,7 @@ export const guideTasks: GuideTask[] = [
         reason:
           "可学习逐参数更新方向，或只适配 head，以检查快速适配到底需要多大容量。",
         settings: [
-          "先跑 ANIL 的 head-only 基线，再逐层开放内循环参数。",
+          "先跑 ANIL 的 Head-Only 基线，再逐层开放 Inner Loop 参数。",
           "约束或参数化 Meta-SGD 步长，监控极端值和符号变化。",
         ],
         limitation: "逐参数步长增加状态量，ANIL 在需要底层表示变化时会受限。",
@@ -1224,7 +1225,7 @@ export const guideTasks: GuideTask[] = [
         name: "Transfer learning ladder",
         role: "普通迁移基线",
         reason:
-          "强预训练加 linear probe、head 微调和逐层解冻常是元学习必须超过的实际基线。",
+          "强预训练加 Linear Probe、Head Fine-Tuning 和逐层解冻常是 Meta-Learning 必须超过的实际基线。",
         settings: [
           "按冻结、head-only、顶部 block、全量微调逐级增加容量。",
           "每一级分别调学习率并保留相同数据划分与 early stopping 预算。",
@@ -1245,10 +1246,10 @@ export const guideTasks: GuideTask[] = [
   },
   {
     id: "adaptive-systems",
-    title: "持续适应与分布变化",
+    title: "Adaptive Learning Systems",
     english: "Adaptive learning systems",
     description:
-      "根据目标数据何时可见、标签是否到达和历史数据能否保存，选择领域适配、测试时适配、在线或持续学习。",
+      "根据目标数据何时可见、标签是否到达和历史数据能否保存，选择 Domain Adaptation、Test-Time Adaptation、Online Learning 或 Continual Learning。",
     question: "变化发生在训练前、测试时，还是带反馈的数据流中？",
     contexts: [
       {
@@ -1289,11 +1290,11 @@ export const guideTasks: GuideTask[] = [
       {
         lessonId: "semi-supervised-self-training",
         name: "Self-training / FixMatch",
-        role: "伪标签利用目标数据",
+        role: "使用 Pseudo-Label 利用目标数据",
         reason:
-          "有可靠高置信预测时，可把弱增强伪标签用于强增强训练，直接利用目标域样本。",
+          "有可靠高置信预测时，可把弱增强 Pseudo-Label 用于强增强训练，直接利用目标域样本。",
         settings: [
-          "先画置信度与准确率曲线，再设伪标签阈值。",
+          "先画置信度与准确率曲线，再设 Pseudo-Label Threshold。",
           "记录每类接受率，防止多数类把未标注池全部占满。",
         ],
         limitation: "早期错误会被反复强化，未校准置信度会让阈值失去含义。",

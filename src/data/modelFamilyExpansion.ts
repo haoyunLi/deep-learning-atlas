@@ -626,7 +626,7 @@ export const modelFamilyExpansionLessons: Lesson[] = [
     whenToUse: [
       "高分辨率图像生成的像素空间计算过重，而适度感知压缩可接受时。",
       "需要文本、布局或图像等条件生成，希望在潜空间统一处理生成过程时。",
-      "使用已有强 autoencoder 和 diffusion checkpoint 做领域适配，并能验证压缩是否保留任务关键信息时。",
+      "使用已有强 Autoencoder 和 Diffusion Checkpoint 做 Domain Adaptation，并能验证压缩是否保留任务关键信息时。",
     ],
     limits: [
       "autoencoder 的信息瓶颈限制可还原细节；细小标记、精密纹理或要求像素准确的结构尤其需要验证。",

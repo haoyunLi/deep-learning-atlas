@@ -182,8 +182,8 @@ export const animationCatalog: Record<string, { label: string; hint: string }> =
       hint: "T>1 通常降低最大 softmax 概率；正温度不会改变类别排序。",
     },
     "episodic-meta-learning": {
-      label: "每类 support 数 K",
-      hint: "固定 3-way 和每类 4 个 query；只改变 support 标注预算。",
+      label: "每类 Support Set 样本数 K",
+      hint: "固定 3-way 和每类 4 个 Query Set 样本；只改变 Support Set 标注预算。",
     },
     "fomaml-reptile": {
       label: "Inner learning rate α",

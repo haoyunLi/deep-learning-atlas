@@ -63,7 +63,7 @@ const masteryTopics = [
   },
   {
     id: "adaptation",
-    label: "元学习与适应",
+    label: "Meta-Learning 与 Adaptation",
     english: "Learning to adapt",
     lessonIds: [
       "episodic-meta-learning",

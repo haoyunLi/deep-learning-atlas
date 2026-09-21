@@ -6,7 +6,7 @@
 
 ## 学什么
 
-网站目前包含 169 篇课程，按基础原理、训练与泛化、经典基线、视觉模型、语言与序列、生成模型、表示学习、强化学习、更多架构、元学习与适应这十条路线组织。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、持续学习、主动学习、领域适配、AutoML、联邦学习与测试时适配。每篇回答七个问题：
+网站目前包含 169 篇课程，按基础原理、训练与泛化、经典基线、视觉模型、语言与序列、生成模型、表示学习、强化学习、更多架构、Meta-Learning 与 Adaptation 这十条路线组织。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、Continual Learning、Active Learning、Domain Adaptation、AutoML、Federated Learning 与 Test-Time Adaptation。每篇回答七个问题：
 
 1. 一句话怎样理解？
 2. 内部机制如何运作？

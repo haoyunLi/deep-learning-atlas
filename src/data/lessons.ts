@@ -90,9 +90,10 @@ export const categories = [
   },
   {
     id: "adaptation",
-    label: "元学习与适应",
+    label: "Meta-Learning 与 Adaptation",
     englishLabel: "Learning to Adapt",
-    description: "从 few-shot episode、元优化到领域变化、持续学习与联邦协作。",
+    description:
+      "从 Few-Shot Episode、Meta-Optimization 到 Domain Shift、Continual Learning 与 Federated Learning。",
   },
 ] as const;
 
@@ -204,7 +205,7 @@ const coreLessons: Lesson[] = [
       "先定位误差类型再改目标：离群值、类别失衡和概率不校准对应不同处理，不能只看平均 loss。",
     ],
     modifications: [
-      "多任务学习可组合多个 loss，但要控制量纲和权重。",
+      "Multi-Task Learning 可组合多个 loss，但要控制量纲和权重。",
       "难样本问题可试 focal loss；概率质量要求高时检查 calibration。",
     ],
     pitfalls: [
@@ -661,7 +662,7 @@ const coreLessons: Lesson[] = [
     ],
     tuning: [
       "Kernel size 控制局部视野；stride 控制下采样速度。",
-      "小数据优先迁移学习，再考虑从零增大网络。",
+      "小数据优先使用 Transfer Learning，再考虑从零增大网络。",
       "报告准确率之外的参数量、显存、推理延迟与小目标错误，避免只凭单一分数选架构。",
     ],
     modifications: [
@@ -1201,7 +1202,7 @@ const coreLessons: Lesson[] = [
     ],
     modifications: [
       "Instruction fine-tuning 改变模型响应风格与任务遵循。",
-      "LoRA 用较少可训练参数做特定领域适配。",
+      "LoRA 用较少可训练参数做特定 Domain Adaptation。",
     ],
     pitfalls: [
       "训练数据中的模式不保证生成事实正确。",

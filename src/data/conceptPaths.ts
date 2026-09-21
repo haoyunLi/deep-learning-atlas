@@ -495,7 +495,7 @@ export const conceptPaths: ConceptPath[] = [
     id: "meta-learning-complete",
     title: "Meta-Learning：从 Episode 到会适配的学习器",
     description:
-      "先固定任务和 support/query 协议，再比较度量式、优化式、记忆式与策略式元学习，最后进入跨域压力测试。",
+      "先固定 Task 与 Support/Query Protocol，再比较 Metric-Based、Optimization-Based、Memory-Based 与 Policy-Based Meta-Learning，最后进入 Cross-Domain 压力测试。",
     steps: [
       {
         lessonId: "episodic-meta-learning",
@@ -545,7 +545,7 @@ export const conceptPaths: ConceptPath[] = [
   },
   {
     id: "domain-adaptation-stack",
-    title: "从迁移学习到未知域与测试时适配",
+    title: "Transfer Learning、Domain Generalization 与 Test-Time Adaptation",
     description:
       "按目标域信息何时可见来选方法：有标签少量适配、训练时无标签对齐、目标域完全不可见、上线后无标签微调。",
     steps: [
@@ -577,7 +577,8 @@ export const conceptPaths: ConceptPath[] = [
   },
   {
     id: "data-efficient-learning",
-    title: "少标注学习：主动、半监督、课程与持续学习",
+    title:
+      "Data-Efficient Learning：Active Learning、Semi-Supervised Learning、Curriculum Learning 与 Continual Learning",
     description:
       "同样面对有限标注，分别决定标哪一笔、怎样使用无标签数据、先学什么，以及新数据到来后怎样不忘旧知识。",
     steps: [
@@ -605,7 +606,7 @@ export const conceptPaths: ConceptPath[] = [
   },
   {
     id: "automated-distributed-learning",
-    title: "学习系统：自动搜索、元优化与分布式协作",
+    title: "Learning Systems：AutoML、Meta-Optimization 与 Federated Learning",
     description:
       "把更新规则、超参数、架构和多客户端训练都视为外层设计问题，同时计算总预算、信息边界与部署约束。",
     steps: [

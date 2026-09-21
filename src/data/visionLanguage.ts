@@ -362,7 +362,7 @@ export const visionLanguageLessons: Lesson[] = [
       "用同一硬件记录参数、激活显存、吞吐和精度，而非只看模型文件大小。",
     ],
     tuning: [
-      "输入分辨率和 batch size 会明显影响显存；迁移学习先冻结早期 stage。",
+      "输入分辨率和 Batch Size 会明显影响显存；Transfer Learning 先冻结早期 Stage。",
       "从较小 VGG 版本开始，若训练不稳定先检查学习率。",
       "训练变慢或 OOM 时先减少输入分辨率／batch，评估是否该换结构。",
       "解冻后验证集退化时先降 backbone 学习率并检查数据增强是否过弱。",
@@ -502,7 +502,7 @@ export const visionLanguageLessons: Lesson[] = [
     ],
     whenToUse: [
       "分类需要在精度与计算预算间挑选不同规模模型。",
-      "想用成熟的预训练 CNN backbone 做迁移学习。",
+      "想用成熟的预训练 CNN Backbone 做 Transfer Learning。",
     ],
     howToUse: [
       "先选与设备延迟、显存匹配的 B 型号和推荐输入尺寸。",

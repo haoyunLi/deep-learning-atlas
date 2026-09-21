@@ -333,7 +333,7 @@ const specs: Record<string, QuizSpec> = {
       "方法保存 10 倍 replay 数据却只与零内存基线比较准确率。缺少什么？",
       ["同内存预算对照与存储成本", "更大的 test", "更小模型名称", "更多颜色"],
       0,
-      "持续学习必须在相同 memory/参数/计算预算下比较。",
+      "Continual Learning 必须在相同 memory/参数/计算预算下比较。",
     ],
   },
   "active-learning": {
@@ -493,7 +493,7 @@ const specs: Record<string, QuizSpec> = {
         "按类检查置信校准与阈值/分布对齐",
         "删除少数类",
         "进一步提高统一阈值",
-        "使用 test 伪标签",
+        "使用 test Pseudo-Label",
       ],
       0,
       "统一阈值会使校准差或难类失去训练信号，应做 class-aware 审计。",

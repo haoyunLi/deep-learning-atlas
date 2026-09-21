@@ -197,7 +197,7 @@ export const learningConceptLessons: Lesson[] = [
     tuning: [
       "类别名模糊时写更具体的可见属性或任务定义，避免偷偷加入答案线索。",
       "同义 prompt 差异大时用事先确定的模板集或领域验证集选择，但要保留独立测试集。",
-      "领域表现差时比较冻结特征线性探针或少量领域适配，并重新标注为 few-shot/finetuned 结果。",
+      "Domain 表现差时比较冻结特征的 Linear Probe 或少量 Domain Adaptation，并重新标注为 Few-Shot/Fine-Tuned 结果。",
     ],
     settings: [
       {
@@ -610,7 +610,7 @@ export const learningConceptLessons: Lesson[] = [
       "用 CLIP 等预训练 embedding 直接算 prototype 可成为低训练成本对照。",
     ],
     pitfalls: [
-      "把 query 标签也用于算均值，造成支持集与测试集泄漏。",
+      "把 Query Set 标签也用于计算均值，造成 Support Set 与 Test Set 泄漏。",
       "只测与训练相同的类别，误把普通分类性能当成新类 few-shot 泛化。",
     ],
     example:
@@ -669,7 +669,8 @@ export const learningConceptLessons: Lesson[] = [
       {
         name: "Inner 学习率 α",
         start: "从能让 support loss 稳定下降的保守值开始。",
-        adjust: "适配后 query 变差时降低 α，且同时检查支持集过拟合。",
+        adjust:
+          "适配后 Query Set 表现变差时降低 α，同时检查 Support Set Overfitting。",
       },
       {
         name: "Inner 步数",

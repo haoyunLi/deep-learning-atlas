@@ -1434,8 +1434,8 @@ function MetaLearningSandbox() {
   const result = calculateMetaLearning(innerRate, shots, innerSteps);
   const steps: SandboxStep[] = [
     {
-      title: "构造任务与 support/query",
-      english: "Build tasks and splits",
+      title: "构造 Task 与 Support/Query Split",
+      english: "Build tasks and data splits",
       explanation: (
         <>
           两个未见任务共享初始化 θ={number(result.theta)}。每个任务用 K=
@@ -1445,8 +1445,8 @@ function MetaLearningSandbox() {
       ),
     },
     {
-      title: "Inner loop 只看 support",
-      english: "Adapt on support only",
+      title: "Inner Loop 只使用 Support Set",
+      english: "Adapt on the support set only",
       explanation: (
         <>
           每一步计算 g=2(θ−support estimate)，再做 θ′←θ′−αg。
@@ -1455,8 +1455,8 @@ function MetaLearningSandbox() {
       ),
     },
     {
-      title: "在 query 上计算 outer 目标",
-      english: "Evaluate adapted parameters",
+      title: "在 Query Set 上计算 Outer Objective",
+      english: "Evaluate adapted parameters on queries",
       explanation: (
         <>
           适配结束后才计算 query loss。平均 outer loss=
@@ -1466,8 +1466,8 @@ function MetaLearningSandbox() {
       ),
     },
     {
-      title: "比较三种 meta direction",
-      english: "Compare outer updates",
+      title: "比较三种 Meta-Gradient Direction",
+      english: "Compare outer-update directions",
       explanation: (
         <>
           精确 MAML 保留 inner Jacobian，FOMAML 忽略它，Reptile
@@ -1478,8 +1478,8 @@ function MetaLearningSandbox() {
   ];
   return (
     <SandboxFrame
-      title="MAML 的 support → inner loop → query → outer loop"
-      english="Few-shot meta-gradient walkthrough"
+      title="MAML：Support Set → Inner Loop → Query Set → Outer Loop"
+      english="Few-Shot Meta-Gradient walkthrough"
       scope="两个一维回归任务；support estimate 含随 K 减小的固定采样误差。"
       steps={steps}
       controls={

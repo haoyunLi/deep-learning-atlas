@@ -98,7 +98,7 @@ function EpisodicLab({ step, value }: LabProps) {
   const queryPoints = Array.from({ length: result.query });
   const colors = [blue, teal, orange];
   return (
-    <LabCanvas label="三分类 few-shot episode 的 support query 与 meta split">
+    <LabCanvas label="Three-Way Few-Shot Episode 的 Support Set、Query Set 与 Meta Split">
       <VizText x={28} y={31} size={14} weight={700}>
         3-way {result.shots}-shot：support 用于适配，query 只用于检验
       </VizText>
@@ -280,7 +280,7 @@ function ActiveLearningLab({ step, value }: LabProps) {
   const result = metaAdaptationCalculations.active(value);
   const positions = [90, 195, 340, 485, 610];
   return (
-    <LabCanvas label="主动学习按不确定性选择固定标注预算">
+    <LabCanvas label="Active Learning 按不确定性选择固定标注预算">
       <VizText x={28} y={31} size={14} weight={700}>
         Acquisition budget={result.count}：先打分，再选择，再请求标签
       </VizText>
@@ -420,15 +420,15 @@ function FederatedLab({ step, value }: LabProps) {
 
 export const metaAdaptationLabs: Record<string, LabDefinition> = {
   "episodic-meta-learning": {
-    title: "N-way K-shot episode 如何组成",
-    englishTitle: "Support/query episode anatomy",
+    title: "N-Way K-Shot Episode 如何组成",
+    englishTitle: "Support Set / Query Set anatomy",
     parameter: {
-      label: "每类 support 数 K",
+      label: "每类 Support Set 样本数 K",
       min: 1,
       max: 5,
       step: 1,
       initial: 1,
-      hint: "固定 3-way 和每类 4 个 query；只改变 support 标注预算。",
+      hint: "固定 3-way 和每类 4 个 Query Set 样本；只改变 Support Set 标注预算。",
     },
     steps: [
       {
@@ -437,12 +437,12 @@ export const metaAdaptationLabs: Record<string, LabDefinition> = {
           "先按类别、用户或域隔离 meta-train/val/test；新任务边界比样本随机切分更重要。",
       },
       {
-        title: "Build the support",
+        title: "Build the Support Set",
         explanation:
           "每类 K 个 support 可被 prototype、head 或 inner loop 读取。拖动 K 会重算标注预算。",
       },
       {
-        title: "Hold out the query",
+        title: "Hold out the Query Set",
         explanation:
           "query 与 support 同任务但样本不重叠，只用于适配后 loss 或评估。",
       },
@@ -491,7 +491,7 @@ export const metaAdaptationLabs: Record<string, LabDefinition> = {
     render: FirstOrderLab,
   },
   "active-learning": {
-    title: "固定标注预算下怎样选下一批",
+    title: "Active Learning：固定标注预算下怎样选下一批",
     englishTitle: "Acquisition budget and uncertainty",
     parameter: {
       label: "本轮标注预算",
@@ -524,7 +524,7 @@ export const metaAdaptationLabs: Record<string, LabDefinition> = {
     render: ActiveLearningLab,
   },
   "federated-learning": {
-    title: "本地多走几步为何会产生 client drift",
+    title: "FedAvg：Local Steps 为何产生 Client Drift",
     englishTitle: "FedAvg local steps and aggregation",
     parameter: {
       label: "Local steps E",

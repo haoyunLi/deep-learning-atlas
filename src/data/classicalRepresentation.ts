@@ -651,7 +651,7 @@ export const classicalRepresentationLessons: Lesson[] = [
       "设定正负样本来源，划分训练身份和验证身份以检验泛化。",
       "输出归一化 embedding，选择 cosine 或欧氏距离并保持训练/检索一致。",
       "采用 batch 内 semi-hard mining，监测有效三元组比例。",
-      "固定验证图库与查询集，绘制难例并测新实体上的 Recall@K。",
+      "固定验证 Gallery 与 Query Set，绘制难例并测新实体上的 Recall@K。",
     ],
     tuning: [
       "margin 太小区分不够，太大可能难以满足；按验证检索指标调。",
@@ -735,7 +735,7 @@ export const classicalRepresentationLessons: Lesson[] = [
     modifications: [
       "显存有限可考虑 MoCo 的队列设计。",
       "有类别标签可加入 supervised contrastive loss。",
-      "若实例级 false negatives 很多，可用标签或伪标签扩展 positive 集。",
+      "若实例级 False Negatives 很多，可用标签或 Pseudo-Label 扩展 Positive Set。",
     ],
     pitfalls: [
       "把决定标签的特征通过增强抹掉，例如病理颜色或遥感方向。",
@@ -851,7 +851,8 @@ export const classicalRepresentationLessons: Lesson[] = [
       {
         name: "文本 prompt",
         start: "对每类写含真实描述的简短模板，并用验证集比较。",
-        adjust: "某类结果对措辞高度敏感时增加同义模板并做平均或领域适配。",
+        adjust:
+          "某类结果对措辞高度敏感时增加同义模板，并做平均或 Domain Adaptation。",
       },
       {
         name: "logit scale / temperature",
