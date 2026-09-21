@@ -261,7 +261,8 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
             From intuition to implementation — 一次理清原理、选择与调参。
           </p>
           <p className="hero-description">
-            用直观的图解、清楚的对比与可执行的步骤，建立对算法的完整认识，并在真实问题中做出合适的选择。
+            从 kNN、EM 到 BERT、U-Net、PPO 与 Reward
+            Model，用直觉、机制、对比和调参步骤看懂不同方法，并在真实问题中做出合适的选择。
           </p>
           <a className="primary-button" href="#/atlas">
             开始学习 <ArrowIcon />
@@ -276,63 +277,23 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
           <p>Learning Route</p>
         </div>
         <div className="route-grid">
-          {[
-            {
-              no: "01",
-              title: "基础",
-              en: "Foundations",
-              description: "建立训练循环与核心直觉",
-              filter: "foundations",
-            },
-            {
-              no: "02",
-              title: "训练",
-              en: "Training",
-              description: "让优化与评估更可靠",
-              filter: "training",
-            },
-            {
-              no: "03",
-              title: "架构",
-              en: "Architectures",
-              description: "理解模型怎样处理数据",
-              filter: "architectures",
-            },
-            {
-              no: "04",
-              title: "生成",
-              en: "Generative",
-              description: "理解模型怎样生成样本",
-              filter: "generative",
-            },
-            {
-              no: "05",
-              title: "进阶",
-              en: "Beyond",
-              description: "面向不同问题继续拓展",
-              filter: "frontiers",
-            },
-          ].map((item) => (
+          {categories.map((item, index) => (
             <button
               className="route-item"
-              key={item.no}
+              key={item.id}
               onClick={() => {
-                setCategory(
-                  categories.some((c) => c.id === item.filter)
-                    ? item.filter
-                    : "all",
-                );
+                setCategory(item.id);
                 document
                   .getElementById("atlas")
                   ?.scrollIntoView({ behavior: "smooth" });
               }}
             >
               <div className="route-line">
-                <span>{item.no}</span>
+                <span>{String(index + 1).padStart(2, "0")}</span>
                 <i />
               </div>
-              <strong>{item.title}</strong>
-              <em>{item.en}</em>
+              <strong>{item.label}</strong>
+              <em>{item.englishLabel}</em>
               <small>{item.description}</small>
             </button>
           ))}
@@ -351,7 +312,7 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索算法或缩写，如 CNN、GAN"
+                placeholder="搜索算法或缩写，如 BERT、U-Net、PPO"
                 aria-label="搜索算法"
               />
             </label>
@@ -440,7 +401,9 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
         <div>
           <h2>先问问题，再选算法。</h2>
           <p>
-            架构回答“信息怎么流动”，训练目标回答“要学到什么”，优化器回答“参数怎么更新”。例如 Transformer + next-token 目标 + AdamW 可以组合使用；最终还要看数据、指标、算力和延迟。
+            架构回答“信息怎么流动”，训练目标回答“要学到什么”，优化器回答“参数怎么更新”。例如
+            Transformer + next-token 目标 + AdamW
+            可以组合使用；最终还要看数据、指标、算力和延迟。
           </p>
         </div>
         <div className="method-links">
@@ -473,14 +436,153 @@ function MechanismDiagram({ lesson }: { lesson: Lesson }) {
     "计算损失 Loss",
     "参数更新 Update",
   ];
-  if (/attention|transformer/.test(name))
+  if (/expectation.maximization|^em\b|em-algorithm/.test(name))
+    steps = ["观测数据", "E-step 估计隐变量", "M-step 更新参数", "重复至收敛"];
+  else if (/\bknn\b|k-nearest/.test(name))
+    steps = ["保存训练样本", "计算查询距离", "找到 k 个近邻", "投票或取平均"];
+  else if (/k-means/.test(name))
+    steps = ["选择 k 个中心", "分配最近中心", "更新簇中心", "重复至稳定"];
+  else if (/gaussian-mixture|\bgmm\b/.test(name))
+    steps = ["多个高斯分量", "计算软归属", "更新均值与方差", "得到混合密度"];
+  else if (/\bpca\b|principal.component/.test(name))
+    steps = ["中心化数据", "寻找最大方差方向", "选择主成分", "投影降维"];
+  else if (/\bsvm\b|support.vector/.test(name))
+    steps = ["输入特征与标签", "最大化分类间隔", "确定支持向量", "预测新样本"];
+  else if (/energy.based|\bebm\b/.test(name))
+    steps = ["输入候选样本", "计算能量 Eθ", "压低真实样本能量", "比较或采样"];
+  else if (/\bdino\b/.test(name))
+    steps = ["裁出不同视图", "学生与教师编码", "教师动量更新", "对齐输出分布"];
+  else if (/\bbyol\b/.test(name))
+    steps = [
+      "同一图像的两种视图",
+      "在线编码器与预测头",
+      "目标编码器 EMA",
+      "对齐两个表示",
+    ];
+  else if (/barlow.twins|\bvicreg\b/.test(name))
+    steps = ["构造两种视图", "分别编码", "保持语义一致", "避免特征塌缩或冗余"];
+  else if (/\bmae\b|masked.autoencoder/.test(name))
+    steps = [
+      "遮住图像 patches",
+      "编码可见部分",
+      "解码缺失部分",
+      "重建原始像素",
+    ];
+  else if (/\bmoco\b/.test(name))
+    steps = [
+      "两种增强视图",
+      "查询与动量编码器",
+      "队列提供负样本",
+      "对比损失更新",
+    ];
+  else if (/contrastive|simclr|moco|clip|infonce|triplet/.test(name))
+    steps = [
+      "构造样本或视图",
+      "编码成 embedding",
+      "比较相似度",
+      "拉近正例、拉远负例",
+    ];
+  else if (/mask.rcnn/.test(name))
+    steps = ["提取图像特征", "提出候选区域", "检测每个物体", "预测实例 mask"];
+  else if (/\bdetr\b/.test(name))
+    steps = [
+      "编码图像特征",
+      "object queries",
+      "集合匹配训练",
+      "输出目标框和类别",
+    ];
+  else if (/u-net|unet|deeplab|segmentation/.test(name))
+    steps = [
+      "输入图像",
+      "提取多尺度特征",
+      "融合局部与全局信息",
+      "输出像素标签",
+    ];
+  else if (/resnet|residual/.test(name))
+    steps = ["输入 x", "残差变换 F(x)", "相加 F(x)+x", "继续堆叠特征"];
+  else if (/\bvit\b|swin.transformer/.test(name))
+    steps = [
+      "图像切分成 patches",
+      "映射为 token",
+      "注意力整合上下文",
+      "输出视觉特征",
+    ];
+  else if (/\bbert\b|roberta/.test(name))
+    steps = ["输入双向上下文", "编码 token 关系", "预训练表示", "接任务头微调"];
+  else if (/seq2seq|encoder.decoder|\bt5\b|\bbart\b/.test(name))
+    steps = [
+      "读取输入序列",
+      "Encoder 建表示",
+      "Decoder 条件生成",
+      "输出目标序列",
+    ];
+  else if (/\bgpt\b|autoregressive|language.model/.test(name))
+    steps = ["已有 token 前缀", "因果注意力", "预测下一个 token", "追加并重复"];
+  else if (/word2vec/.test(name))
+    steps = ["抽取词与上下文", "查找词向量", "预测邻近词", "复用学到的向量"];
+  else if (/\btcn\b|temporal.convolution/.test(name))
+    steps = ["输入时间序列", "因果卷积", "扩张感受野", "预测当前或未来"];
+  else if (/\bppo\b|proximal.policy/.test(name))
+    steps = [
+      "用当前策略采样",
+      "估计优势 Advantage",
+      "裁剪策略比率",
+      "更新策略与价值",
+    ];
+  else if (/\bdqn\b|deep.q|double.dqn|dueling.dqn/.test(name))
+    steps = [
+      "观察状态 s",
+      "估计各动作 Q 值",
+      "选择动作并收集经验",
+      "用 TD 目标更新",
+    ];
+  else if (/\bdpo\b/.test(name))
+    steps = [
+      "收集偏好对",
+      "比较策略与参考模型",
+      "直接优化偏好目标",
+      "评估回复质量",
+    ];
+  else if (/\brlhf\b/.test(name))
+    steps = ["收集人类偏好", "训练奖励模型", "优化生成策略", "验证真实偏好"];
+  else if (/reward.model/.test(name))
+    steps = [
+      "收集偏好或反馈",
+      "比较回答质量",
+      "学习评分函数",
+      "给策略提供信号",
+    ];
+  else if (/decision.transformer/.test(name))
+    steps = [
+      "固定离线轨迹",
+      "加入目标回报",
+      "建模状态动作序列",
+      "预测下一动作",
+    ];
+  else if (/offline.rl|\bcql\b/.test(name))
+    steps = [
+      "收集固定轨迹",
+      "估计价值或策略",
+      "限制数据外动作",
+      "离线评估与验证",
+    ];
+  else if (lesson.category === "reinforcement")
+    steps = [
+      "观察状态 State",
+      "选择动作 Action",
+      "获得奖励 Reward",
+      "改进策略或价值",
+    ];
+  else if (/attention|transformer/.test(name))
     steps = [
       "查询 Q · 键 K · 值 V",
       "相似度 QKᵀ/√d",
       "softmax 权重",
       "加权求和 AV",
     ];
-  else if (/cnn|convolution|resnet/.test(name))
+  else if (
+    /cnn|convolution|vgg|densenet|efficientnet|convnext|\bvit\b|swin/.test(name)
+  )
     steps = [
       "局部图像块 Patch",
       "卷积核 Kernel",
@@ -497,6 +599,15 @@ function MechanismDiagram({ lesson }: { lesson: Lesson }) {
     steps = ["输入 x", "编码器 Encoder", "潜变量 z", "解码器 Decoder"];
   else if (/gnn|graph/.test(name))
     steps = ["节点与边", "邻居消息", "聚合 Aggregate", "节点表示"];
+  else if (lesson.category === "representation")
+    steps = [
+      "构造训练视图",
+      "Encoder 提取表示",
+      "自监督目标更新",
+      "迁移到下游任务",
+    ];
+  else if (lesson.category === "classical")
+    steps = ["准备特征", "拟合或保存样本", "形成决策规则", "预测或分析"];
   return (
     <div
       className="mechanism-diagram"
@@ -788,7 +899,15 @@ function Compare() {
         <span>常看对比</span>
         {[
           ["rnn", "transformer", "RNN ↔ Transformer"],
-          ["cnn", "transformer", "CNN ↔ Transformer"],
+          ["bert", "gpt-language-model", "BERT ↔ GPT"],
+          ["resnet", "vit", "ResNet ↔ ViT"],
+          ["unet", "nnunet", "U-Net ↔ nnU-Net"],
+          ["simclr", "moco", "SimCLR ↔ MoCo"],
+          ["simclr", "byol", "SimCLR ↔ BYOL"],
+          ["q-learning", "sarsa", "Q-learning ↔ SARSA"],
+          ["dqn", "ppo", "DQN ↔ PPO"],
+          ["ppo", "sac", "PPO ↔ SAC"],
+          ["knn", "svm", "kNN ↔ SVM"],
           ["gan", "diffusion", "GAN ↔ Diffusion"],
           ["gradient-descent", "adamw", "SGD ↔ AdamW"],
         ].map(([left, right, label]) => (
@@ -807,21 +926,13 @@ function Compare() {
         <label>
           算法 A
           <select value={first} onChange={(e) => setFirst(e.target.value)}>
-            {lessons.map((item) => (
-              <option value={item.id} key={item.id}>
-                {item.title} · {item.englishTitle}
-              </option>
-            ))}
+            <LessonOptions />
           </select>
         </label>
         <label>
           算法 B
           <select value={second} onChange={(e) => setSecond(e.target.value)}>
-            {lessons.map((item) => (
-              <option value={item.id} key={item.id}>
-                {item.title} · {item.englishTitle}
-              </option>
-            ))}
+            <LessonOptions />
           </select>
         </label>
       </div>
@@ -865,21 +976,52 @@ function Compare() {
   );
 }
 
+function LessonOptions() {
+  return categories.map((category) => (
+    <optgroup label={category.label} key={category.id}>
+      {lessons
+        .filter((item) => item.category === category.id)
+        .map((item) => (
+          <option value={item.id} key={item.id}>
+            {item.title} · {item.englishTitle}
+          </option>
+        ))}
+    </optgroup>
+  ));
+}
+
 const guideOptions = [
+  {
+    id: "classical",
+    title: "小数据或快速基线",
+    en: "Small data & baselines",
+    category: "classical",
+    reason:
+      "先用 kNN、聚类、PCA 等低成本方法检验特征与任务，再判断深层模型是否值得投入。",
+  },
   {
     id: "image",
     title: "图像与空间数据",
     en: "Images & spatial patterns",
-    keywords: /cnn|convolution|resnet/i,
-    reason: "局部结构和平移特性通常很重要，先从卷积结构开始。",
+    category: "vision",
+    reason:
+      "从 CNN 和 ResNet 理解局部特征，再根据数据规模与任务比较视觉 Transformer。",
+  },
+  {
+    id: "segmentation",
+    title: "图像分割",
+    en: "Image segmentation",
+    keywords: /u-net|unet|deeplab|segmentation/i,
+    reason:
+      "需要逐像素预测时，比较 U-Net 的跳接、DeepLab 的多尺度上下文和 nnU-Net 的自动配置。",
   },
   {
     id: "sequence",
     title: "文本与序列",
     en: "Text & sequences",
-    keywords: /transformer|attention|lstm|rnn/i,
+    category: "sequence",
     reason:
-      "需要处理上下文关系；短序列可先比较 RNN/LSTM，长程交互常试 Transformer。",
+      "先看 RNN、attention 和 Transformer 的信息流，再按理解或生成任务选择 BERT 或自回归 LM。",
   },
   {
     id: "graph",
@@ -896,10 +1038,26 @@ const guideOptions = [
     reason: "先明确质量、采样速度、潜变量结构和训练稳定性的优先级。",
   },
   {
+    id: "representation",
+    title: "少标签与表示学习",
+    en: "Few labels & representations",
+    category: "representation",
+    reason:
+      "利用无标签数据学习 embedding；重点比较正负样本、增强方式与是否需要动量编码器。",
+  },
+  {
+    id: "reinforcement",
+    title: "决策与反馈",
+    en: "Decisions & feedback",
+    category: "reinforcement",
+    reason:
+      "先明确状态、动作、奖励和数据来源，再比较 value-based、policy-based、on-policy 与 off-policy 方法。",
+  },
+  {
     id: "general",
     title: "普通预测任务",
     en: "Prediction baseline",
-    keywords: /mlp|backprop|neural network|optimization/i,
+    keywords: /mlp|backprop|neural network|optimization|knn/i,
     reason: "先用简单基线弄清损失函数、数据规模和评估方法，再增加结构复杂度。",
   },
 ];
@@ -908,7 +1066,16 @@ function Guide() {
   const [choice, setChoice] = useState(guideOptions[0].id);
   const selected = guideOptions.find((option) => option.id === choice)!;
   const recommended = lessons
-    .filter((item) => selected.keywords.test(`${item.id} ${item.englishTitle}`))
+    .filter((item) =>
+      "category" in selected
+        ? item.category === selected.category
+        : selected.keywords.test(`${item.id} ${item.englishTitle}`),
+    )
+    .sort(
+      (a, b) =>
+        ["入门", "进阶", "高级"].indexOf(a.level) -
+        ["入门", "进阶", "高级"].indexOf(b.level),
+    )
     .slice(0, 5);
   return (
     <main className="utility-page guide-page page-gutter">
@@ -922,7 +1089,7 @@ function Guide() {
       </div>
       <div className="guide-layout">
         <div>
-          <h2>你的数据是什么结构？</h2>
+          <h2>你想解决什么问题？</h2>
           <div className="choice-list">
             {guideOptions.map((option) => (
               <button
@@ -986,6 +1153,30 @@ const glossary = [
   ["嵌入 Embedding", "把离散对象映射为可学习的连续向量。"],
   ["潜变量 Latent variable", "模型内部用于表达隐藏因素的压缩表示。"],
   ["微调 Fine-tuning", "从预训练参数出发，继续用特定任务数据训练。"],
+  ["基线 Baseline", "先运行的简单方法，给复杂模型一个值得超过的参照。"],
+  ["后验 Posterior", "给定观测后，对隐藏变量或参数的概率判断。"],
+  ["软分配 Soft assignment", "给一个样本属于各组的概率，而非只指定唯一组别。"],
+  ["分割 Segmentation", "对图像的像素或区域逐一预测类别或目标掩码。"],
+  [
+    "跳接 Skip connection",
+    "把较早层的特征直接送到后面的层，保留细节或改善优化。",
+  ],
+  ["Token", "语言模型处理的文本单位，可以是词、子词或字符片段。"],
+  [
+    "因果掩码 Causal mask",
+    "限制当前 token 只能读取已出现的 token，便于逐步生成。",
+  ],
+  ["正样本 Positive pair", "训练时希望表示更接近的一对样本或增强视图。"],
+  ["负样本 Negative pair", "训练时希望模型区分开的一对样本或增强视图。"],
+  [
+    "数据增强 Augmentation",
+    "对训练输入作保留关键信息的变换，增加可学习的变化。",
+  ],
+  ["策略 Policy", "强化学习中从状态选择动作的规则，常记作 π(a|s)。"],
+  ["价值函数 Value function", "估计状态或动作未来累计回报的函数。"],
+  ["On-policy", "主要用当前策略采集的数据更新这个策略的学习方式。"],
+  ["Off-policy", "可以利用其他策略产生的数据学习目标策略的方式。"],
+  ["奖励模型 Reward model", "从人类或其他偏好反馈学习打分信号的模型。"],
 ];
 
 function Glossary() {

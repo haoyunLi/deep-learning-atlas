@@ -1,3 +1,7 @@
+import { classicalRepresentationLessons } from "./classicalRepresentation";
+import { rlLessons } from "./rlModels";
+import { visionLanguageLessons } from "./visionLanguage";
+
 export type Lesson = {
   id: string;
   source?: { label: string; url: string };
@@ -34,10 +38,22 @@ export const categories = [
     description: "掌握优化、正则化与评估，让训练结果可靠且可复现。",
   },
   {
-    id: "architectures",
-    label: "架构谱系",
-    englishLabel: "Architectures",
-    description: "比较卷积、循环、注意力与 Transformer 的归纳偏置。",
+    id: "classical",
+    label: "经典基线",
+    englishLabel: "Classical Baselines",
+    description: "用简单方法建立参照，理解聚类、近邻与潜变量推断。",
+  },
+  {
+    id: "vision",
+    label: "视觉模型",
+    englishLabel: "Computer Vision",
+    description: "从卷积到残差、分割与视觉 Transformer。",
+  },
+  {
+    id: "sequence",
+    label: "语言与序列",
+    englishLabel: "Language & Sequences",
+    description: "理解循环网络、注意力、BERT 与语言模型。",
   },
   {
     id: "generative",
@@ -46,14 +62,26 @@ export const categories = [
     description: "沿着潜变量、对抗训练与逐步去噪理解生成。",
   },
   {
+    id: "representation",
+    label: "表示学习",
+    englishLabel: "Representation Learning",
+    description: "对比、自监督与多模态方法怎样学到可迁移的特征。",
+  },
+  {
+    id: "reinforcement",
+    label: "强化学习",
+    englishLabel: "Reinforcement Learning",
+    description: "比较价值、策略、模型与奖励反馈的不同路线。",
+  },
+  {
     id: "frontiers",
-    label: "进阶方法",
-    englishLabel: "Beyond the Basics",
-    description: "图、对比学习、参数高效微调与强化学习的实用路线。",
+    label: "更多架构",
+    englishLabel: "More Architectures",
+    description: "图网络、参数高效微调与专家模型。",
   },
 ] as const;
 
-export const lessons: Lesson[] = [
+const coreLessons: Lesson[] = [
   {
     id: "neural-networks",
     source: {
@@ -359,7 +387,7 @@ export const lessons: Lesson[] = [
     },
     title: "卷积为何懂图像",
     englishTitle: "Convolutional Neural Networks",
-    category: "architectures",
+    category: "vision",
     level: "入门",
     duration: "9 分钟",
     icon: "▦",
@@ -401,7 +429,7 @@ export const lessons: Lesson[] = [
     },
     title: "残差网络搭一条近路",
     englishTitle: "Residual Networks",
-    category: "architectures",
+    category: "vision",
     level: "进阶",
     duration: "8 分钟",
     icon: "↗",
@@ -443,7 +471,7 @@ export const lessons: Lesson[] = [
     },
     title: "循环网络逐步读序列",
     englishTitle: "Recurrent Neural Networks",
-    category: "architectures",
+    category: "sequence",
     level: "入门",
     duration: "8 分钟",
     icon: "⤴",
@@ -485,7 +513,7 @@ export const lessons: Lesson[] = [
     },
     title: "LSTM 与 GRU 的门",
     englishTitle: "LSTM & GRU",
-    category: "architectures",
+    category: "sequence",
     level: "进阶",
     duration: "9 分钟",
     icon: "⊞",
@@ -527,7 +555,7 @@ export const lessons: Lesson[] = [
     },
     title: "注意力是按需查找",
     englishTitle: "Attention & QKV",
-    category: "architectures",
+    category: "sequence",
     level: "进阶",
     duration: "10 分钟",
     icon: "✳",
@@ -569,7 +597,7 @@ export const lessons: Lesson[] = [
     },
     title: "Transformer 的积木",
     englishTitle: "Transformer Architecture",
-    category: "architectures",
+    category: "sequence",
     level: "进阶",
     duration: "11 分钟",
     icon: "▧",
@@ -613,7 +641,7 @@ export const lessons: Lesson[] = [
     },
     title: "Encoder 擅长读懂",
     englishTitle: "Encoder-only Models",
-    category: "architectures",
+    category: "sequence",
     level: "进阶",
     duration: "8 分钟",
     icon: "⊙",
@@ -655,7 +683,7 @@ export const lessons: Lesson[] = [
     },
     title: "Decoder 擅长续写",
     englishTitle: "Decoder-only Models",
-    category: "architectures",
+    category: "sequence",
     level: "进阶",
     duration: "9 分钟",
     icon: "▹",
@@ -697,7 +725,7 @@ export const lessons: Lesson[] = [
     },
     title: "Encoder–Decoder 做转换",
     englishTitle: "Sequence-to-Sequence",
-    category: "architectures",
+    category: "sequence",
     level: "进阶",
     duration: "9 分钟",
     icon: "⇄",
@@ -911,7 +939,7 @@ export const lessons: Lesson[] = [
     },
     title: "对比学习让相似靠近",
     englishTitle: "Contrastive Learning",
-    category: "frontiers",
+    category: "representation",
     level: "进阶",
     duration: "9 分钟",
     icon: "⇆",
@@ -995,8 +1023,8 @@ export const lessons: Lesson[] = [
     },
     title: "强化学习从反馈中决策",
     englishTitle: "Reinforcement Learning",
-    category: "frontiers",
-    level: "高级",
+    category: "reinforcement",
+    level: "入门",
     duration: "11 分钟",
     icon: "♜",
     summary: "Agent 试动作、看结果、积累 reward，学习长期收益更好的策略。",
@@ -1073,3 +1101,14 @@ export const lessons: Lesson[] = [
     compareTo: ["transformer", "decoder-models"],
   },
 ];
+
+export const lessons: Lesson[] = [
+  ...coreLessons,
+  ...classicalRepresentationLessons,
+  ...visionLanguageLessons,
+  ...rlLessons,
+].sort(
+  (a, b) =>
+    categories.findIndex((category) => category.id === a.category) -
+    categories.findIndex((category) => category.id === b.category),
+);
