@@ -1,7 +1,10 @@
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import AttentionAnimation from "./AttentionAnimation";
 import DiffusionAnimation from "./DiffusionAnimation";
 import PPOAnimation from "./PPOAnimation";
+import type { Lesson } from "../data/lessons";
+import { parameterLabs } from "./labs";
+import CourseWalkthrough, { courseAnimationSteps } from "./CourseWalkthrough";
 import "../animation.css";
 
 type AnimationSpec = {
@@ -10,7 +13,7 @@ type AnimationSpec = {
   steps: { title: string; explanation: string }[];
 };
 
-export const animationSpecs: Record<string, AnimationSpec> = {
+export const legacyAnimationSpecs: Record<string, AnimationSpec> = {
   attention: {
     title: "注意力怎样挑选上下文？",
     englishTitle: "Attention · Q/K/V walkthrough",
@@ -101,12 +104,31 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export default function AnimatedExplainer({ lessonId }: { lessonId: string }) {
+export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
+  const lab = parameterLabs[lesson.id];
+  const visualSpec = lab ?? legacyAnimationSpecs[lesson.id];
+  const [mode, setMode] = useState<"visual" | "flow">(
+    visualSpec ? "visual" : "flow",
+  );
   const [step, setStep] = useState(0);
+  const [value, setValue] = useState(lab?.parameter.initial ?? 0);
+  const [speed, setSpeed] = useState(1);
   const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
   const [playing, setPlaying] = useState(() => !prefersReducedMotion());
-  const spec = animationSpecs[lessonId];
-  const Visualization = visualizations[lessonId];
+  const [visible, setVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const flow = mode === "flow" || !visualSpec;
+  const spec: AnimationSpec = flow
+    ? {
+        title: `${lesson.title}：跟着步骤走`,
+        englishTitle: `${lesson.englishTitle} · Step walkthrough`,
+        steps: courseAnimationSteps(lesson),
+      }
+    : visualSpec;
+  const Visualization = lab?.render;
+  const LegacyVisualization = visualizations[lesson.id];
+  const count = spec.steps.length;
+  const current = Math.min(step, count - 1);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -119,54 +141,129 @@ export default function AnimatedExplainer({ lessonId }: { lessonId: string }) {
   }, []);
 
   useEffect(() => {
-    if (!playing || reducedMotion) return;
-    const interval = window.setInterval(() => {
-      if (!document.hidden) setStep((current) => (current + 1) % 4);
-    }, 3400);
-    return () => window.clearInterval(interval);
-  }, [playing, reducedMotion]);
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0.12 },
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
-  if (!spec || !Visualization) return null;
+  useEffect(() => {
+    if (!playing || reducedMotion || !visible) return;
+    const interval = window.setInterval(() => {
+      if (!document.hidden) setStep((previous) => (previous + 1) % count);
+    }, 5200 / speed);
+    return () => window.clearInterval(interval);
+  }, [playing, reducedMotion, visible, count, speed]);
 
   function selectStep(next: number) {
     setPlaying(false);
-    setStep((next + spec.steps.length) % spec.steps.length);
+    setStep((next + count) % count);
+  }
+  function switchMode(next: "visual" | "flow") {
+    setMode(next);
+    setStep(0);
+    setPlaying(false);
+  }
+  function reset() {
+    setStep(0);
+    setValue(lab?.parameter.initial ?? 0);
+    setPlaying(false);
   }
 
   return (
     <section
+      ref={sectionRef}
       className="animated-explainer"
       id="animation"
+      data-playing={playing && !reducedMotion && visible}
       aria-label={`${spec.title}动效图`}
     >
       <div className="animated-explainer-heading">
         <div>
           <span className="animated-explainer-kicker">
-            INTERACTIVE WALKTHROUGH · 动效拆解
+            {flow
+              ? "STEP WALKTHROUGH · 步骤导览"
+              : lab
+                ? "INTERACTIVE LAB · 参数实验"
+                : "VISUAL EXPLAINER · 机制图"}
           </span>
           <h2>{spec.title}</h2>
           <p>{spec.englishTitle}</p>
         </div>
         <span className="animated-explainer-counter">
-          {String(step + 1).padStart(2, "0")} <i>/</i>{" "}
-          {String(spec.steps.length).padStart(2, "0")}
+          {String(current + 1).padStart(2, "0")} <i>/</i>{" "}
+          {String(count).padStart(2, "0")}
         </span>
       </div>
+      {visualSpec && (
+        <div
+          className="animation-mode-tabs"
+          role="group"
+          aria-label="选择动效内容"
+        >
+          <button
+            type="button"
+            aria-pressed={!flow}
+            onClick={() => switchMode("visual")}
+          >
+            {lab ? "调参数，看机制" : "机制动效"}
+          </button>
+          <button
+            type="button"
+            aria-pressed={flow}
+            onClick={() => switchMode("flow")}
+          >
+            完整课程步骤
+          </button>
+        </div>
+      )}
+      {!flow && lab && (
+        <div className="lab-parameter">
+          <div>
+            <label htmlFor={`lab-${lesson.id}`}>{lab.parameter.label}</label>
+            <output htmlFor={`lab-${lesson.id}`}>
+              {Number(value.toFixed(3))}
+              {lab.parameter.unit ? ` ${lab.parameter.unit}` : ""}
+            </output>
+          </div>
+          <input
+            id={`lab-${lesson.id}`}
+            type="range"
+            min={lab.parameter.min}
+            max={lab.parameter.max}
+            step={lab.parameter.step}
+            value={value}
+            onChange={(e) => {
+              setValue(Number(e.target.value));
+              setPlaying(false);
+            }}
+          />
+          <p>{lab.parameter.hint}</p>
+        </div>
+      )}
       <div className="animated-explainer-stage">
-        <Visualization step={step} />
+        {flow ? (
+          <CourseWalkthrough lesson={lesson} step={current} />
+        ) : Visualization ? (
+          <Visualization step={current} value={value} />
+        ) : LegacyVisualization ? (
+          <LegacyVisualization step={current} />
+        ) : null}
       </div>
       <div className="animated-explainer-bottom">
         <div
           className="animated-step-copy"
           aria-live={playing ? "off" : "polite"}
         >
-          <strong>{spec.steps[step].title}</strong>
-          <p>{spec.steps[step].explanation}</p>
+          <strong>{spec.steps[current].title}</strong>
+          <p>{spec.steps[current].explanation}</p>
         </div>
         <div className="animated-controls" aria-label="动效播放控制">
           <button
             type="button"
-            onClick={() => selectStep(step - 1)}
+            onClick={() => selectStep(current - 1)}
             aria-label="上一步"
           >
             ←
@@ -174,20 +271,18 @@ export default function AnimatedExplainer({ lessonId }: { lessonId: string }) {
           <button
             type="button"
             className="animated-play"
-            onClick={() => setPlaying((value) => !value)}
+            onClick={() => setPlaying((v) => !v)}
             disabled={reducedMotion}
             aria-label={playing ? "暂停动效" : "播放动效"}
             title={
-              reducedMotion
-                ? "系统已启用减少动画，可使用前后步骤按钮"
-                : undefined
+              reducedMotion ? "系统已启用减少动画，可手动切换步骤" : undefined
             }
           >
             {playing ? "Ⅱ 暂停" : "▶ 播放"}
           </button>
           <button
             type="button"
-            onClick={() => selectStep(step + 1)}
+            onClick={() => selectStep(current + 1)}
             aria-label="下一步"
           >
             →
@@ -198,16 +293,48 @@ export default function AnimatedExplainer({ lessonId }: { lessonId: string }) {
         {spec.steps.map((item, index) => (
           <button
             type="button"
-            key={item.title}
+            key={index}
             aria-label={`跳转第 ${index + 1} 步：${item.title}`}
-            aria-current={step === index ? "step" : undefined}
+            aria-current={current === index ? "step" : undefined}
             onClick={() => selectStep(index)}
-          />
+          >
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <small>{item.title}</small>
+          </button>
         ))}
       </div>
+      <div className="animation-utilities">
+        <button type="button" onClick={reset}>
+          ↺ 重置实验
+        </button>
+        <label>
+          播放速度{" "}
+          <select
+            aria-label="播放速度"
+            value={speed}
+            onChange={(e) => setSpeed(Number(e.target.value))}
+          >
+            <option value={0.5}>0.5× · 慢读</option>
+            <option value={1}>1× · 标准</option>
+            <option value={2}>2× · 快览</option>
+          </select>
+        </label>
+        <a href="#/animations">浏览全部动效 →</a>
+      </div>
       <p className="animated-explainer-note">
-        示意动效用于理解计算顺序；颜色和示例数字不代表实际训练结果。
-        <span className="animated-mobile-hint">手机上可左右滑动图示。</span>
+        {flow
+          ? "本图按课程步骤展示流程，不运行模型训练；具体设置与使用边界见下方课程。"
+          : lab
+            ? lab.note
+            : "示意动效用于理解计算顺序；颜色和示例数字不代表实际训练结果。"}
+        {!flow && (
+          <span className="animated-mobile-hint">手机上可左右滑动图示。</span>
+        )}
+        {reducedMotion && (
+          <span className="animation-reduced-note">
+            系统已开启减少动态效果：自动播放关闭，仍可手动切步和调参。
+          </span>
+        )}
       </p>
     </section>
   );

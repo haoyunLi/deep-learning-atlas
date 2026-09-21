@@ -20,7 +20,9 @@
 
 还包括关键词搜索、分类筛选、两算法并排比较、按数据结构选起点的指南、关键概念路径、术语表，以及保存在本机浏览器的阅读进度。每篇课程都链接到原始论文或官方文档。
 
-Attention、Diffusion 和 PPO 课程配有四步动效图，可自动播放、暂停或手动跳步。示意图对齐课程机制步骤，同时标出教学示例数值与真实训练输出的区别；系统设置为减少动态效果时会暂停自动播放。
+全部 104 节课程都有步骤动效；其中 48 节配有专属机制图，45 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
+
+[动效实验室](https://haoyunli.github.io/deep-learning-atlas/#/animations) 支持关键词、学习方向与动效类型筛选。每个实验提供四步中英说明、滑块或图解、播放/暂停、慢速/快速、手动跳步与重置；也可切换到完整课程步骤。手机上支持图内横向滑动。自动播放只在图进入视野时运行；系统启用减少动态效果时关闭自动播放和过渡。参数实验使用可手算的合成案例，清楚说明哪些公式在实时计算、哪些示意并未运行模型训练。
 
 关键概念路径把课程按问题串起来：prediction head 与 attention head 的不同位置；zero-shot、few-shot、linear probe、原型网络与元学习；GPT 的 in-context learning、chain-of-thought 与偏好训练；cohort 定义、数据泄漏、分布漂移、外部验证与校准。每一步说明为什么要接着学下一步，并链接到完整课程。独立课程中的机制拆解仍按步骤展开，附有配置起点与调整信号。
 
@@ -52,11 +54,15 @@ npm run preview
 - [`src/data/dataConcepts.ts`](src/data/dataConcepts.ts)：cohort、数据泄漏、分布变化与可信评估课程。
 - [`src/data/conceptPaths.ts`](src/data/conceptPaths.ts)：把模型课与概念课串成四条逐步学习路径。
 - [`src/App.tsx`](src/App.tsx)：课程图谱、详情、对比、选型与术语交互。
-- [`src/components/AnimatedExplainer.tsx`](src/components/AnimatedExplainer.tsx)：动效步骤、播放控制和课程说明。
+- [`src/components/AnimatedExplainer.tsx`](src/components/AnimatedExplainer.tsx)：动效步骤、参数控制、播放速度、可见性与减少动画设置。
+- [`src/components/AnimationDirectory.tsx`](src/components/AnimationDirectory.tsx)：可搜索筛选的动效实验室。
+- [`src/components/CourseWalkthrough.tsx`](src/components/CourseWalkthrough.tsx)：由课程机制生成的完整步骤导览。
+- [`src/components/labs/`](src/components/labs/)：45 个专属参数实验，按基础/经典、视觉/序列、强化/表示、生成/数据组织。
 - [`src/components/AttentionAnimation.tsx`](src/components/AttentionAnimation.tsx)、[`src/components/DiffusionAnimation.tsx`](src/components/DiffusionAnimation.tsx)、[`src/components/PPOAnimation.tsx`](src/components/PPOAnimation.tsx)：三张算法机制动效图。
 - [`src/styles.css`](src/styles.css)：响应式视觉系统。
 - [`src/animation.css`](src/animation.css)：动效图与首页入口样式。
 - [`scripts/validate-content.mjs`](scripts/validate-content.mjs)：构建时检查课程字段、来源、分类、唯一 ID 和比较链接。
+- [`scripts/validate-animations.mjs`](scripts/validate-animations.mjs)：构建时检查动效覆盖、参数端点、540 组 SVG 渲染及梯度、EM、概率归一化和 RL 目标等数值不变量；可单独运行 `npm run validate:animations`。
 - [`design/concept-home.png`](design/concept-home.png)、[`design/concept-lesson.png`](design/concept-lesson.png)：首页和课程详情的设计参考。
 
 添加课程时给出唯一的 `id`、所属 `category`，填写课程各字段，特别是 `mechanicsSteps`、`limits` 与 `settings`，并确保 `compareTo` 引用已有课程 ID。生产构建会检查这三组内容的最低条目数和设置项字段。项目采用 hash 路由，因此课程链接可在 GitHub Pages 上直接打开或分享。

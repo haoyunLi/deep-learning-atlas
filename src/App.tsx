@@ -1,11 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { categories, lessons, type Lesson } from "./data/lessons";
 import { conceptPaths } from "./data/conceptPaths";
-import AnimatedExplainer, {
-  animationSpecs,
-} from "./components/AnimatedExplainer";
+import AnimatedExplainer from "./components/AnimatedExplainer";
+import AnimationDirectory from "./components/AnimationDirectory";
+import { mechanismCount, parameterLabs } from "./components/labs";
 
 const repoUrl = "https://github.com/haoyunLi/deep-learning-atlas";
+function scrollBehavior(): ScrollBehavior {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+}
 
 function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
   return diagonal ? (
@@ -42,6 +47,7 @@ function Header({ route }: { route: string }) {
   const [open, setOpen] = useState(false);
   const links = [
     { href: "#/path", label: "学习路径" },
+    { href: "#/animations", label: "动效实验室" },
     { href: "#/concepts", label: "关键概念" },
     { href: "#/atlas", label: "算法图谱" },
     { href: "#/compare", label: "对比" },
@@ -249,7 +255,7 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
         () =>
           document
             .getElementById(initialSection)
-            ?.scrollIntoView({ behavior: "smooth" }),
+            ?.scrollIntoView({ behavior: scrollBehavior() }),
         40,
       );
   }, [initialSection]);
@@ -296,7 +302,7 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
                 setCategory(item.id);
                 document
                   .getElementById("atlas")
-                  ?.scrollIntoView({ behavior: "smooth" });
+                  ?.scrollIntoView({ behavior: scrollBehavior() });
               }}
             >
               <div className="route-line">
@@ -332,7 +338,10 @@ function Home({ initialSection }: { initialSection?: "path" | "atlas" }) {
       >
         <div className="animation-promo-heading">
           <h2 id="animation-promo-title">跟着动效，看懂算法的每一步。</h2>
-          <span>Interactive walkthroughs · 可暂停、可逐步查看</span>
+          <a className="animation-all-link" href="#/animations">
+            {lessons.length} 节步骤动效 · {mechanismCount} 张机制图 ·{" "}
+            {Object.keys(parameterLabs).length} 个参数实验　浏览全部 →
+          </a>
         </div>
         <div className="animation-promo-grid">
           {[
@@ -493,300 +502,6 @@ function readProgress(): string[] {
   }
 }
 
-function MechanismDiagram({ lesson }: { lesson: Lesson }) {
-  const name = `${lesson.id} ${lesson.englishTitle}`.toLowerCase();
-  let steps = [
-    "输入数据 Input",
-    "模型变换 Model",
-    "计算损失 Loss",
-    "参数更新 Update",
-  ];
-  const conceptFlows: Record<string, string[]> = {
-    "prediction-heads": [
-      "读取 backbone 表示",
-      "选聚合与输出形状",
-      "产生 logits 或数值",
-      "按任务损失训练",
-    ],
-    "attention-heads": [
-      "投影多组 Q/K/V",
-      "每组分别注意",
-      "拼接各 head 输出",
-      "输出投影融合",
-    ],
-    "zero-shot-learning": [
-      "固定未见任务",
-      "写任务描述或标签",
-      "不提供目标样例",
-      "独立测试泛化",
-    ],
-    "few-shot-learning": [
-      "准备少量 support",
-      "限定示例预算",
-      "适配或放进 prompt",
-      "测 query 泛化",
-    ],
-    "in-context-learning": [
-      "选择任务示例",
-      "放进上下文窗口",
-      "保持模型权重不变",
-      "预测新输入",
-    ],
-    "chain-of-thought-prompting": [
-      "给任务或示例",
-      "引导中间步骤",
-      "生成推理文本",
-      "核验最终答案",
-    ],
-    "linear-probe": [
-      "冻结预训练编码器",
-      "抽取 embedding",
-      "训练线性分类器",
-      "评估表示质量",
-    ],
-    "prototypical-networks": [
-      "编码 support 样本",
-      "每类求 prototype",
-      "计算 query 距离",
-      "按距离分类",
-    ],
-    "meta-learning-maml": [
-      "采样多个任务",
-      "任务内快速更新",
-      "跨任务求元梯度",
-      "适应新任务",
-    ],
-    "cohort-design": [
-      "定义目标人群",
-      "设 index date",
-      "限定特征与结局窗口",
-      "按个体切分评估",
-    ],
-    "data-leakage": [
-      "画预测时间线",
-      "核查特征可用时点",
-      "隔离训练与测试",
-      "重跑无泄漏评估",
-    ],
-    "domain-shift": [
-      "定义训练分布",
-      "识别目标环境",
-      "比较漂移类型",
-      "外部数据验证",
-    ],
-    "external-validation": [
-      "冻结模型与阈值",
-      "选择新时间或地点",
-      "独立计算指标",
-      "分析性能差异",
-    ],
-    "calibration-uncertainty": [
-      "输出预测概率",
-      "按风险段分组",
-      "比较预测与发生率",
-      "必要时重新校准",
-    ],
-    "class-imbalance": [
-      "检查类别基率",
-      "选任务相关指标",
-      "训练对比基线",
-      "调阈值与校准",
-    ],
-  };
-  if (conceptFlows[lesson.id]) steps = conceptFlows[lesson.id];
-  else if (/expectation.maximization|^em\b|em-algorithm/.test(name))
-    steps = ["观测数据", "E-step 估计隐变量", "M-step 更新参数", "重复至收敛"];
-  else if (/\bknn\b|k-nearest/.test(name))
-    steps = ["保存训练样本", "计算查询距离", "找到 k 个近邻", "投票或取平均"];
-  else if (/k-means/.test(name))
-    steps = ["选择 k 个中心", "分配最近中心", "更新簇中心", "重复至稳定"];
-  else if (/gaussian-mixture|\bgmm\b/.test(name))
-    steps = ["多个高斯分量", "计算软归属", "更新均值与方差", "得到混合密度"];
-  else if (/\bpca\b|principal.component/.test(name))
-    steps = ["中心化数据", "寻找最大方差方向", "选择主成分", "投影降维"];
-  else if (/\bsvm\b|support.vector/.test(name))
-    steps = ["输入特征与标签", "最大化分类间隔", "确定支持向量", "预测新样本"];
-  else if (/energy.based|\bebm\b/.test(name))
-    steps = ["输入候选样本", "计算能量 Eθ", "压低真实样本能量", "比较或采样"];
-  else if (/\bdino\b/.test(name))
-    steps = ["裁出不同视图", "学生与教师编码", "教师动量更新", "对齐输出分布"];
-  else if (/\bbyol\b/.test(name))
-    steps = [
-      "同一图像的两种视图",
-      "在线编码器与预测头",
-      "目标编码器 EMA",
-      "对齐两个表示",
-    ];
-  else if (/barlow.twins|\bvicreg\b/.test(name))
-    steps = ["构造两种视图", "分别编码", "保持语义一致", "避免特征塌缩或冗余"];
-  else if (/\bmae\b|masked.autoencoder/.test(name))
-    steps = [
-      "遮住图像 patches",
-      "编码可见部分",
-      "解码缺失部分",
-      "重建原始像素",
-    ];
-  else if (/\bmoco\b/.test(name))
-    steps = [
-      "两种增强视图",
-      "查询与动量编码器",
-      "队列提供负样本",
-      "对比损失更新",
-    ];
-  else if (/contrastive|simclr|moco|clip|infonce|triplet/.test(name))
-    steps = [
-      "构造样本或视图",
-      "编码成 embedding",
-      "比较相似度",
-      "拉近正例、拉远负例",
-    ];
-  else if (/mask.rcnn/.test(name))
-    steps = ["提取图像特征", "提出候选区域", "检测每个物体", "预测实例 mask"];
-  else if (/\bdetr\b/.test(name))
-    steps = [
-      "编码图像特征",
-      "object queries",
-      "集合匹配训练",
-      "输出目标框和类别",
-    ];
-  else if (/u-net|unet|deeplab|segmentation/.test(name))
-    steps = [
-      "输入图像",
-      "提取多尺度特征",
-      "融合局部与全局信息",
-      "输出像素标签",
-    ];
-  else if (/resnet|residual/.test(name))
-    steps = ["输入 x", "残差变换 F(x)", "相加 F(x)+x", "继续堆叠特征"];
-  else if (/\bvit\b|swin.transformer/.test(name))
-    steps = [
-      "图像切分成 patches",
-      "映射为 token",
-      "注意力整合上下文",
-      "输出视觉特征",
-    ];
-  else if (/\bbert\b|roberta/.test(name))
-    steps = ["输入双向上下文", "编码 token 关系", "预训练表示", "接任务头微调"];
-  else if (/seq2seq|encoder.decoder|\bt5\b|\bbart\b/.test(name))
-    steps = [
-      "读取输入序列",
-      "Encoder 建表示",
-      "Decoder 条件生成",
-      "输出目标序列",
-    ];
-  else if (/\bgpt\b|autoregressive|language.model/.test(name))
-    steps = ["已有 token 前缀", "因果注意力", "预测下一个 token", "追加并重复"];
-  else if (/word2vec/.test(name))
-    steps = ["抽取词与上下文", "查找词向量", "预测邻近词", "复用学到的向量"];
-  else if (/\btcn\b|temporal.convolution/.test(name))
-    steps = ["输入时间序列", "因果卷积", "扩张感受野", "预测当前或未来"];
-  else if (/\bppo\b|proximal.policy/.test(name))
-    steps = [
-      "用当前策略采样",
-      "估计优势 Advantage",
-      "裁剪策略比率",
-      "更新策略与价值",
-    ];
-  else if (/\bdqn\b|deep.q|double.dqn|dueling.dqn/.test(name))
-    steps = [
-      "观察状态 s",
-      "估计各动作 Q 值",
-      "选择动作并收集经验",
-      "用 TD 目标更新",
-    ];
-  else if (/\bdpo\b/.test(name))
-    steps = [
-      "收集偏好对",
-      "比较策略与参考模型",
-      "直接优化偏好目标",
-      "评估回复质量",
-    ];
-  else if (/\brlhf\b/.test(name))
-    steps = ["收集人类偏好", "训练奖励模型", "优化生成策略", "验证真实偏好"];
-  else if (/reward.model/.test(name))
-    steps = [
-      "收集偏好或反馈",
-      "比较回答质量",
-      "学习评分函数",
-      "给策略提供信号",
-    ];
-  else if (/decision.transformer/.test(name))
-    steps = [
-      "固定离线轨迹",
-      "加入目标回报",
-      "建模状态动作序列",
-      "预测下一动作",
-    ];
-  else if (/offline.rl|\bcql\b/.test(name))
-    steps = [
-      "收集固定轨迹",
-      "估计价值或策略",
-      "限制数据外动作",
-      "离线评估与验证",
-    ];
-  else if (lesson.category === "reinforcement")
-    steps = [
-      "观察状态 State",
-      "选择动作 Action",
-      "获得奖励 Reward",
-      "改进策略或价值",
-    ];
-  else if (/attention|transformer/.test(name))
-    steps = [
-      "查询 Q · 键 K · 值 V",
-      "相似度 QKᵀ/√d",
-      "softmax 权重",
-      "加权求和 AV",
-    ];
-  else if (
-    /cnn|convolution|vgg|densenet|efficientnet|convnext|\bvit\b|swin/.test(name)
-  )
-    steps = [
-      "局部图像块 Patch",
-      "卷积核 Kernel",
-      "特征图 Feature map",
-      "预测 Prediction",
-    ];
-  else if (/rnn|lstm|gru/.test(name))
-    steps = ["当前输入 xₜ", "隐藏状态 hₜ₋₁", "状态更新 hₜ", "下一步输出"];
-  else if (/diffusion/.test(name))
-    steps = ["真实样本 x₀", "逐步加噪 Noise", "预测噪声 ε", "逐步去噪 Sample"];
-  else if (/gan/.test(name))
-    steps = ["随机噪声 z", "生成器 G", "判别器 D", "交替优化"];
-  else if (/vae|autoencoder/.test(name))
-    steps = ["输入 x", "编码器 Encoder", "潜变量 z", "解码器 Decoder"];
-  else if (/gnn|graph/.test(name))
-    steps = ["节点与边", "邻居消息", "聚合 Aggregate", "节点表示"];
-  else if (lesson.category === "representation")
-    steps = [
-      "构造训练视图",
-      "Encoder 提取表示",
-      "自监督目标更新",
-      "迁移到下游任务",
-    ];
-  else if (lesson.category === "classical")
-    steps = ["准备特征", "拟合或保存样本", "形成决策规则", "预测或分析"];
-  return (
-    <div
-      className="mechanism-diagram"
-      aria-label={`${lesson.title}的机制示意图`}
-    >
-      <div className="diagram-caption">
-        机制速览 <span>Mechanism at a glance</span>
-      </div>
-      <div className="diagram-flow">
-        {steps.map((step, i) => (
-          <div className="diagram-step" key={step}>
-            <span className="diagram-index">0{i + 1}</span>
-            <strong>{step}</strong>
-            {i < steps.length - 1 && <ArrowIcon />}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function TextList({ items }: { items: string[] }) {
   return (
     <ul className="editorial-list">
@@ -797,12 +512,22 @@ function TextList({ items }: { items: string[] }) {
   );
 }
 
-function Detail({ id }: { id: string }) {
+function Detail({
+  id,
+  showAnimation = false,
+}: {
+  id: string;
+  showAnimation?: boolean;
+}) {
   const lesson = lessons.find((item) => item.id === id);
   const [completed, setCompleted] = useState<string[]>(readProgress);
-  useEffect(() => {
+  useLayoutEffect(() => {
     window.scrollTo({ top: 0 });
-  }, [id]);
+    if (!showAnimation) return;
+    document
+      .getElementById("animation")
+      ?.scrollIntoView({ behavior: "instant" });
+  }, [id, showAnimation]);
   if (!lesson)
     return (
       <div className="not-found page-gutter">
@@ -866,9 +591,7 @@ function Detail({ id }: { id: string }) {
         <nav className="detail-toc">
           {[
             ["intuition", "直觉 Intuition"],
-            ...(animationSpecs[lesson.id]
-              ? [["animation", "动效 Walkthrough"]]
-              : []),
+            ["animation", "动效 Walkthrough"],
             ["mechanics", "步骤 Mechanics"],
             ["usage", "选型与上手 Use"],
             ["tuning", "配置与调参 Settings"],
@@ -881,7 +604,7 @@ function Detail({ id }: { id: string }) {
               onClick={() =>
                 document
                   .getElementById(section)
-                  ?.scrollIntoView({ behavior: "smooth" })
+                  ?.scrollIntoView({ behavior: scrollBehavior() })
               }
             >
               {label}
@@ -916,11 +639,7 @@ function Detail({ id }: { id: string }) {
           </h2>
           <p>{lesson.intuition}</p>
         </section>
-        {animationSpecs[lesson.id] ? (
-          <AnimatedExplainer key={lesson.id} lessonId={lesson.id} />
-        ) : (
-          <MechanismDiagram lesson={lesson} />
-        )}
+        <AnimatedExplainer key={lesson.id} lesson={lesson} />
         <section className="detail-section" id="mechanics">
           <h2>
             机制拆解 <span>How it works</span>
@@ -1428,7 +1147,7 @@ function Concepts({ selectedPath }: { selectedPath?: string }) {
     const timeout = window.setTimeout(() => {
       document
         .getElementById(selectedPath)
-        ?.scrollIntoView({ behavior: "smooth" });
+        ?.scrollIntoView({ behavior: scrollBehavior() });
     }, 50);
     return () => window.clearTimeout(timeout);
   }, [selectedPath]);
@@ -1635,8 +1354,21 @@ function App() {
     return () => window.removeEventListener("hashchange", update);
   }, []);
   let page;
-  if (route.startsWith("/lesson/"))
-    page = <Detail id={decodeURIComponent(route.slice(8))} />;
+  if (route.startsWith("/lesson/")) {
+    const [rawId, query = ""] = route.slice(8).split("?");
+    let id = rawId;
+    try {
+      id = decodeURIComponent(rawId);
+    } catch {
+      /* The not-found page handles malformed paths. */
+    }
+    page = (
+      <Detail
+        id={id}
+        showAnimation={new URLSearchParams(query).get("animation") === "1"}
+      />
+    );
+  } else if (route === "/animations") page = <AnimationDirectory />;
   else if (route === "/compare") page = <Compare />;
   else if (route === "/guide") page = <Guide />;
   else if (route.startsWith("/concepts"))
