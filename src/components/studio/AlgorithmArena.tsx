@@ -2,11 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import {
   defaultArenaConfig,
   runArena,
+  arenaModelSettings,
+  type ArenaAlgorithm,
   type ArenaConfig,
   type ArenaDataset,
   type ArenaResult,
 } from "../../studio/arenaMath";
 import { visitStudioTool } from "../../studio/studioState";
+import { arenaDataKey, readArenaExposures, saveArenaExposures, type ArenaExposure } from "../../studio/arenaEvidence";
 import { StudioSectionTitle, StudioShell, StatusDot } from "./StudioShell";
 
 function percent(value: number) {
@@ -128,7 +131,7 @@ function LearningCurve({ result }: { result: ArenaResult }) {
         0
       </text>
       <text x="296" y="169">
-        budget
+        {result.curve[result.curve.length - 1]?.step}
       </text>
       <text x="3" y="34">
         1.0
@@ -145,6 +148,13 @@ export default function AlgorithmArena() {
   const [config, setConfig] = useState<ArenaConfig>(defaultArenaConfig);
   const [selectedId, setSelectedId] = useState("boosting");
   const [testUnlocked, setTestUnlocked] = useState(false);
+  const [exposures, setExposures] = useState<ArenaExposure[]>(readArenaExposures);
+  const [reason, setReason] = useState("");
+  const [storageUnavailable, setStorageUnavailable] = useState(false);
+  const dataKey = arenaDataKey(config);
+  const previousExposure = exposures.find((item) => item.dataKey === dataKey);
+  const settings = arenaModelSettings(config);
+  const seedValid = Number.isSafeInteger(draft.seed) && draft.seed >= 0 && draft.seed <= 4294967295;
   const arena = useMemo(
     () => runArena(config, testUnlocked),
     [config, testUnlocked],
@@ -160,17 +170,26 @@ export default function AlgorithmArena() {
   const setNumber = (key: keyof ArenaConfig, value: number) =>
     setDraft((current) => ({ ...current, [key]: value }));
   const run = () => {
-    setConfig(draft);
+    if (!seedValid) return;
+    setConfig({ ...draft });
     setTestUnlocked(false);
+    setReason("");
+  };
+  const reveal = () => {
+    if (!reason.trim()) return;
+    const next = [...exposures, { dataKey, model: selected.id as ArenaAlgorithm, reason: reason.trim(), budget: config.budget, revealedAt: Date.now() }];
+    setExposures(next);
+    setStorageUnavailable(!saveArenaExposures(next));
+    setTestUnlocked(true);
   };
 
   return (
     <StudioShell
       route="/studio/arena"
       eyebrow="ALGORITHM ARENA · 跨算法竞技场"
-      title="同一数据，同一切分，同一预算。"
+      title="同一数据，同一切分，明确模型设置。"
       english="Compare inductive biases under a controlled experiment."
-      intro="五种算法在相同的二维分类任务上实际训练。训练集拟合标准化参数，验证集选型；分布偏移后的测试集保持锁定，直到你明确揭晓。"
+      intro="五种教学算法使用相同二维合成数据与切分。训练集拟合标准化参数，验证集选型；各模型的更新步数、树桩数和 k 分别公开，未控制相同 FLOPs、时间或调参次数。"
     >
       <div className="arena-layout">
         <aside className="arena-controls">
@@ -257,7 +276,7 @@ export default function AlgorithmArena() {
           </label>
           <label>
             <span>
-              训练预算 Budget <strong>{draft.budget}</strong>
+              设置倍率 Setting scale <strong>{draft.budget}</strong>
             </span>
             <input
               type="range"
@@ -274,19 +293,25 @@ export default function AlgorithmArena() {
             <span>随机种子 Seed</span>
             <input
               type="number"
-              value={draft.seed}
+              min="0"
+              max="4294967295"
+              step="1"
+              aria-invalid={!seedValid}
+              value={Number.isFinite(draft.seed) ? draft.seed : ""}
               onChange={(event) =>
-                setNumber("seed", Number(event.target.value) || 1)
+                setNumber("seed", event.target.valueAsNumber)
               }
             />
           </label>
-          <button className="studio-primary-button" onClick={run}>
+          {!seedValid && <p role="status">Seed 请输入 0–4294967295 的整数。</p>}
+          <button className="studio-primary-button" onClick={run} disabled={!seedValid}>
             重新训练五个模型 →
           </button>
           <p className="arena-split-note">
             <StatusDot tone="blue" />
             Train {config.trainSize} · Validation 120 · Test 160
           </p>
+          <p className="arena-settings-note">设置倍率同时改变不同模型的不同参数。它不代表相等的计算预算。</p>
         </aside>
 
         <section className="arena-evidence">
@@ -324,7 +349,9 @@ export default function AlgorithmArena() {
             <strong>{percent(selected.validation.balancedAccuracy)}</strong>
           </div>
           <LearningCurve result={selected} />
+          <p className="arena-settings-note">横轴：{selected.curveUnit}。kNN 只有当前 k 的一个验证点，不表示训练曲线。</p>
           <dl>
+            <div><dt>ACTUAL SETTINGS</dt><dd>{selected.settings}</dd></div>
             <div>
               <dt>COMPUTE</dt>
               <dd>{selected.cost}</dd>
@@ -342,6 +369,7 @@ export default function AlgorithmArena() {
       </div>
 
       <section className="arena-table-section">
+        <details className="arena-settings"><summary>本轮五个模型的实际设置</summary><ul>{Object.entries(settings).map(([id, item]) => <li key={id}><strong>{id}</strong>：{item.value} {item.unit} · {item.detail}</li>)}</ul><p>树模型采用单层树桩，不能代表完整 Random Forest / Gradient Boosting 的实现与性能。</p></details>
         <StudioSectionTitle
           index="04"
           title="模型比较"
@@ -390,25 +418,32 @@ export default function AlgorithmArena() {
       <section className={`test-lock ${testUnlocked ? "unlocked" : ""}`}>
         <div>
           <StatusDot tone={testUnlocked ? "green" : "orange"} />
-          <span>{testUnlocked ? "TEST REVEALED" : "LOCKED TEST SET"}</span>
+          <span>{testUnlocked ? "TEST REVEALED" : previousExposure ? "PREVIOUSLY EXPOSED TEST" : "TEST RESULTS HIDDEN"}</span>
         </div>
         <h2>
           {testUnlocked
             ? "测试集已经揭晓。不要再用它调参。"
+            : previousExposure ? "这份测试数据曾揭晓，不能恢复为未见测试集。"
             : "先写下你选择的模型与理由，再看测试结果。"}
         </h2>
         <p>
           {testUnlocked
             ? `分布偏移强度 ${config.shift.toFixed(2)}；请比较 validation 与 test 的落差。`
-            : "测试集含未用于选型的分布偏移。揭晓会重新训练相同配置并只增加一次测试评估。"}
+            : previousExposure ? "重新训练只隐藏当前结果。后续查看属于探索；要做独立评估，请使用新的、未参与选型的数据。换一个合成 seed 也不能替代外部验证。" : "测试指标默认隐藏；数据由固定 seed 在浏览器生成，隐藏不是安全隔离。先记录模型和理由，揭晓后保留暴露历史。"}
         </p>
+        {previousExposure && <p>首次记录：{previousExposure.model} · 设置倍率 {previousExposure.budget} · 理由：{previousExposure.reason}。当前数据共揭晓 {exposures.filter((item) => item.dataKey === dataKey).length} 次。</p>}
+        {exposures.length > 0 && <p>本浏览器累计记录 {exposures.length} 次揭晓；改变配置或重新训练不会清除它们。{storageUnavailable ? "本机存储不可用；当前会话保留记录，刷新后可能丢失。" : "记录保存在本机浏览器，清除浏览器数据会丢失。"}</p>}
         {!testUnlocked && (
+          <>
+          <label className="arena-choice-reason">当前选择：{selected.label}。用 validation 说明理由<input type="text" maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} /></label>
           <button
             className="studio-primary-button"
-            onClick={() => setTestUnlocked(true)}
+            onClick={reveal}
+            disabled={!reason.trim()}
           >
-            冻结选择并揭晓 Test →
+            记录当前选择并揭晓 Test →
           </button>
+          </>
         )}
       </section>
     </StudioShell>

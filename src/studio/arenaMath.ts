@@ -31,6 +31,8 @@ export type ArenaResult = {
   family: string;
   validation: ArenaMetrics;
   test?: ArenaMetrics;
+  settings: string;
+  curveUnit: string;
   cost: string;
   tuning: string;
   failureMode: string;
@@ -43,7 +45,7 @@ type Predictor = (x: [number, number]) => number;
 
 const labels: Record<
   ArenaAlgorithm,
-  Omit<ArenaResult, "validation" | "test" | "curve" | "boundary">
+  Omit<ArenaResult, "validation" | "test" | "curve" | "boundary" | "settings" | "curveUnit">
 > = {
   logistic: {
     id: "logistic",
@@ -57,15 +59,15 @@ const labels: Record<
     id: "knn",
     label: "kNN",
     family: "局部实例方法",
-    cost: "几乎无训练；每次推理 O(n log k)",
+    cost: "存储训练样本；此实现每次推理计算 n 个距离并排序，O(n log n)",
     tuning: "小数据从奇数 k≈√n 开始，并检查距离尺度。",
     failureMode: "高维、分布偏移或密度不均时距离失真。",
   },
   forest: {
     id: "forest",
     label: "Random Forest",
-    family: "Bagging 树集成",
-    cost: "训练随树数增长；推理可并行",
+    family: "随机单层树桩集成（教学简化）",
+    cost: "树桩随机选轴与阈值，未搜索完整 CART 树；训练随树数增长",
     tuning: "先增加树到验证集稳定，再限制叶节点最小样本。",
     failureMode: "轴对齐切分拟合斜边界时需要很多树。",
   },
@@ -291,10 +293,9 @@ function curvePoint(step: number, samples: Sample[], predict: Predictor) {
   };
 }
 
-function trainLogistic(train: Sample[], validation: Sample[], budget: number) {
+function trainLogistic(train: Sample[], validation: Sample[], steps: number) {
   const weights: [number, number, number] = [0, 0, 0];
   const learningRate = 0.12;
-  const steps = Math.max(20, budget * 12);
   const curve: { step: number; balancedAccuracy: number }[] = [];
   const predict: Predictor = (x) =>
     sigmoid(weights[0] * x[0] + weights[1] * x[1] + weights[2]);
@@ -320,14 +321,7 @@ function trainLogistic(train: Sample[], validation: Sample[], budget: number) {
   return { predict, curve };
 }
 
-function trainKnn(train: Sample[], validation: Sample[], budget: number) {
-  const k = Math.max(
-    1,
-    Math.min(
-      train.length,
-      Math.round(Math.sqrt(train.length) * (0.55 + budget / 40)),
-    ),
-  );
+function trainKnn(train: Sample[], validation: Sample[], k: number) {
   const predict: Predictor = (x) => {
     const neighbors = train
       .map((sample) => ({
@@ -384,11 +378,10 @@ function fitProbabilityStump(
 function trainForest(
   train: Sample[],
   validation: Sample[],
-  budget: number,
+  count: number,
   seed: number,
 ) {
   const random = mulberry32(seed + 103);
-  const count = Math.max(8, budget * 3);
   const stumps: Stump[] = [];
   const curve: { step: number; balancedAccuracy: number }[] = [];
   const predict: Predictor = (x) =>
@@ -414,14 +407,13 @@ function trainForest(
   return { predict, curve };
 }
 
-function trainBoosting(train: Sample[], validation: Sample[], budget: number) {
+function trainBoosting(train: Sample[], validation: Sample[], count: number) {
   const baseRate = train.reduce((sum, item) => sum + item.y, 0) / train.length;
   const base = Math.log(
     clampProbability(baseRate) / (1 - clampProbability(baseRate)),
   );
   const trees: Stump[] = [];
   const learningRate = 0.28;
-  const count = Math.max(8, budget * 2);
   const score = (x: [number, number]) =>
     base +
     learningRate * trees.reduce((sum, tree) => sum + stumpPredict(tree, x), 0);
@@ -473,7 +465,7 @@ function trainBoosting(train: Sample[], validation: Sample[], budget: number) {
 function trainMlp(
   train: Sample[],
   validation: Sample[],
-  budget: number,
+  steps: number,
   seed: number,
 ) {
   const random = mulberry32(seed + 701);
@@ -498,7 +490,6 @@ function trainMlp(
     };
   };
   const predict: Predictor = (x) => forward(x).probability;
-  const steps = Math.max(30, budget * 15);
   const learningRate = 0.055;
   const curve: { step: number; balancedAccuracy: number }[] = [];
   for (let step = 1; step <= steps; step += 1) {
@@ -556,7 +547,18 @@ function makeBoundary(
   return boundary;
 }
 
+export function arenaModelSettings(config: ArenaConfig) {
+  return {
+    logistic: { value: Math.max(20, config.budget * 12), unit: "full-batch GD steps", detail: "LR 0.12 · L2 0.002" },
+    knn: { value: Math.max(1, Math.min(config.trainSize, Math.round(Math.sqrt(config.trainSize) * (0.55 + config.budget / 40)))), unit: "neighbors k", detail: "不执行梯度训练；k 是超参数，不是计算预算" },
+    forest: { value: Math.max(8, config.budget * 3), unit: "random stumps", detail: "bootstrap · 单层树桩 · 随机轴与阈值" },
+    boosting: { value: Math.max(8, config.budget * 2), unit: "boosting stumps", detail: "残差树桩 · LR 0.28" },
+    mlp: { value: Math.max(30, config.budget * 15), unit: "full-batch GD steps", detail: "8 tanh hidden units · LR 0.055" },
+  };
+}
+
 export function runArena(config: ArenaConfig, includeTest = false) {
+  const settings = arenaModelSettings(config);
   const raw = generateArenaData(config);
   const { transform, transformX } = standardizer(raw.train);
   const train = raw.train.map(transform);
@@ -569,17 +571,19 @@ export function runArena(config: ArenaConfig, includeTest = false) {
       curve: { step: number; balancedAccuracy: number }[];
     }
   > = {
-    logistic: () => trainLogistic(train, validation, config.budget),
-    knn: () => trainKnn(train, validation, config.budget),
-    forest: () => trainForest(train, validation, config.budget, config.seed),
-    boosting: () => trainBoosting(train, validation, config.budget),
-    mlp: () => trainMlp(train, validation, config.budget, config.seed),
+    logistic: () => trainLogistic(train, validation, settings.logistic.value),
+    knn: () => trainKnn(train, validation, settings.knn.value),
+    forest: () => trainForest(train, validation, settings.forest.value, config.seed),
+    boosting: () => trainBoosting(train, validation, settings.boosting.value),
+    mlp: () => trainMlp(train, validation, settings.mlp.value, config.seed),
   };
   const results = (Object.keys(trainers) as ArenaAlgorithm[]).map(
     (id): ArenaResult => {
       const trained = trainers[id]();
       return {
         ...labels[id],
+        settings: `${settings[id].value} ${settings[id].unit} · ${settings[id].detail}`,
+        curveUnit: settings[id].unit,
         validation: arenaMetrics(validation, trained.predict),
         test: includeTest ? arenaMetrics(test, trained.predict) : undefined,
         curve: trained.curve,

@@ -4,6 +4,7 @@ import {
   codeLabMetrics,
   codeLabs,
   formatCount,
+  validateCodeLabDimensions,
 } from "../../studio/codeLabs";
 import type { CodeMode, StudioDimensions } from "../../studio/types";
 import { visitStudioTool } from "../../studio/studioState";
@@ -12,7 +13,7 @@ import { StudioSectionTitle, StudioShell, StatusDot } from "./StudioShell";
 const modeLabels: Record<CodeMode, { title: string; english: string }> = {
   scratch: { title: "手写计算", english: "From scratch" },
   pytorch: { title: "框架实现", english: "PyTorch" },
-  production: { title: "生产版本", english: "Production" },
+  production: { title: "部署示意", english: "Deployment sketch" },
 };
 
 function highlightedCode(code: string, range: [number, number]) {
@@ -42,7 +43,7 @@ export default function CodeLab({ query }: { query: string }) {
     initial.dimensions,
   );
   const [runState, setRunState] = useState<
-    "idle" | "running" | "passed" | "failed"
+    "idle" | "passed" | "failed"
   >("idle");
   const lab = codeLabByLesson.get(labId) || codeLabs[0];
   const step = lab.steps[Math.min(stepIndex, lab.steps.length - 1)];
@@ -60,21 +61,11 @@ export default function CodeLab({ query }: { query: string }) {
           bytes: "bytes",
         }
       : { B: "B", T: "T", D: "D", H: "H", bytes: "bytes" };
-  const shapeValid =
-    lab.lessonId !== "attention" || dimensions.D % dimensions.H === 0;
+  const errors = validateCodeLabDimensions(lab, dimensions);
 
   useEffect(() => {
     visitStudioTool(`code:${labId}`);
   }, [labId]);
-
-  useEffect(() => {
-    if (runState !== "running") return;
-    const timer = window.setTimeout(
-      () => setRunState(shapeValid ? "passed" : "failed"),
-      520,
-    );
-    return () => window.clearTimeout(timer);
-  }, [runState, shapeValid]);
 
   const chooseLab = (id: string) => {
     const next = codeLabByLesson.get(id) || codeLabs[0];
@@ -100,7 +91,7 @@ export default function CodeLab({ query }: { query: string }) {
       eyebrow="CODE LAB · 代码实验"
       title={lab.title}
       english={lab.english}
-      intro="同一个模型逐行走过显式数组运算、可训练 PyTorch 和带输入契约的生产版本。这里的运行按钮检查当前 shape、计算量、激活显存与反向路径。"
+      intro="逐行阅读数组运算、PyTorch 片段与部署示意。浏览器只校验尺寸参数并做公式估算，不执行 Python，也不测试数值、梯度或模型训练。"
     >
       <div className="lab-picker" role="group" aria-label="选择代码实验">
         {codeLabs.map((item) => (
@@ -120,8 +111,8 @@ export default function CodeLab({ query }: { query: string }) {
         <aside className="execution-rail">
           <StudioSectionTitle
             index="01"
-            title="执行路径"
-            english="Execution path"
+            title="代码阅读路径"
+            english="Code walkthrough"
           />
           <ol>
             {lab.steps.map((item, index) => (
@@ -167,6 +158,7 @@ export default function CodeLab({ query }: { query: string }) {
             <StatusDot tone="blue" />
             <span>{lab.variants[mode].note}</span>
           </div>
+          <p className="code-scope">代码是阅读片段：imports、数据、模型成员与 helper 需在自己的环境补齐。尺寸输入只用于估算，不会改写代码中的常数；下方清单是待做测试。</p>
           <pre
             className="studio-code"
             aria-label={`${modeLabels[mode].english} 代码，当前高亮 ${step.title}`}
@@ -182,10 +174,9 @@ export default function CodeLab({ query }: { query: string }) {
             </button>
             <button
               className="run-code"
-              onClick={() => setRunState("running")}
-              disabled={runState === "running"}
+              onClick={() => setRunState(errors.length ? "failed" : "passed")}
             >
-              {runState === "running" ? "检查中…" : "运行检查 Run"}
+              校验尺寸与估算
             </button>
             <button
               disabled={stepIndex === lab.steps.length - 1}
@@ -241,12 +232,15 @@ export default function CodeLab({ query }: { query: string }) {
                 <input
                   type="number"
                   min="1"
-                  max={key === "T" ? 512 : 2048}
-                  value={value}
+                  max={key === "bytes" ? 8 : key === "T" ? 512 : 2048}
+                  step="1"
+                  value={Number.isFinite(value) ? value : ""}
+                  aria-invalid={errors.some((error) => error.startsWith(`${key}：`))}
+                  aria-describedby="estimator-status"
                   onChange={(event) =>
                     updateDimension(
                       key,
-                      Math.max(1, Number(event.target.value) || 1),
+                      event.target.valueAsNumber,
                     )
                   }
                 />
@@ -258,37 +252,36 @@ export default function CodeLab({ query }: { query: string }) {
 
       <section className={`run-report ${runState}`} aria-live="polite">
         <div>
-          <span>PARAMETERS</span>
+          <span>ESTIMATED PARAMETERS</span>
           <strong>{formatCount(metrics.params)}</strong>
         </div>
         <div>
-          <span>FORWARD FLOPS</span>
+          <span>ESTIMATED FORWARD FLOPS</span>
           <strong>{formatCount(metrics.flops)}</strong>
         </div>
         <div>
-          <span>ACTIVATIONS</span>
-          <strong>{formatCount(metrics.activationBytes)}B</strong>
+          <span>ESTIMATED ACTIVATION STORAGE</span>
+          <strong>{metrics.activationBytes === null ? "未估算" : `${formatCount(metrics.activationBytes)}B`}</strong>
         </div>
         <div>
-          <span>GRADIENT</span>
+          <span>GRADIENT · 未测试</span>
           <strong>{metrics.gradient}</strong>
         </div>
-        <p>
+        <p id="estimator-status" role="status">
           {runState === "idle"
-            ? "调整尺寸后运行检查。"
-            : runState === "running"
-              ? "正在沿执行路径验证…"
-              : runState === "passed"
-                ? "✓ Shape、有限数值与梯度路径检查通过。"
-                : `✕ D=${dimensions.D} 不能按 H=${dimensions.H} 整分；先修复 head 宽度。`}
+            ? "调整尺寸后校验。数值有限性、autograd 与训练结果均未测试。"
+            : runState === "passed"
+              ? lab.lessonId === "attention" ? "参数有效，D 可按 H 整分。其余 tensor/mask shape、数值与梯度未测试。" : "尺寸参数有效。此模型的实际 tensor shape、数值与梯度未测试。"
+              : errors.join(" ")}
         </p>
+        <p>{metrics.scope}</p>
       </section>
 
       <section className="production-checks">
         <StudioSectionTitle
           index="03"
-          title="生产检查清单"
-          english="Production checklist"
+          title="部署前需验证"
+          english="Tests to run in your environment"
         />
         <ol>
           {lab.productionChecks.map((item, index) => (

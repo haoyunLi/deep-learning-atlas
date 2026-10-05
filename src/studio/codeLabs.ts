@@ -143,7 +143,7 @@ assert x.grad is not None`,
     },
     production: {
       label: "Production",
-      note: "补上输入契约、低精度安全、dropout、缓存接口与测试断言。",
+      note: "部署示意，非完整模块：需补 torch / nn / F imports，并验证 mask、全屏蔽行与 cache；浏览器不执行这些断言。",
       code: `class MultiHeadAttention(nn.Module):
     def __init__(self, d_model, heads, dropout=0.0):
         super().__init__()
@@ -280,7 +280,7 @@ function compactLab(
       },
       production: {
         label: "Production",
-        note: "加入契约、监控和边界处理。",
+        note: "部署设计片段：self 成员、数据与 helper 函数未全部定义，需自行实现与测试；不可直接作为完整生产模块运行。",
         code: production,
       },
     },
@@ -431,46 +431,54 @@ export const codeLabByLesson = new Map(
   codeLabs.map((lab) => [lab.lessonId, lab]),
 );
 
+export function validateCodeLabDimensions(lab: CodeLab, values: StudioDimensions): string[] {
+  const errors: string[] = [];
+  for (const key of ["B", "T", "D", "H", "bytes"]) {
+    const value = values[key];
+    const max = key === "bytes" ? 8 : key === "T" ? 512 : 2048;
+    if (!Number.isSafeInteger(value) || value < 1 || value > max) {
+      errors.push(`${key}：请输入 1–${max} 的有限整数。`);
+    }
+  }
+  if (!errors.length && ![1, 2, 4, 8].includes(values.bytes)) {
+    errors.push("bytes：每个元素只支持 1、2、4 或 8 bytes。该设置仅影响存储估算，不选择实际 dtype。");
+  }
+  if (!errors.length && lab.lessonId === "attention" && values.D % values.H !== 0) {
+    errors.push(`D：D=${values.D} 不能按 H=${values.H} 整分；请修复 head 宽度。`);
+  }
+  return errors;
+}
+
 export function codeLabMetrics(lab: CodeLab, values: StudioDimensions) {
-  const B = values.B || 1,
-    T = values.T || 1,
-    D = values.D || 1,
-    H = values.H || 1,
-    bytes = values.bytes || 4;
+  const { B, T, D, H, bytes } = values;
+  const gradient = lab.lessonId === "attention"
+    ? "预期 Q/K/V 与输出投影有有限梯度；需运行 backward 后验证"
+    : lab.lessonId === "meta-learning-maml"
+      ? "预期 query loss 经 inner updates 回传至 θ；需在 autograd 中验证"
+      : "预期核心变换与输出 head 有有限梯度；需运行 backward 后验证";
+  if (validateCodeLabDimensions(lab, values).length) {
+    return { params: null, flops: null, activationBytes: null, gradient, scope: "参数无效，暂不提供估算。" };
+  }
   if (lab.lessonId === "attention") {
-    const params = 4 * D * D;
-    const flops = 8 * B * T * D * D + 4 * B * T * T * D;
-    const activationBytes = B * (3 * T * D + H * T * T + T * D) * bytes;
     return {
-      params,
-      flops,
-      activationBytes,
-      gradient: "Q/K/V 与输出投影均应得到有限梯度",
+      params: 4 * D * D,
+      flops: 8 * B * T * D * D + 4 * B * T * T * D,
+      activationBytes: B * (4 * T * D + H * T * T) * bytes,
+      gradient,
+      scope: "估算范围：单层 dense self-attention、无 bias/cache/dropout；一次乘加记 2 FLOPs，忽略 softmax/mask 等开销。存储仅含 Q/K/V、一个 attention 矩阵与 context，非实测峰值显存；不含输入、参数、梯度、优化器和中间缓存。",
     };
   }
   if (lab.lessonId === "meta-learning-maml") {
-    const params = D;
-    const flops = B * T * D * (6 * H + 4);
-    const activationBytes = B * T * D * (H + 1) * bytes;
-    return {
-      params,
-      flops,
-      activationBytes,
-      gradient: "query loss 应沿 H 次 inner update 回传到共享 θ",
-    };
+    return { params: D, flops: null, activationBytes: null, gradient, scope: "D 是用户声明的共享参数个数。MAML 的计算与存储取决于 base model、support/query 样本数及一阶/二阶图；这些未指定，暂不估算 FLOPs 或显存。" };
   }
-  const params = D * D * 3;
-  const flops = 2 * B * T * params;
-  const activationBytes = B * T * D * bytes * 3;
   return {
-    params,
-    flops,
-    activationBytes,
-    gradient: "核心变换与输出 head 都应得到非空有限梯度",
+    params: null, flops: null, activationBytes: null, gradient,
+    scope: "此模型缺少完整架构尺寸，暂不估算资源：CNN/U-Net 需要 channels、空间尺寸与 kernel；RNN 需要 hidden/output 宽度；GNN 需要 node/edge 数与聚合方式。B/T/D/H 不构成这些模型的完整 shape 契约。",
   };
 }
 
-export function formatCount(value: number) {
+export function formatCount(value: number | null) {
+  if (value === null || !Number.isFinite(value)) return "未估算";
   if (value >= 1e9) return `${(value / 1e9).toFixed(2)}G`;
   if (value >= 1e6) return `${(value / 1e6).toFixed(2)}M`;
   if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`;

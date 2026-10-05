@@ -1742,3 +1742,14 @@
     transition: none;
   }
 }
+
+/* Learning evidence stays adjacent to the action it qualifies. */
+.code-scope, .arena-settings-note { font-size: 13px; line-height: 1.7; color: var(--ink); }
+.code-scope { margin: 12px 0; }
+.arena-settings { margin-bottom: 24px; line-height: 1.8; }
+.arena-settings summary { cursor: pointer; font-weight: 600; }
+.arena-settings li { margin-top: 8px; }
+.arena-choice-reason { display: grid; gap: 9px; margin: 18px 0; max-width: 70ch; font-size: 13px; }
+.arena-choice-reason input { padding: 10px; font: inherit; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 4px; min-width: 0; }
+.test-lock button:disabled { opacity: .5; cursor: not-allowed; }
+.dimension-inputs input[aria-invalid="true"] { border-color: var(--studio-red); }

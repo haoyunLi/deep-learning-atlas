@@ -64,7 +64,7 @@ assert.match(
   /D 必须等于 H × Dh/,
 );
 
-const { codeLabs, codeLabMetrics } = load("src/studio/codeLabs.ts");
+const { codeLabs, codeLabMetrics, validateCodeLabDimensions } = load("src/studio/codeLabs.ts");
 assert.equal(codeLabs.length, 6, "six code labs");
 for (const lab of codeLabs) {
   assert.ok(lab.steps.length >= 4, `${lab.lessonId}: stepwise lab`);
@@ -80,13 +80,27 @@ for (const lab of codeLabs) {
     }
   }
   const metrics = codeLabMetrics(lab, lab.dimensions);
-  assert.ok(
-    metrics.params > 0 && metrics.flops > 0 && metrics.activationBytes > 0,
-    `${lab.lessonId}: finite resource estimates`,
-  );
+  assert.deepEqual(validateCodeLabDimensions(lab, lab.dimensions), [], `${lab.lessonId}: valid default dimensions`);
+  for (const value of [0, -1, 1.5, NaN, Infinity, 2049]) {
+    const invalid = { ...lab.dimensions, B: value };
+    assert.ok(validateCodeLabDimensions(lab, invalid).length, `${lab.lessonId}: rejects B=${value}`);
+    assert.equal(codeLabMetrics(lab, invalid).params, null, "invalid input produces no estimate");
+  }
+  assert.ok(validateCodeLabDimensions(lab, { ...lab.dimensions, bytes: 3 }).length, "unsupported element width rejected");
+  assert.ok(validateCodeLabDimensions(lab, { ...lab.dimensions, T: 513 }).length, "out-of-range T rejected");
+  if (lab.lessonId === "attention") {
+    assert.equal(metrics.params, 16384);
+    assert.equal(metrics.flops, 270336);
+    assert.equal(metrics.activationBytes, 9216);
+    assert.ok(validateCodeLabDimensions(lab, { ...lab.dimensions, D: 65 }).length, "attention requires whole head widths");
+  } else {
+    assert.equal(metrics.flops, null, "incomplete architecture has no FLOPs claim");
+    assert.equal(metrics.activationBytes, null, "incomplete architecture has no memory claim");
+    assert.equal(metrics.params, lab.lessonId === "meta-learning-maml" ? lab.dimensions.D : null);
+  }
 }
 
-const { defaultArenaConfig, generateArenaData, runArena } = load(
+const { defaultArenaConfig, generateArenaData, runArena, arenaModelSettings } = load(
   "src/studio/arenaMath.ts",
 );
 const rawA = generateArenaData(defaultArenaConfig);
@@ -106,6 +120,12 @@ assert.ok(
   "test points stay hidden",
 );
 const revealed = runArena(defaultArenaConfig, true);
+const settings = arenaModelSettings(defaultArenaConfig);
+assert.equal(settings.logistic.value, 120);
+assert.equal(settings.knn.value, 9);
+assert.equal(settings.forest.value, 30);
+assert.equal(settings.boosting.value, 20);
+assert.equal(settings.mlp.value, 150);
 assert.ok(
   revealed.results.every(
     (result) => result.test && Number.isFinite(result.test.logLoss),
@@ -113,6 +133,7 @@ assert.ok(
   "explicit reveal evaluates test",
 );
 for (const result of revealed.results) {
+  assert.equal(result.curve.at(-1).step, settings[result.id].value, `${result.id}: disclosed setting matches actual final step/k/tree count`);
   assert.equal(
     result.boundary.length,
     625,
@@ -133,6 +154,14 @@ for (const result of revealed.results) {
     `${result.id}: valid balanced accuracy`,
   );
 }
+
+const { arenaDataKey, parseArenaExposures } = load("src/studio/arenaEvidence.ts");
+const exposure = { dataKey: arenaDataKey(defaultArenaConfig), model: "knn", reason: "validation evidence", budget: 10, revealedAt: 1234 };
+const history = parseArenaExposures(JSON.stringify([exposure]));
+assert.equal(history[0].dataKey, arenaDataKey({ ...defaultArenaConfig, budget: 20 }), "retraining settings cannot erase data exposure");
+assert.notEqual(history[0].dataKey, arenaDataKey({ ...defaultArenaConfig, seed: 43 }), "new generated dataset has its own identity");
+for (const raw of [null, "{", "null", "{}", '[{"dataKey":"bad"}]']) assert.deepEqual(parseArenaExposures(raw), [], "malformed exposure storage recovers");
+assert.deepEqual(parseArenaExposures(JSON.stringify([...history, {...exposure, budget: 20}])), [...history, {...exposure, budget: 20}], "old exposure persists when another setting is revealed");
 
 const { studioProjects } = load("src/studio/projects.ts");
 const { lessons } = load("src/data/lessons.ts");
@@ -196,7 +225,7 @@ for (const [path, query, title] of [
     "MAML：从 support 更新到 query meta-gradient",
   ],
   ["/studio/shapes", "", "让每一条轴都有名字。"],
-  ["/studio/arena", "", "同一数据，同一切分，同一预算。"],
+  ["/studio/arena", "", "同一数据，同一切分，明确模型设置。"],
   ["/studio/projects", "project=grounded-rag", "一个模型，不等于一个项目。"],
 ]) {
   const html = renderToStaticMarkup(
@@ -204,6 +233,10 @@ for (const [path, query, title] of [
   );
   assert.ok(html.includes(title), `${path}: server renders route title`);
   assert.ok(html.includes("学习工作台"), `${path}: shared tool navigation`);
+  if (path === "/studio/code") {
+    assert.ok(html.includes("不执行 Python") && html.includes("GRADIENT · 未测试"), "estimator scope is visible");
+    assert.ok(!html.includes("有限数值与梯度路径检查通过"), "unrun checks never claim success");
+  }
 }
 
 console.log(
