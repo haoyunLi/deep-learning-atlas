@@ -4,6 +4,7 @@ import CodeLab from "./CodeLab";
 import LearningStudio from "./LearningStudio";
 import ProjectCases from "./ProjectCases";
 import ShapeDebugger from "./ShapeDebugger";
+import TrainingWalkthrough from "./TrainingWalkthrough";
 
 export default function StudioPage({
   path,
@@ -12,6 +13,7 @@ export default function StudioPage({
   path: string;
   query: string;
 }) {
+  if (path === "/studio/training") return <TrainingWalkthrough />;
   if (path === "/studio/code") return <CodeLab query={query} />;
   if (path === "/studio/shapes") return <ShapeDebugger />;
   if (path === "/studio/arena") return <AlgorithmArena />;

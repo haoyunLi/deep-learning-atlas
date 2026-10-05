@@ -1,8 +1,16 @@
 # Learning evidence: bounded recovery changes
 
-Recovery branch: `learning-honesty-recovery`. Baseline: `51b952c45739841ffb0e8f13bff197465b1e43f9`.
+Publication branch: `learning-honesty-2026-10-05`. Public-main baseline: `51b952c45739841ffb0e8f13bff197465b1e43f9`.
 
 This change addresses CodeLab's validation claims and Arena's experimental bookkeeping. It preserves the existing course content, research paths, diagrams, and visual identity.
+
+## One training step
+
+The new `/studio/training` walkthrough connects an actual browser calculation through seven states: fixed parameters, forward computation, loss, output gradient, chain rule, simultaneous SGD, and a new forward computation. The model is `z=w*x`, `h=tanh(z)`, `prediction=v*h`, and `loss=0.5*(prediction-target)^2`, with one synthetic sample, no bias, and two scalar parameters. Both update gradients use the same old forward pass. It illustrates one sample's loss, not generalization or a complete training system.
+
+Learners change input, either weight, target, or learning rate; make an initial prediction; and use manual steps or explicit play, pause, and replay. Parameter changes stop playback and reset the prediction. Presets contrast a decreasing-loss step, large-step overshoot, tanh saturation, and zero error. Original SVG paths, synchronized values, formulas, and an update table distinguish forward quantities from gradient propagation. Small nonzero gradients use scientific notation. Reduced-motion preference disables playback and retains manual controls. Narrow screens scroll only the graph/table regions.
+
+The calculations and visual assets are original. Further primary-source guidance: [Stanford CS231n backpropagation notes](https://cs231n.github.io/optimization-2/) and [3Blue1Brown backpropagation calculus](https://www.3blue1brown.com/lessons/backpropagation-calculus/), alongside the D2L computational-graph chapter below. No third-party video or figure was embedded or copied.
 
 ## CodeLab
 
@@ -32,6 +40,8 @@ Sources were reviewed during this recovery task; no figures, code, or assessment
 
 - `npm run build` passed all repository validators, TypeScript, and Vite production compilation.
 - Added regression checks cover invalid and non-finite dimensions, attention formulas/divisibility, missing architecture estimates, exact trainer settings/curve endpoints, stable exposure keys, and corrupted history.
+- Training derivatives passed 450 central finite-difference comparisons across 225 parameter combinations. Additional checks cover simultaneous updates, loss decrease and overshoot, zero learning rate, zero error, saturation, and invalid input; seven Studio routes pass server-rendering checks.
+- Publication previews passed Chrome browser checks for prediction locking, step/play/pause/replay behavior, slider resets, synchronized numerical examples, reduced-motion manual controls, narrow-screen overflow, and the earlier CodeLab/Arena interactions. Desktop and phone-width rendered figures were reviewed. The browser scripts and screenshots are retained in the separate local handoff workspace.
 - Safari desktop interaction verified invalid D/H handling, unavailable CNN estimates, reason-gated test reveal, and retained exposure after retraining and reload. Phone-width review used Safari Responsive Design Mode at 375 × 812.
 - Impeccable's detector ran once on the changed UI sources. It reported existing Atlas CSS warnings and token advisories; the new reason field's font-size advisory was resolved with the documented 13px control size. Existing unrelated styling was preserved.
 

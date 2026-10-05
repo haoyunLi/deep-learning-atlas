@@ -273,7 +273,7 @@ export default function LearningStudio() {
         {[
           [
             "Code Lab",
-            "同一算法的 From scratch / PyTorch / Production 三层实现。",
+            "同一算法的 From scratch / PyTorch / Deployment sketch 阅读片段。",
             "#/studio/code",
           ],
           [
@@ -283,7 +283,7 @@ export default function LearningStudio() {
           ],
           [
             "Algorithm Arena",
-            "固定数据、切分与预算，比较五种算法。",
+            "同一数据与切分，公开实际设置，比较五种教学算法。",
             "#/studio/arena",
           ],
           [
@@ -291,6 +291,7 @@ export default function LearningStudio() {
             "八个项目，每个按八阶段交付证据。",
             "#/studio/projects",
           ],
+          ["Training step", "Forward、chain rule 与同时 SGD 的完整可调计算。", "#/studio/training"],
         ].map(([title, text, href], index) => (
           <a href={href} key={title}>
             <span>0{index + 1}</span>

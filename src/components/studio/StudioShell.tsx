@@ -31,6 +31,7 @@ const tools = [
     label: "项目案例",
     english: "Projects",
   },
+  { href: "#/studio/training", route: "/studio/training", label: "一轮训练", english: "Training step" },
 ];
 
 export function StudioShell({

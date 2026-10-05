@@ -25,6 +25,7 @@ export default function LessonInteractive({
     <LessonExercises key={lesson.id} lessonId={lesson.id} />
   ) : (
     <>
+      {lesson.id === "backpropagation" && <p className="training-lesson-link"><a href="#/studio/training">进一步：把 Forward、两层 chain rule 与同时 SGD 串成一轮可调计算 →</a></p>}
       <AnimatedExplainer key={lesson.id} lesson={lesson} />
       <HandCalculationSandbox
         key={`sandbox-${lesson.id}`}

@@ -1753,3 +1753,47 @@
 .arena-choice-reason input { padding: 10px; font: inherit; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 4px; min-width: 0; }
 .test-lock button:disabled { opacity: .5; cursor: not-allowed; }
 .dimension-inputs input[aria-invalid="true"] { border-color: var(--studio-red); }
+
+.training-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 28px; margin-top: 30px; }
+.training-inputs { border-top: 1px solid var(--line); padding-top: 18px; }
+.training-inputs h2, .training-explanation h2 { font-size: 24px; margin: 0 0 18px; }
+.training-inputs label { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin: 20px 0; font-size: 13px; }
+.training-inputs input { grid-column: 1 / -1; width: 100%; accent-color: var(--blue); }
+.training-inputs strong { font-variant-numeric: tabular-nums; }
+.training-inputs p, .training-motion-note, .training-scroll-note { font-size: 13px; line-height: 1.7; }
+.training-presets, .training-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.training-presets button, .training-controls button, .training-steps button { padding: 9px 12px; border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: 13px; background: white; color: var(--ink); cursor: pointer; }
+.training-controls { margin-top: 18px; }
+.training-controls button:nth-child(2) { background: var(--blue); color: white; }
+.training-layout button:disabled { opacity: .5; cursor: not-allowed; }
+.training-layout :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.training-predict { display: grid; gap: 8px; max-width: 70ch; font-size: 13px; }
+.training-predict select { padding: 10px; border: 1px solid var(--line); border-radius: 4px; font: inherit; color: var(--ink); background: white; }
+.training-steps { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 20px 0; }
+.training-steps button[aria-current="step"] { background: var(--blue-pale); border-color: var(--blue); font-weight: 700; }
+.training-graph-scroll, .training-table-scroll { overflow-x: auto; max-width: 100%; }
+.training-graph { display: block; width: 900px; max-width: none; color: var(--ink); font-size: 13px; }
+.training-graph text { fill: currentColor; }
+.training-diagram-heading { font-weight: 700; font-size: 16px; }
+.training-value { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.training-node rect { fill: white; stroke: #d6dfe9; }
+.training-node.revealed rect { stroke: #245fbd; fill: #ecf3ff; }
+.training-node.derivative.revealed rect { stroke: #a74e21; fill: #fff8f2; }
+.training-edge { stroke: #bfcbd9; stroke-width: 2; fill: none; }
+.training-edge.forward-flow { stroke: #245fbd; }
+.training-backward-edge { stroke: #a74e21; stroke-width: 2; fill: none; }
+.training-graph.is-playing .forward-flow { stroke-dasharray: 7 5; animation: training-flow 1s linear infinite; }
+.training-graph.is-playing .backward-flow { stroke-dasharray: 7 5; animation: training-flow 1s linear infinite; }
+@keyframes training-flow { to { stroke-dashoffset: -24; } }
+.training-explanation { padding: 22px 0; border-top: 1px solid var(--line); line-height: 1.9; }
+.training-table-scroll table { width: 100%; min-width: 530px; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+.training-table-scroll caption { text-align: left; font-weight: 700; padding: 10px 0; }
+.training-table-scroll th, .training-table-scroll td { padding: 12px; border-bottom: 1px solid var(--line); text-align: left; font-variant-numeric: tabular-nums; }
+.training-result { border-top: 1px solid var(--line); padding: 15px 0; line-height: 1.8; }
+.training-result dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.training-result dt { font-size: 13px; }
+.training-result dd { margin: 8px 0 0; font-size: 24px; font-variant-numeric: tabular-nums; }
+.training-boundary, .training-sources { font-size: 13px; line-height: 1.8; max-width: 100ch; margin-top: 26px; }
+.training-sources a { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 760px) { .training-layout { grid-template-columns: minmax(0, 1fr); } .training-result dl { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .training-graph.is-playing .forward-flow, .training-graph.is-playing .backward-flow { animation: none; } }

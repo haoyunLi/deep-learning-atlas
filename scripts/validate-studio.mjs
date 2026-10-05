@@ -216,6 +216,29 @@ assert.equal(recovered.mastery.invalid, undefined);
 assert.deepEqual(recovered.projectStages["readmission-risk"], ["audit"]);
 
 const { default: StudioPage } = load("src/components/studio/StudioPage.tsx");
+const { trainingStep, forwardTraining, defaultTrainingInputs } = load("src/studio/backpropMath.ts");
+for (const x of [-2, -0.5, 0, 0.75, 2]) for (const w of [-3, -0.5, 0, 0.5, 3]) for (const v of [-2, 0.25, 1]) for (const target of [-1, 0, 1]) {
+  const p = { x, w, v, target, eta: 0.25 };
+  const r = trainingStep(p);
+  for (const [parameter, gradient] of [["w", r.wGradient], ["v", r.vGradient]]) {
+    const epsilon = 1e-5;
+    const numeric = (forwardTraining({ ...p, [parameter]: p[parameter] + epsilon }).loss - forwardTraining({ ...p, [parameter]: p[parameter] - epsilon }).loss) / (2 * epsilon);
+    assert.ok(Math.abs(numeric - gradient) < 1e-7 * Math.max(1, Math.abs(numeric)), `${parameter}: finite-difference chain rule`);
+    assert.equal(r.updated[parameter], p[parameter] - p.eta * gradient, "SGD uses old gradients simultaneously");
+  }
+}
+const defaultStep = trainingStep(defaultTrainingInputs);
+assert.ok(defaultStep.after.loss < defaultStep.before.loss);
+const overshoot = trainingStep({ ...defaultTrainingInputs, eta: 2 });
+assert.ok(overshoot.after.loss > overshoot.before.loss, "negative gradient direction can overshoot with a large step");
+const frozen = trainingStep({ ...defaultTrainingInputs, eta: 0 });
+assert.deepEqual(frozen.before, frozen.after);
+const zeroError = trainingStep({ ...defaultTrainingInputs, x: 0, target: 0 });
+assert.equal(zeroError.wGradient, 0); assert.equal(zeroError.vGradient, 0);
+const saturated = trainingStep({ ...defaultTrainingInputs, w: 3, target: 0 });
+assert.ok(saturated.activationDerivative < 0.0001 && Math.abs(saturated.wGradient) < 0.0001 && Math.abs(saturated.vGradient) > 0.9);
+assert.throws(() => trainingStep({ ...defaultTrainingInputs, eta: -1 }), /nonnegative/);
+assert.throws(() => trainingStep({ ...defaultTrainingInputs, x: NaN }), /finite/);
 for (const [path, query, title] of [
   ["/studio", "", "从看懂，到会做。"],
   ["/studio/code", "lesson=attention", "Attention：从公式到可靠实现"],
@@ -227,6 +250,7 @@ for (const [path, query, title] of [
   ["/studio/shapes", "", "让每一条轴都有名字。"],
   ["/studio/arena", "", "同一数据，同一切分，明确模型设置。"],
   ["/studio/projects", "project=grounded-rag", "一个模型，不等于一个项目。"],
+  ["/studio/training", "", "误差怎样变成一次参数更新？"],
 ]) {
   const html = renderToStaticMarkup(
     React.createElement(StudioPage, { path, query }),
@@ -240,5 +264,5 @@ for (const [path, query, title] of [
 }
 
 console.log(
-  `Validated Studio: ${codeLabs.length} code labs, ${shapeDefinitions.length} shape debuggers, ${locked.results.length} trained arena models, ${studioProjects.length} projects, ${lessons.length} linked lessons, and six SSR routes.`,
+  `Validated Studio: ${codeLabs.length} code labs, ${shapeDefinitions.length} shape debuggers, ${locked.results.length} trained arena models, ${studioProjects.length} projects, ${lessons.length} linked lessons, 450 finite-difference training checks, and seven SSR routes.`,
 );

@@ -1407,6 +1407,7 @@ function App() {
     "/studio/shapes": "张量形状调试器",
     "/studio/arena": "跨算法竞技场",
     "/studio/projects": "端到端项目案例",
+    "/studio/training": "一轮训练计算图",
   };
   const routeTitle = path.startsWith("/lesson/")
     ? lessons.find((l) => l.id === lessonId)?.title || "课程未找到"
@@ -1437,7 +1438,8 @@ function App() {
     path === "/studio/code" ||
     path === "/studio/shapes" ||
     path === "/studio/arena" ||
-    path === "/studio/projects"
+    path === "/studio/projects" ||
+    path === "/studio/training"
   )
     page = <StudioPage path={path} query={routeQuery} />;
   else if (
