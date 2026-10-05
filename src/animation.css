@@ -32,7 +32,7 @@
 
 .animated-explainer-heading p {
   margin: 0;
-  color: #6d7e97;
+  color: #526784;
   font-family: Georgia, var(--serif);
   font-size: 13px;
 }
@@ -108,6 +108,12 @@
   background: #fff;
   color: #21569f;
   font-size: 15px;
+  gap: 6px;
+}
+.animation-glyph {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
 }
 
 .animated-controls button:hover:not(:disabled),
@@ -364,7 +370,7 @@
 }
 .lab-parameter p {
   margin: 0;
-  color: #6a7f98;
+  color: #526784;
   font-size: 12px;
   line-height: 1.65;
 }
@@ -375,7 +381,7 @@
   border-radius: 12px;
 }
 .lab-canvas {
-  min-width: 580px;
+  min-width: 720px;
   font-family:
     Inter,
     -apple-system,
@@ -417,6 +423,9 @@
   background: transparent;
   color: #245fbd;
   padding: 4px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .animation-utilities select {
   color: #3c5b81;

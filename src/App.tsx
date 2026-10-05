@@ -8,6 +8,7 @@ import {
 } from "react";
 import { categories, lessons, type Lesson } from "./data/lessons";
 import { conceptPaths } from "./data/conceptPaths";
+import { researchLinksForLesson } from "./data/researchPaths";
 import AnimationDirectory from "./components/AnimationDirectory";
 import {
   mechanismCount,
@@ -22,6 +23,7 @@ import { hashParts, replaceHash } from "./lib/routing";
 import "./study.css";
 import "./practice.css";
 import "./animation.css";
+import "./research.css";
 const StudyReview = lazy(() => import("./components/StudyReview"));
 const GlossaryPage = lazy(() => import("./components/GlossaryPage"));
 const ModelGuide = lazy(() => import("./components/ModelGuide"));
@@ -441,7 +443,7 @@ function Home({
         <div className="animation-promo-heading">
           <h2 id="animation-promo-title">跟着动效，看懂算法的每一步。</h2>
           <a className="animation-all-link" href="#/animations">
-            {lessons.length} 节步骤动效 · {mechanismCount} 张机制图 ·{" "}
+            {lessons.length} 节步骤导览 · {mechanismCount} 张机制图 ·{" "}
             {Object.keys(animationCatalog).length} 个参数实验　浏览全部 →
           </a>
         </div>
@@ -485,7 +487,7 @@ function Home({
               显存计算器
             </p>
           </div>
-          <a href="#/practice">进入实践工坊 →</a>
+          <a href="#/practice?research=spatial">Spatial / Age 科研实践 →</a>
         </div>
         <div className="atlas-heading">
           <div className="section-intro">
@@ -681,6 +683,7 @@ function Detail({
       </div>
     );
   const index = lessons.indexOf(lesson);
+  const researchConnections = researchLinksForLesson(lesson.id);
   const related = lesson.compareTo
     .map((other) => lessons.find((item) => item.id === other))
     .filter((item): item is Lesson => Boolean(item));
@@ -778,6 +781,20 @@ function Detail({
           <span>{lesson.englishTitle}</span>
         </h1>
         <p className="detail-summary">{lesson.summary}</p>
+        {researchConnections.length > 0 && (
+          <section className="lesson-research-context">
+            <h2>把这节课放回你的研究问题</h2>
+            <p>
+              先明确 Input、Output 和独立样本，再选择
+              baseline、设置和评估。打开对应路径，查看这个算法在项目中的作用与边界。
+            </p>
+            {researchConnections.map((path) => (
+              <a key={path.id} href={`#/practice?research=${path.id}`}>
+                <strong>{path.name}</strong> · {path.question} →
+              </a>
+            ))}
+          </section>
+        )}
         <details className="lesson-mobile-toc">
           <summary>本节目录 · 跳到原理、设置或练习</summary>
           <nav aria-label="手机课程目录">

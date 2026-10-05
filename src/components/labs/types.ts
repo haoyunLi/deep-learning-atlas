@@ -16,5 +16,6 @@ export type LabDefinition = {
     unit?: string;
   };
   note: string;
+  readout?: (value: number) => { label: string; value: string }[];
   render: ComponentType<LabProps>;
 };

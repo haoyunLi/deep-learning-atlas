@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import LanguageBudgetLab from "./LanguageBudgetLab";
 import DiagnosticTree from "./DiagnosticTree";
+import ResearchWorkbench from "./ResearchWorkbench";
 import {
   caseRows,
   caseSplit,
@@ -442,11 +443,14 @@ function PracticalCase() {
 }
 
 export default function PracticeHub() {
-  const [tab, setTab] = useState<"case" | "diagnostic" | "language">("case");
+  const [tab, setTab] = useState<
+    "research" | "case" | "diagnostic" | "language"
+  >("research");
   return (
-    <main className="practice-page page-gutter">
+    <main
+      className={`practice-page page-gutter${tab === "research" ? " research-entry-page" : ""}`}
+    >
       <header className="practice-page-header">
-        <div className="practice-eyebrow">THE PRACTICE WORKBENCH</div>
         <h1>从懂原理，到做对实验。</h1>
         <p>
           计算中间值，比较算法，再把模型放回完整工作流程。每节课程末尾也有两道可交互练习。
@@ -455,9 +459,10 @@ export default function PracticeHub() {
       <div className="practice-tabs practice-main-tabs">
         {(
           [
-            { id: "case", title: "01 · 完整实验案例" },
-            { id: "diagnostic", title: "02 · 训练诊断树" },
-            { id: "language", title: "03 · LM 显存与形状" },
+            { id: "research", title: "科研项目：Spatial / Age" },
+            { id: "case", title: "完整实验案例" },
+            { id: "diagnostic", title: "训练诊断树" },
+            { id: "language", title: "LM 显存与形状" },
           ] as const
         ).map((item) => (
           <button
@@ -468,6 +473,9 @@ export default function PracticeHub() {
             {item.title}
           </button>
         ))}
+      </div>
+      <div hidden={tab !== "research"}>
+        <ResearchWorkbench />
       </div>
       <div hidden={tab !== "case"}>
         <PracticalCase />
@@ -480,7 +488,7 @@ export default function PracticeHub() {
       </div>
       <section className="practice-sandboxes">
         <h2>
-          五个手算沙盘 <span>Numeric sandboxes</span>
+          六个手算沙盘 <span>Numeric sandboxes</span>
         </h2>
         <div>
           {[
@@ -489,6 +497,7 @@ export default function PracticeHub() {
             ["attention", "Attention · 分数到输出"],
             ["ppo", "PPO · 带符号的裁剪"],
             ["cohort-design", "Cohort · 时间窗与泄漏"],
+            ["meta-learning-maml", "MAML · Inner / Outer 更新"],
           ].map(([id, title]) => (
             <a key={id} href={`#/lesson/${id}?sandbox=1`}>
               {title}

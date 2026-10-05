@@ -1,6 +1,22 @@
 // Lightweight directory metadata; validate-animations checks this against live labs.
 export const animationCatalog: Record<string, { label: string; hint: string }> =
   {
+    "count-likelihoods": {
+      label: "NB dispersion θ",
+      hint: "固定 μ=3；θ 越大越接近 Poisson。软件若报告 α=1/θ，α 越大反而越分散。",
+    },
+    "pseudobulk-hierarchy": {
+      label: "Replicate 2 的 Type A cells",
+      hint: "总 cell 数固定为 10；Type B cells=10−A。这里让两个 cell types 始终存在，方便比较。",
+    },
+    "elastic-net": {
+      label: "Regularization λ",
+      hint: "只改变 penalty 强度；ρ 固定 0.5。拖到 0 看 unregularized coefficients，再增加 λ 观察何时被置零。",
+    },
+    "spatial-assignment": {
+      label: "Expression weight α",
+      hint: "Geometry weight=1−α；固定 T=0.25。先预测 α 增大时哪一个候选获得更多权重。",
+    },
     "neural-networks": {
       label: "第一条连接的权重 w",
       hint: "在 w=0.5 附近拖动，观察 ReLU 何时开始传递信号。",

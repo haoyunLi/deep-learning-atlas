@@ -60,8 +60,8 @@ const { guideTasks } = load("src/data/modelGuide.ts");
 
 assert.equal(
   glossaryEntries.length,
-  112,
-  "Glossary keeps the audited 112 terms",
+  124,
+  "Glossary keeps the audited 124 terms",
 );
 assert.equal(
   glossaryGroups.length,

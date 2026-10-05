@@ -1,3 +1,5 @@
+import { researchGlossaryEntries } from "./researchGlossary";
+
 export type GlossaryGroup =
   | "math"
   | "training"
@@ -38,6 +40,7 @@ function term(
   return { id, chinese, english, group, aliases, definition, lessonIds };
 }
 export const glossaryEntries: GlossaryEntry[] = [
+  ...researchGlossaryEntries,
   term(
     "tensor",
     "张量",

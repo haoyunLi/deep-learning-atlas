@@ -45,7 +45,7 @@ export default function AnimationDirectory() {
         <dl className="animation-stats">
           <div>
             <dt>{lessons.length}</dt>
-            <dd>课程步骤动效</dd>
+            <dd>课程步骤导览</dd>
           </div>
           <div>
             <dt>{mechanismCount}</dt>

@@ -55,6 +55,7 @@ const groups = [
   ["reinforcementRepresentation", "reinforcementRepresentationLabs"],
   ["generativeData", "generativeDataLabs"],
   ["metaAdaptation", "metaAdaptationLabs"],
+  ["researchMethods", "researchMethodsLabs"],
 ].map(([file, name]) => loadTs(`src/components/labs/${file}.tsx`)[name]);
 const groupKeys = groups.flatMap(Object.keys);
 assert.equal(
@@ -141,6 +142,28 @@ for (const [id, lab] of Object.entries(parameterLabs)) {
     render(p.max),
     `${id}: slider must affect output`,
   );
+  if (lab.readout) {
+    const svgLabel = (value) =>
+      render(value).match(/<svg[^>]*aria-label="([^"]+)"/)?.[1];
+    assert.notEqual(
+      svgLabel(p.min),
+      svgLabel(p.max),
+      `${id}: changed numerical state is accessible in SVG name`,
+    );
+    for (const value of [p.min, p.initial, p.max]) {
+      const values = lab.readout(value);
+      assert.ok(
+        values.length >= 3 &&
+          values.every(
+            (item) =>
+              item.label &&
+              item.value &&
+              !/NaN|undefined|Infinity/.test(item.value),
+          ),
+        `${id}: readable final numerical state`,
+      );
+    }
+  }
 }
 
 for (const file of [
@@ -329,6 +352,62 @@ for (const steps of [1, 3, 5]) {
   );
   close(federated.aggregate, weighted, "FedAvg sample weighting");
 }
+
+const { researchMethodCalculations: research } = loadTs(
+  "src/components/labs/researchMethods.tsx",
+);
+for (const theta of [0.5, 1, 2, 20]) {
+  const distribution = research.countLikelihoods(theta, 300);
+  const pmf = distribution.negativeBinomial;
+  close(
+    pmf.reduce((sum, p) => sum + p, 0),
+    1,
+    "NB PMF mass",
+  );
+  const mean = pmf.reduce((sum, p, k) => sum + k * p, 0);
+  close(mean, 3, "NB PMF mean");
+  close(
+    pmf.reduce((sum, p, k) => sum + (k - mean) ** 2 * p, 0),
+    3 + 9 / theta,
+    "NB PMF variance",
+  );
+}
+close(
+  research.countLikelihoods(1).negativeBinomialZero,
+  0.25,
+  "NB geometric P0",
+);
+for (let cells = 0; cells <= 10; cells++) {
+  const bulk = research.pseudobulkHierarchy(cells);
+  close(bulk.sum, 20 + 8 * cells, "composition raw-count sum");
+  close(bulk.mean, bulk.sum / 10, "composition mean");
+  close(bulk.countA, 10, "within-type A expression unchanged");
+  close(bulk.countB, 2, "within-type B expression unchanged");
+}
+const en = research.elasticNet(1);
+[5 / 3, 1 / 3, 0].forEach((expected, i) =>
+  close(en.coefficients[i], expected, "Elastic Net exact toy"),
+);
+close(research.elasticNet(1, 0).coefficients[0], 1.5, "Ridge endpoint");
+close(research.elasticNet(1, 1).coefficients[0], 2, "Lasso endpoint");
+for (const alpha of [0, 0.25, 0.5, 0.75, 1]) {
+  const assignment = research.spatialAssignment(alpha);
+  close(
+    assignment.probabilities.reduce((a, b) => a + b, 0),
+    1,
+    "assignment weight normalization",
+  );
+  close(
+    assignment.probabilities[0],
+    research.spatialAssignment(1 - alpha).probabilities[1],
+    "symmetric conflicting costs",
+  );
+}
+close(
+  research.spatialAssignment(0.5).entropy,
+  Math.log(2),
+  "equal assignment maximum entropy",
+);
 
 console.log(
   `Validated ${lessons.length} lesson walkthroughs (${flowRenders} step renders), ${mechanismCount} mechanism diagrams, ${groupKeys.length} parameter labs (${svgRenders} SVG renders), and numeric invariants.`,

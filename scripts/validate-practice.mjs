@@ -12,7 +12,8 @@ const cache = new Map();
 function loadTs(input) {
   let file = resolve(input);
   if (extname(file) === ".css") return {};
-  if (!extname(file)) file = [file + ".ts", file + ".tsx"].find(existsSync);
+  if (!extname(file))
+    file = [file + ".ts", file + ".tsx", file + "/index.ts"].find(existsSync);
   assert.ok(file, `Cannot resolve ${input}`);
   if (cache.has(file)) return cache.get(file).exports;
   const module = { exports: {} };
@@ -470,4 +471,61 @@ assert.equal(
 );
 console.log(
   `Validated LessonExercises SSR for all ${lessons.length} courses: two fieldsets, authored questions/options, unique radio groups, and initially disabled answer checks.`,
+);
+
+const { hierarchySplit } = loadTs("src/components/researchMath.ts");
+for (let cells = 2; cells <= 20; cells += 2) {
+  const row = hierarchySplit(cells, "row"),
+    group = hierarchySplit(cells, "group");
+  assert.equal(row.rows.length, cells * 4);
+  assert.equal(row.trainRows, group.trainRows, "same training row budget");
+  assert.equal(row.testRows, group.testRows, "same test row budget");
+  assert.deepEqual(row.overlap, ["A", "B", "C", "D"]);
+  assert.deepEqual(group.overlap, []);
+  close(row.mae, 0, "memorizer only works on seen donors");
+  close(group.mae, 30, "unseen donor test MAE");
+  close(group.fallback, 35, "fallback uses only training donor ages");
+  for (const r of group.rows.filter((r) => !r.train))
+    assert.equal(r.prediction, 35);
+}
+const { researchPaths, researchLinksForLesson } = loadTs(
+  "src/data/researchPaths.ts",
+);
+assert.equal(researchPaths.length, 3);
+for (const path of researchPaths) {
+  assert.equal(path.stages.length, 6);
+  for (const stage of path.stages) {
+    assert.ok(stage.steps.length >= 3 && stage.message && stage.check);
+    for (const id of stage.lessonIds)
+      assert.ok(
+        lessons.some((l) => l.id === id),
+        `${path.id}: stage course ${id}`,
+      );
+  }
+  for (const choice of path.choices)
+    assert.ok(
+      lessons.some((l) => l.id === choice.lessonId),
+      `${path.id}: choice ${choice.lessonId}`,
+    );
+  assert.ok(
+    path.challenge.answer >= 0 &&
+      path.challenge.answer < path.challenge.options.length,
+  );
+  assert.ok(path.sources.every((s) => s.url.startsWith("https://")));
+}
+assert.ok(
+  researchLinksForLesson("spatial-assignment").some((p) => p.id === "spatial"),
+);
+const { default: ResearchWorkbench } = loadTs(
+  "src/components/ResearchWorkbench.tsx",
+);
+const researchHtml = renderToStaticMarkup(
+  React.createElement(ResearchWorkbench),
+);
+assert.ok(researchHtml.includes("Spatial bin-to-cell"));
+assert.ok(researchHtml.includes('id="lab-spatial-assignment"'));
+assert.ok(researchHtml.includes('id="hierarchy-cells"'));
+assert.ok(researchHtml.includes("下载实验方案"));
+console.log(
+  "Validated 3 research paths, known course connections, accessible initial controls, and donor-split numerical invariants.",
 );

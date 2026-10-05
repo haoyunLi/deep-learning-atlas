@@ -13,6 +13,37 @@ type AnimationSpec = {
   steps: { title: string; explanation: string }[];
 };
 
+function AnimationGlyph({
+  kind,
+}: {
+  kind: "previous" | "next" | "play" | "pause" | "reset";
+}) {
+  const path =
+    kind === "previous"
+      ? "M19 12H5m6-6-6 6 6 6"
+      : kind === "next"
+        ? "M5 12h14m-6-6 6 6-6 6"
+        : kind === "play"
+          ? "m8 5 11 7-11 7Z"
+          : kind === "pause"
+            ? "M8 5v14M16 5v14"
+            : "M4 9a8 8 0 1 1 0 7M4 3v6h6";
+  return (
+    <svg
+      className="animation-glyph"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={path} />
+    </svg>
+  );
+}
+
 export const legacyAnimationSpecs: Record<string, AnimationSpec> = {
   attention: {
     title: "注意力怎样挑选上下文？",
@@ -117,7 +148,9 @@ export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
   const [value, setValue] = useState(lab?.parameter.initial ?? 0);
   const [speed, setSpeed] = useState(1);
   const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
-  const [playing, setPlaying] = useState(() => !prefersReducedMotion());
+  const [playing, setPlaying] = useState(
+    () => Boolean(visualSpec) && !prefersReducedMotion(),
+  );
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const flow = mode === "flow" || !visualSpec;
@@ -160,12 +193,12 @@ export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
   }, []);
 
   useEffect(() => {
-    if (!playing || reducedMotion || !visible) return;
+    if (flow || !playing || reducedMotion || !visible) return;
     const interval = window.setInterval(() => {
       if (!document.hidden) setStep((previous) => (previous + 1) % count);
     }, 5200 / speed);
     return () => window.clearInterval(interval);
-  }, [playing, reducedMotion, visible, count, speed]);
+  }, [flow, playing, reducedMotion, visible, count, speed]);
 
   function selectStep(next: number) {
     setPlaying(false);
@@ -187,18 +220,11 @@ export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
       ref={sectionRef}
       className="animated-explainer"
       id="animation"
-      data-playing={playing && !reducedMotion && visible}
-      aria-label={`${spec.title}动效图`}
+      data-playing={!flow && playing && !reducedMotion && visible}
+      aria-label={`${spec.title}${flow ? "步骤导览" : "动效图"}`}
     >
       <div className="animated-explainer-heading">
         <div>
-          <span className="animated-explainer-kicker">
-            {flow
-              ? "STEP WALKTHROUGH · 步骤导览"
-              : lab
-                ? "INTERACTIVE LAB · 参数实验"
-                : "VISUAL EXPLAINER · 机制图"}
-          </span>
           <h2>{spec.title}</h2>
           <p>{spec.englishTitle}</p>
         </div>
@@ -264,6 +290,19 @@ export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
           <LegacyVisualization step={current} />
         ) : null}
       </div>
+      {!flow && lab?.readout && (
+        <div className="lab-computed-readout">
+          <p>当前参数的完整计算结果 · 图中按步骤展示中间量</p>
+          <dl aria-live={playing ? "off" : "polite"}>
+            {lab.readout(value).map((item) => (
+              <div key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
       <div className="animated-explainer-bottom">
         <div
           className="animated-step-copy"
@@ -272,33 +311,39 @@ export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
           <strong>{spec.steps[current].title}</strong>
           <p>{spec.steps[current].explanation}</p>
         </div>
-        <div className="animated-controls" aria-label="动效播放控制">
+        <div
+          className="animated-controls"
+          aria-label={flow ? "步骤导览控制" : "动效播放控制"}
+        >
           <button
             type="button"
             onClick={() => selectStep(current - 1)}
             aria-label="上一步"
           >
-            ←
+            <AnimationGlyph kind="previous" />
           </button>
-          <button
-            type="button"
-            className="animated-play"
-            onClick={() => setPlaying((v) => !v)}
-            disabled={reducedMotion}
-            aria-label={playing ? "暂停动效" : "播放动效"}
-            aria-pressed={playing}
-            title={
-              reducedMotion ? "系统已启用减少动画，可手动切换步骤" : undefined
-            }
-          >
-            {playing ? "Ⅱ 暂停" : "▶ 播放"}
-          </button>
+          {!flow && (
+            <button
+              type="button"
+              className="animated-play"
+              onClick={() => setPlaying((v) => !v)}
+              disabled={reducedMotion}
+              aria-label={playing ? "暂停动效" : "播放动效"}
+              aria-pressed={playing}
+              title={
+                reducedMotion ? "系统已启用减少动画，可手动切换步骤" : undefined
+              }
+            >
+              <AnimationGlyph kind={playing ? "pause" : "play"} />
+              <span>{playing ? "暂停" : "播放"}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => selectStep(current + 1)}
             aria-label="下一步"
           >
-            →
+            <AnimationGlyph kind="next" />
           </button>
         </div>
       </div>
@@ -318,25 +363,27 @@ export default function AnimatedExplainer({ lesson }: { lesson: Lesson }) {
       </div>
       <div className="animation-utilities">
         <button type="button" onClick={reset}>
-          ↺ 重置实验
+          <AnimationGlyph kind="reset" /> <span>重置实验</span>
         </button>
-        <label>
-          播放速度{" "}
-          <select
-            aria-label="播放速度"
-            value={speed}
-            onChange={(e) => setSpeed(Number(e.target.value))}
-          >
-            <option value={0.5}>0.5× · 慢读</option>
-            <option value={1}>1× · 标准</option>
-            <option value={2}>2× · 快览</option>
-          </select>
-        </label>
+        {!flow && (
+          <label>
+            播放速度{" "}
+            <select
+              aria-label="播放速度"
+              value={speed}
+              onChange={(e) => setSpeed(Number(e.target.value))}
+            >
+              <option value={0.5}>0.5× · 慢读</option>
+              <option value={1}>1× · 标准</option>
+              <option value={2}>2× · 快览</option>
+            </select>
+          </label>
+        )}
         <a href="#/animations">浏览全部动效 →</a>
       </div>
       <p className="animated-explainer-note">
         {flow
-          ? "本图按课程步骤展示流程，不运行模型训练；具体设置与使用边界见下方课程。"
+          ? "这是手动步骤导览。用前后按钮或步骤列表查看完整机制；不运行模型训练。"
           : lab
             ? lab.note
             : "示意动效用于理解计算顺序；颜色和示例数字不代表实际训练结果。"}

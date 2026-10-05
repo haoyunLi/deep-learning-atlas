@@ -6,7 +6,7 @@
 
 ## 学什么
 
-网站目前包含 169 篇课程，按基础原理、训练与泛化、经典基线、视觉模型、语言与序列、生成模型、表示学习、强化学习、更多架构、Meta-Learning 与 Adaptation 这十条路线组织。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、Continual Learning、Active Learning、Domain Adaptation、AutoML、Federated Learning 与 Test-Time Adaptation。每篇回答七个问题：
+网站目前包含 177 篇课程，按基础原理、训练与泛化、经典基线、视觉模型、语言与序列、生成模型、表示学习、强化学习、更多架构、Meta-Learning 与 Adaptation 这十条路线组织。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、Continual Learning、Active Learning、Domain Adaptation、AutoML、Federated Learning 与 Test-Time Adaptation。每篇回答七个问题：
 
 1. 一句话怎样理解？
 2. 内部机制如何运作？
@@ -18,11 +18,11 @@
 
 每节进一步提供至少 4 步的算法运行过程、2 条适用边界，以及至少 3 个具体设置项。设置项分别说明从哪里开始、观察到什么信号后怎样调整；这些是实验起点，仍要依据数据、验证集和资源预算决定。
 
-还包括兼容常用缩写的关键词搜索、分类与学习状态筛选、可分享的两算法对比、关键概念路径，以及保存在本机浏览器的阅读与答题记录。85 项中英术语都能跳到相关课程；选型指南从 10 类任务的 27 种具体情境出发，给出可比较的基线、第一轮设置、适用边界和评估方法。每篇课程都链接到原始论文或官方文档。
+还包括兼容常用缩写的关键词搜索、分类与学习状态筛选、可分享的两算法对比、关键概念路径，以及保存在本机浏览器的阅读与答题记录。124 项中英术语都能跳到相关课程；选型指南从 15 类任务的 39 种具体情境出发，给出可比较的基线、第一轮设置、适用边界和评估方法。每篇课程都链接到原始论文或官方文档。
 
-全部 126 节课程都有步骤动效；其中 48 节配有专属机制图，45 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
+全部 177 节课程都有步骤导览；其中 56 节配有专属机制图，53 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
 
-[动效实验室](https://haoyunli.github.io/deep-learning-atlas/#/animations) 支持关键词、学习方向与动效类型筛选。每个实验提供四步中英说明、滑块或图解、播放/暂停、慢速/快速、手动跳步与重置；也可切换到完整课程步骤。手机上支持图内横向滑动。自动播放只在图进入视野时运行；系统启用减少动态效果时关闭自动播放和过渡。参数实验使用可手算的合成案例，清楚说明哪些公式在实时计算、哪些示意并未运行模型训练。
+[动效实验室](https://haoyunli.github.io/deep-learning-atlas/#/animations) 支持关键词、学习方向与动效类型筛选。机制实验提供四步中英说明、滑块或图解、播放/暂停、慢速/快速、手动跳步与重置；也可切换到完整课程步骤。手机上支持图内横向滑动。自动播放只在图进入视野时运行；系统启用减少动态效果时关闭自动播放和过渡。参数实验使用可手算的合成案例，清楚说明哪些公式在实时计算、哪些示意并未运行模型训练。
 
 关键概念路径把课程按问题串起来：prediction head 与 attention head 的不同位置；zero-shot、few-shot、linear probe、原型网络与元学习；GPT 的 in-context learning、chain-of-thought 与偏好训练；cohort 定义、数据泄漏、分布漂移、外部验证与校准。每一步说明为什么要接着学下一步，并链接到完整课程。独立课程中的机制拆解仍按步骤展开，附有配置起点与调整信号。
 
@@ -30,16 +30,26 @@
 
 ## 手算、练习与实践工坊
 
-全部 126 节课各有一题机制题和一题选型/排错题，共 252 题；提交后显示解释，可重新作答。最近一次答案保存在当前浏览器，“学习记录与错题复习”页会汇总阅读标记、作答情况和待复习题目；课程题目修订后，旧答案不会误算进新题。
+全部 177 节课各有一题机制题和一题选型/排错题，共 354 题；提交后显示解释，可重新作答。最近一次答案保存在当前浏览器，“学习记录与错题复习”页会汇总阅读标记、作答情况和待复习题目；课程题目修订后，旧答案不会误算进新题。
 
 [实践工坊](https://haoyunli.github.io/deep-learning-atlas/#/practice) 包含：
 
-- **五个手算沙盘**：kNN 距离、排名与投票；均值型 EM 的密度、责任度、加权和与似然；attention 的 Q/K/V、缩放、mask、softmax 和加权输出；PPO 正负 advantage 的裁剪目标和局部导数；cohort 的入组、观察/结果窗、随访、时间与患者切分。参数变化会重新计算中间值，支持播放/暂停、逐步查看和重置。
+- **六个手算沙盘**：kNN 距离、排名与投票；均值型 EM 的密度、责任度、加权和与似然；attention 的 Q/K/V、缩放、mask、softmax 和加权输出；PPO 正负 advantage 的裁剪目标和局部导数；cohort 的入组、观察/结果窗、随访、时间与患者切分。另有 MAML 的 support/query、inner update 与 meta-gradient 沙盘。参数变化会重新计算中间值，支持播放/暂停、逐步查看和重置。
 - **完整实验案例**：160 位合成客户，按时间切成 80 train / 30 validation / 30 test，中间保留两个 30 天间隔。浏览器真实拟合 Logistic Regression，比较常数概率基线与 kNN，执行 18 组候选比较、特征消融、阈值与错误分析。查看独立测试后锁定模型和阈值，CSV 可下载复现。
 - **诊断树**：loss 不降/NaN、训练好验证差、线上变差三类症状，共九个有分支的检查点。
 - **LM 显存与形状计算器**：调整 batch、上下文、生成长度、层数、KV heads、head dimension 和 dtype 字节数；比较 MHA/GQA/MQA，查看 prefill/decode 的逻辑张量形状。计算的是理想 KV 存储，不是总显存或硬件延迟预测。
 
 新增 22 节课程：BatchNorm、LayerNorm、LR schedules、gradient clipping、mixed precision；tokenization、positional encoding、autoregressive inference、KV cache、GQA、RAG、LM evaluation；XGBoost、GCN、GraphSAGE、GAT、time-series forecasting、DDPM、DDIM、latent diffusion、flow matching、OPE。新增训练稳定性、LM 完整工作链、生成路径、结构化模型选型四条关联路径。
+
+## 从你的科研问题学习算法
+
+[科研实践入口](https://haoyunli.github.io/deep-learning-atlas/#/practice?research=spatial) 默认打开 Spatial bin-to-cell，也可切换 Pathway/Age 和 Methylation/Age。每条路径先写 Question、Input、Output 和结论边界，再沿 6 个阶段连接 baseline、算法机制、设置、消融、独立评估与解释。选型表比较优势、代价、适用条件与第一轮设置；新情境题检查迁移理解；实验方案可编辑、本机保存并下载 Markdown。
+
+新增 8 节课、16 道机制/选型题与 12 个术语：Count Likelihood、Pseudobulk、Nested Group Validation、Elastic Net、scVI、Spatial Assignment、Optimal Transport、Multiple Instance Learning。每课写出输入输出 shapes、具体计算、原始论文与适用边界。
+
+新增 4 个参数机制图：Poisson/NB PMF、composition 与 aggregation、Elastic Net soft-threshold/shrinkage、geometry/expression costs 到 Gibbs weights。另有 donor split 反例：固定 4 位 donor，改变每人 cells 数与 split 单位，实时计算 fingerprint memorizer 的预测与 MAE。所有数据均为明确标识的合成教学例子，不是用户科研结果。
+
+课程步骤导览默认手动切换；真实机制实验保留播放、暂停与调参。NB、Elastic Net 与 assignment 的参数符号、概率含义、观测单位及不适用条件明确说明。
 
 ## 本地运行
 
@@ -66,18 +76,18 @@ npm run preview
 - [`src/data/learningConcepts.ts`](src/data/learningConcepts.ts)：head、zero/few-shot、in-context learning 等概念课程。
 - [`src/data/dataConcepts.ts`](src/data/dataConcepts.ts)：cohort、数据泄漏、分布变化与可信评估课程。
 - [`src/data/trainingLanguageExpansion.ts`](src/data/trainingLanguageExpansion.ts)、[`src/data/modelFamilyExpansion.ts`](src/data/modelFamilyExpansion.ts)：新增 22 节专题。
-- [`src/data/exercises.ts`](src/data/exercises.ts)：252 道题的统一注册；题目分文件维护。
-- [`src/components/HandCalculationSandbox.tsx`](src/components/HandCalculationSandbox.tsx)、[`src/components/sandboxMath.ts`](src/components/sandboxMath.ts)：五个沙盘及纯数值计算。
+- [`src/data/exercises.ts`](src/data/exercises.ts)：354 道题的统一注册；题目分文件维护。
+- [`src/components/HandCalculationSandbox.tsx`](src/components/HandCalculationSandbox.tsx)、[`src/components/sandboxMath.ts`](src/components/sandboxMath.ts)：六个沙盘及纯数值计算。
 - [`src/components/PracticeHub.tsx`](src/components/PracticeHub.tsx)：完整实验案例、诊断与 LM 预算工坊。
-- [`src/data/conceptPaths.ts`](src/data/conceptPaths.ts)：把模型课与概念课串成八条逐步学习路径。
-- [`src/data/glossary.ts`](src/data/glossary.ts)、[`src/data/modelGuide.ts`](src/data/modelGuide.ts)：85 项术语及 10 类任务的情境化选型数据。
+- [`src/data/conceptPaths.ts`](src/data/conceptPaths.ts)：把模型课与概念课串成17 条逐步学习路径。
+- [`src/data/glossary.ts`](src/data/glossary.ts)、[`src/data/modelGuide.ts`](src/data/modelGuide.ts)：124 项术语及 15 类任务的情境化选型数据。
 - [`src/App.tsx`](src/App.tsx)：课程图谱、详情、可分享筛选、对比与路由。
 - [`src/components/GlossaryPage.tsx`](src/components/GlossaryPage.tsx)、[`src/components/ModelGuide.tsx`](src/components/ModelGuide.tsx)、[`src/components/StudyReview.tsx`](src/components/StudyReview.tsx)：术语、选型和学习复习页面。
 - [`src/lib/studyState.ts`](src/lib/studyState.ts)、[`src/lib/search.ts`](src/lib/search.ts)、[`src/lib/routing.ts`](src/lib/routing.ts)：本机学习记录、缩写搜索和可分享 URL 状态。
 - [`src/components/AnimatedExplainer.tsx`](src/components/AnimatedExplainer.tsx)：动效步骤、参数控制、播放速度、可见性与减少动画设置。
 - [`src/components/AnimationDirectory.tsx`](src/components/AnimationDirectory.tsx)：可搜索筛选的动效实验室。
 - [`src/components/CourseWalkthrough.tsx`](src/components/CourseWalkthrough.tsx)：由课程机制生成的完整步骤导览。
-- [`src/components/labs/`](src/components/labs/)：45 个专属参数实验，按基础/经典、视觉/序列、强化/表示、生成/数据组织。
+- [`src/components/labs/`](src/components/labs/)：53 个专属参数实验，覆盖基础/经典、视觉/序列、强化/表示、生成/数据、Meta-Learning 与科研方法。
 - [`src/components/AttentionAnimation.tsx`](src/components/AttentionAnimation.tsx)、[`src/components/DiffusionAnimation.tsx`](src/components/DiffusionAnimation.tsx)、[`src/components/PPOAnimation.tsx`](src/components/PPOAnimation.tsx)：三张算法机制动效图。
 - [`src/styles.css`](src/styles.css)：响应式视觉系统。
 - [`src/animation.css`](src/animation.css)：动效图与首页入口样式。
