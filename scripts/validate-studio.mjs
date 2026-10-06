@@ -216,7 +216,7 @@ assert.equal(recovered.mastery.invalid, undefined);
 assert.deepEqual(recovered.projectStages["readmission-risk"], ["audit"]);
 
 const { default: StudioPage } = load("src/components/studio/StudioPage.tsx");
-const { trainingStep, forwardTraining, defaultTrainingInputs } = load("src/studio/backpropMath.ts");
+const { trainingStep, forwardTraining, defaultTrainingInputs, tanhProbe, trainingLossSlice } = load("src/studio/backpropMath.ts");
 for (const x of [-2, -0.5, 0, 0.75, 2]) for (const w of [-3, -0.5, 0, 0.5, 3]) for (const v of [-2, 0.25, 1]) for (const target of [-1, 0, 1]) {
   const p = { x, w, v, target, eta: 0.25 };
   const r = trainingStep(p);
@@ -239,6 +239,25 @@ const saturated = trainingStep({ ...defaultTrainingInputs, w: 3, target: 0 });
 assert.ok(saturated.activationDerivative < 0.0001 && Math.abs(saturated.wGradient) < 0.0001 && Math.abs(saturated.vGradient) > 0.9);
 assert.throws(() => trainingStep({ ...defaultTrainingInputs, eta: -1 }), /nonnegative/);
 assert.throws(() => trainingStep({ ...defaultTrainingInputs, x: NaN }), /finite/);
+assert.equal(tanhProbe(0, 0.1).slope, 1);
+assert.ok(defaultStep.wGradient < 0 && trainingStep({ ...defaultTrainingInputs, x: -2 }).wGradient > 0 && trainingStep({ ...defaultTrainingInputs, v: -1 }).wGradient > 0, "a nonnegative tanh derivative does not fix the full gradient sign");
+assert.ok(Math.abs(tanhProbe(6, 0.1).slope - 0.000024576547405286) < 1e-12);
+for (const z of [-6, -1, 0, 1, 6]) for (const direction of [-1, 1]) {
+  const large = tanhProbe(z, direction * 0.1), small = tanhProbe(z, direction * 0.001);
+  assert.ok(Math.abs(small.secant - small.slope) < Math.abs(large.secant - large.slope));
+  assert.ok(Math.abs(small.secant - small.slope) < 0.001);
+}
+assert.throws(() => tanhProbe(1, 0), /nonzero/);
+const slice = trainingLossSlice(defaultTrainingInputs);
+assert.ok(Math.abs(slice.points[0].loss - 0.0284186732) < 1e-10);
+assert.ok(Math.abs(slice.points[10].loss - 0.0133037315) < 1e-10);
+assert.ok(Math.abs(slice.points[80].loss - 0.0422726041) < 1e-10);
+assert.ok(Math.abs(slice.initialSlope + 0.0730666511) < 1e-10);
+const epsilon = 1e-6;
+const initialDifference = (trainingStep({ ...defaultTrainingInputs, eta: epsilon }).after.loss - defaultStep.before.loss) / epsilon;
+assert.ok(Math.abs(initialDifference - slice.initialSlope) < 1e-6);
+assert.deepEqual(trainingLossSlice({ ...defaultTrainingInputs, eta: 2 }), slice, "eta selects a proposed update; it does not change old parameters or direction");
+assert.ok(trainingLossSlice({ ...defaultTrainingInputs, x: 0, target: 0 }).points.every(p => p.loss === 0));
 for (const [path, query, title] of [
   ["/studio", "", "从看懂，到会做。"],
   ["/studio/code", "lesson=attention", "Attention：从公式到可靠实现"],

@@ -1782,8 +1782,8 @@
 .training-edge { stroke: #bfcbd9; stroke-width: 2; fill: none; }
 .training-edge.forward-flow { stroke: #245fbd; }
 .training-backward-edge { stroke: #a74e21; stroke-width: 2; fill: none; }
-.training-graph.is-playing .forward-flow { stroke-dasharray: 7 5; animation: training-flow 1s linear infinite; }
-.training-graph.is-playing .backward-flow { stroke-dasharray: 7 5; animation: training-flow 1s linear infinite; }
+.training-graph.is-playing.is-forward .forward-flow { stroke-dasharray: 7 5; animation: training-flow 1s linear infinite; }
+.training-graph.is-playing.is-backward .backward-flow { stroke-dasharray: 7 5; animation: training-flow 1s linear infinite; }
 @keyframes training-flow { to { stroke-dashoffset: -24; } }
 .training-explanation { padding: 22px 0; border-top: 1px solid var(--line); line-height: 1.9; }
 .training-table-scroll table { width: 100%; min-width: 530px; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
@@ -1797,3 +1797,19 @@
 .training-sources a { text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 760px) { .training-layout { grid-template-columns: minmax(0, 1fr); } .training-result dl { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .training-graph.is-playing .forward-flow, .training-graph.is-playing .backward-flow { animation: none; } }
+.training-diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; border-top: 1px solid var(--line); padding-top: 20px; }
+.training-diagnostic { min-width: 0; font-size: 13px; line-height: 1.8; }
+.training-diagnostic h3 { font-size: 18px; }
+.training-diagnostic select { font: inherit; color: var(--ink); background: white; padding: 6px; border: 1px solid var(--line); }
+.training-plot-scroll { overflow-x: auto; }
+.training-plot-scroll svg { display: block; width: 420px; max-width: none; font-size: 13px; color: var(--ink); }
+.training-plot-scroll text { fill: currentColor; }
+.diagnostic-axis { fill: none; stroke: var(--line); }
+.diagnostic-curve { fill: none; stroke: #245fbd; stroke-width: 2; }
+.diagnostic-tangent { fill: none; stroke: #a74e21; stroke-width: 2; stroke-dasharray: 4 3; }
+.diagnostic-probe { fill: none; stroke: #a74e21; stroke-width: 2; }
+.diagnostic-current { fill: #245fbd; }
+.diagnostic-probe-point { fill: white; stroke: #a74e21; stroke-width: 2; }
+.diagnostic-selected { fill: #a74e21; }
+.diagnostic-reference { fill: none; stroke: #60708b; stroke-dasharray: 4 4; }
+.training-probe-values, .training-chain-product { font-variant-numeric: tabular-nums; }

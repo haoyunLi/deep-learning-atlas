@@ -6,6 +6,7 @@ import {
   type TrainingInputs,
 } from "../../studio/backpropMath";
 import { StudioShell } from "./StudioShell";
+import TrainingDiagnostics from "./TrainingDiagnostics";
 
 const labels = [
   "固定参数",
@@ -47,6 +48,13 @@ export default function TrainingWalkthrough() {
     setPrediction("");
   };
   useEffect(() => {
+    const pauseHidden = () => {
+      if (document.hidden) setPlaying(false);
+    };
+    document.addEventListener("visibilitychange", pauseHidden);
+    return () => document.removeEventListener("visibilitychange", pauseHidden);
+  }, []);
+  useEffect(() => {
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => {
       setReduced(preference.matches);
@@ -59,6 +67,10 @@ export default function TrainingWalkthrough() {
   useEffect(() => {
     if (!playing || reduced || step >= 6) return;
     const timer = window.setTimeout(() => {
+      if (document.hidden) {
+        setPlaying(false);
+        return;
+      }
       setStep(step + 1);
       if (step === 5) setPlaying(false);
     }, 2400);
@@ -229,13 +241,13 @@ export default function TrainingWalkthrough() {
             aria-label="训练计算图，窄屏可左右滑动"
           >
             <svg
-              className={`training-graph ${playing ? "is-playing" : ""}`}
+              className={`training-graph ${playing ? "is-playing" : ""} ${step === 1 ? "is-forward" : ""} ${step === 3 || step === 4 ? "is-backward" : ""}`}
               viewBox="0 0 900 420"
               role="img"
               aria-labelledby="training-graph-title training-graph-desc"
             >
               <title id="training-graph-title">
-              {`第 ${step + 1}/7 步：${labels[step]}`}
+                {`第 ${step + 1}/7 步：${labels[step]}`}
               </title>
               <desc id="training-graph-desc">
                 {descriptions[step]} 蓝色向右是 Forward；橙色向左是 chain rule
@@ -380,7 +392,7 @@ export default function TrainingWalkthrough() {
           <div
             className="training-explanation"
             role="status"
-            aria-live="polite"
+            aria-live={playing ? "off" : "polite"}
           >
             <h2>
               {step + 1}/7 · {labels[step]}
@@ -447,6 +459,7 @@ export default function TrainingWalkthrough() {
               </p>
             </div>
           )}
+          {step >= 4 && <TrainingDiagnostics inputs={inputs} step={step} />}
         </section>
       </div>
       <p className="training-boundary">
@@ -470,6 +483,14 @@ export default function TrainingWalkthrough() {
           rel="noreferrer"
         >
           CS231n：chain rule
+        </a>{" "}
+        ·{" "}
+        <a
+          href="https://d2l.ai/chapter_optimization/gd.html"
+          target="_blank"
+          rel="noreferrer"
+        >
+          D2L：步长与下降
         </a>{" "}
         ·{" "}
         <a

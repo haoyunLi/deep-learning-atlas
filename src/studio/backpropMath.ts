@@ -57,3 +57,39 @@ export function trainingNumber(value: number) {
   if (value === 0) return "0";
   return Math.abs(value) < 0.001 ? value.toExponential(2) : value.toFixed(4);
 }
+
+export function tanhProbe(z: number, delta: number) {
+  if (!Number.isFinite(z) || !Number.isFinite(delta) || delta === 0)
+    throw new RangeError(
+      "Probe needs a finite point and nonzero finite change",
+    );
+  const h = Math.tanh(z);
+  const slope = 1 - h ** 2;
+  const nextH = Math.tanh(z + delta);
+  return {
+    h,
+    slope,
+    nextH,
+    actualChange: nextH - h,
+    linearChange: slope * delta,
+    secant: (nextH - h) / delta,
+  };
+}
+
+// Each point proposes ONE simultaneous update from the same old parameters.
+// It is a slice along a frozen negative-gradient direction, not training history.
+export function trainingLossSlice(p: TrainingInputs) {
+  const r = trainingStep(p);
+  const points = Array.from({ length: 81 }, (_, i) => {
+    const eta = i / 40;
+    return {
+      eta,
+      loss: forwardTraining({
+        ...p,
+        w: p.w - eta * r.wGradient,
+        v: p.v - eta * r.vGradient,
+      }).loss,
+    };
+  });
+  return { points, initialSlope: -(r.wGradient ** 2 + r.vGradient ** 2) };
+}

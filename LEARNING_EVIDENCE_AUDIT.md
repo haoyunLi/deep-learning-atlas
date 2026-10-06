@@ -12,6 +12,16 @@ Learners change input, either weight, target, or learning rate; make an initial 
 
 The calculations and visual assets are original. Further primary-source guidance: [Stanford CS231n backpropagation notes](https://cs231n.github.io/optimization-2/) and [3Blue1Brown backpropagation calculus](https://www.3blue1brown.com/lessons/backpropagation-calculus/), alongside the D2L computational-graph chapter below. No third-party video or figure was embedded or copied.
 
+### Sensitivity and step-size appraisal
+
+The tanh plot now connects the current point and tangent to a small signed `delta-z` probe. It compares the actual change in h, the local linear approximation, and the secant slope; the probe changes only the gate input and performs no SGD update. The same numerical local derivative appears in the complete chain-rule product. Nonnegative local tanh sensitivity does not determine the full gradient's sign, which also depends on the upstream gradient and input.
+
+A second plot shows `phi(eta)=L(w-eta*g_w, v-eta*g_v)` for eta from 0 to 2. All 81 points propose one update from the same old parameters and frozen gradient. They are not training history. The old-loss reference and selected step show why a sufficiently small step can decrease loss while a large step overshoots. The horizontal range stays fixed; the vertical scale starts at zero and its automatic adjustment is disclosed. Further guidance: [D2L gradient descent](https://d2l.ai/chapter_optimization/gd.html).
+
+The user-approved Plot Is All You Need skill's installed appraisal guidance was applied to rendered original keyframes. Two self-produced gallery samples were viewed privately for zero-reference, panel, and directional-contribution conventions; no gallery image, plotting code, or research data was published. Its reviewed contact-sheet helper produced private comparisons from this site's own renders. No taste selection or gallery ingestion was recorded.
+
+Playback flow now marks only the active forward/backward phase. Hidden-document events stop playback, and the queued timer independently checks visibility before advancing. Screen-reader status announcements remain polite during manual/paused steps and are disabled while playing. Rendered desktop/mobile checks cover every phase, probe convergence and saturation, sign reversal, exact selected loss, flat zero-gradient loss, phase-specific flow, hidden-page pause, and reduced-motion numerical equivalence.
+
 ## CodeLab
 
 - The browser now describes its action as dimension validation and formula estimation. It performs no Python execution, numerical comparison, backward pass, or training test.
