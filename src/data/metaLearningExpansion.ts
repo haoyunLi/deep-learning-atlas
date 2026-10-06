@@ -648,7 +648,7 @@ export const metaLearningExpansionLessons: Lesson[] = [
     mechanicsSteps: [
       "episode 开始清空或初始化 memory，输入样本表示但把其标签延迟到下一步。",
       "controller 产生 read key，对 memory slots 做相似度寻址并读取加权内容。",
-      "把当前样本与上一时刻标签写入选定 slot，维护 usage 或 least-recently-used 状态。",
+      "收到 yₜ₋₁ 时，将它与缓存的上一样本 xₜ₋₁ 绑定；当前 xₜ 的标签 yₜ 要等到下一步才到达，不能把 xₜ 错配给 yₜ₋₁。具体 slot 的写入时机由 controller 的读写策略决定。",
       "在同一任务后续样本上训练预测，并测试 memory 容量、顺序与任务重置。",
     ],
     whenToUse: [
@@ -696,7 +696,7 @@ export const metaLearningExpansionLessons: Lesson[] = [
       "批处理中不同 episode 共用 memory slots，造成跨任务串线。",
     ],
     example:
-      "新符号分类中第一次看到符号和标签后写入 memory，第二次出现相似符号时通过内容寻址读取标签。",
+      "教学序列 A→1、B→2：t=1 输入 (A,null)，尚不知道 A 的标签；t=2 输入 (B,1)，标签 1 对应缓存的 A，得到 A→1；t=3 输入 (A,2)，标签 2 对应上一样本 B，得到 B→2，同时可查 A→1 预测当前 A。这里演示绑定时序，不是声称 controller 使用离散字典。",
     compareTo: [
       "matching-networks",
       "in-context-learning",
@@ -1030,8 +1030,8 @@ export const metaLearningExpansionLessons: Lesson[] = [
       "从多个 source environments 学在各环境都成立的预测关系，再到完全未见 target 测试。",
     intuition:
       "背景颜色在每个训练环境里的相关性会变化，而真正形状规律保持。若同一个分类器能在不同环境都最优，表示更可能依赖稳定信号。",
-    core: "ERM 最小化所有 source 风险平均。IRM 希望学表示 Φ，使同一 classifier w 在每个 environment 都最优，实际常用 IRMv1 梯度惩罚近似。效果依赖 environment 划分与变化足够暴露伪相关；理论目标不保证真实深网总能找到因果特征。",
-    equation: "minΦ,w Σe Re(w∘Φ)+λ‖∇w Re(w·Φ)|w=1‖²",
+    core: "ERM 最小化 source 风险。原始 IRM 联合寻找表示 Φ 与 classifier w，并要求 w 在每个 environment 上都最优。实用近似 IRMv1 把 Φ 当作整个预测器，只优化 Φ；额外标量 w 固定为 1，用 ∂Rᵉ(w·Φ)/∂w 在 w=1 处的平方检查缩放敏感度。它不是一边优化自由 classifier w、一边又固定同一个 w。效果依赖 environment 划分；惩罚小也不保证找到因果特征。",
+    equation: "IRMv1: minΦ Σe [Rᵉ(Φ)+λ(∂Rᵉ(w·Φ)/∂w |w=1)²]；w=1 是固定标量，Φ 是整个预测器",
     mechanicsSteps: [
       "按机构、时间、设备或生成机制定义多个 source environments，不读取 target。",
       "先训练 ERM 与强数据增广基线，记录每环境风险。",
@@ -1406,7 +1406,7 @@ export const metaLearningExpansionLessons: Lesson[] = [
     id: "curriculum-self-paced",
     source: {
       label: "Bengio et al.: Curriculum Learning",
-      url: "https://arxiv.org/abs/0904.1694",
+      url: "https://doi.org/10.1145/1553374.1553380",
     },
     title: "Curriculum 与 Self-Paced Learning：先学什么",
     englishTitle: "Curriculum and Self-Paced Learning",
@@ -1717,7 +1717,7 @@ export const metaLearningExpansionLessons: Lesson[] = [
     id: "online-learning-drift",
     source: {
       label: "Gama et al.: A Survey on Concept Drift Adaptation",
-      url: "https://arxiv.org/abs/1304.6003",
+      url: "https://doi.org/10.1145/2523813",
     },
     title: "Online Learning 与 Concept Drift：数据流里持续更新",
     englishTitle: "Online Learning and Concept Drift",

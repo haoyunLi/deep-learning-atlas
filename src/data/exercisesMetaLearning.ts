@@ -175,15 +175,15 @@ const specs: Record<string, QuizSpec> = {
   },
   "memory-augmented-meta-learning": {
     mechanism: [
-      "外部 memory 在 one-shot 任务里主要做什么？",
+      "延迟一拍给标签：t=1 输入 (A,null)，t=2 输入 (B,1)。标签 1 应绑定到谁？",
       [
-        "永久修改模型权重",
-        "快速绑定 episode 内样本与新标签",
-        "生成测试标签",
-        "替代所有 encoder",
+        "当前 B，形成 B→1",
+        "缓存的上一样本 A，形成 A→1",
+        "所有 episode 样本，共享标签 1",
+        "不能绑定，因为模型权重未更新",
       ],
       1,
-      "可读写 memory 保存临时样本标签绑定，权重可保持不变。",
+      "当前输入是 (xₜ,yₜ₋₁)，标签属于上一样本。必须保留上一样本的表示再与标签配对；B 的标签要等下一步。可读写 memory 处理 episode 内临时绑定，权重可保持不变。",
     ],
     decision: [
       "两个用户的预测相互影响。首先检查什么？",
@@ -295,15 +295,15 @@ const specs: Record<string, QuizSpec> = {
   },
   "domain-generalization-irm": {
     mechanism: [
-      "IRM 希望同一个什么在多个环境都最优？",
+      "实用近似 IRMv1 的 penalty 对什么求导，又固定在哪里？",
       [
-        "classifier on learned representation",
-        "随机种子",
-        "测试标签",
-        "batch size",
+        "额外标量 w；在 w=1 求导，优化整个预测器 Φ",
+        "同时自由优化 w，又把同一个 w 固定为 1",
+        "对测试标签求导",
+        "对 batch size 求导",
       ],
       0,
-      "IRM 学表示，使同一 readout/classifier 在各训练环境上同时适用。",
+      "原始 IRM 约束共享 classifier 的环境最优性；IRMv1 将 Φ 视为整个预测器，用固定标量 w=1 的风险梯度构造可微惩罚。两种目标的变量不能混写。",
     ],
     decision: [
       "所有 source 环境的伪相关方向都相同。IRM 能否可靠识别？",

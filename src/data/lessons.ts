@@ -257,15 +257,15 @@ const coreLessons: Lesson[] = [
       label: "PyTorch: A Gentle Introduction to torch.autograd",
       url: "https://docs.pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html",
     },
-    title: "反向传播像传账单",
+    title: "反向传播与局部敏感度",
     englishTitle: "Backpropagation",
     category: "foundations",
     level: "入门",
     duration: "9 分钟",
     icon: "↶",
-    summary: "从最终误差往回计算每个参数的责任，再用梯度更新参数。",
+    summary: "沿计算图求 loss 对每个参数的局部导数，再由优化器更新参数。",
     intuition:
-      "如果最终答案错了，backprop 会沿计算路径把“这一步造成了多少误差”逐层分摊。它不是从数据中倒着推理，而是用 chain rule 高效求导。",
+      "把某个参数微调一点，loss 会往哪个方向、变化多快？backprop 用 chain rule 沿计算图高效求这个局部敏感度。导数不把总误差拆成各参数造成的份额，也不是现实世界的因果归因；多条路径汇入同一参数时，路径导数相加。",
     core: "Forward pass 保存计算所需的中间量；反向 pass 从 loss 对输出的导数出发，逐层乘局部导数。自动微分处理图的求导，优化器再使用这些梯度更新权重。",
     equation: "若 z = wx, L = (z−y)²，则 ∂L/∂w = 2(z−y)x",
     whenToUse: [

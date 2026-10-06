@@ -483,7 +483,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
     ],
     howToUse: [
       "先检查 audio duration、采样率、transcript 与空样本。",
-      "确认 encoder 帧长 T 足以对齐去重后的标签。",
+      "目标标签不能去重。若目标长度为 U、相邻重复对数为 R，至少需要 encoder 帧长 T≥U+R；否则没有合法路径。",
       "冻结 feature encoder 先稳定微调，再按验证集逐层解冻。",
       "报告总体 WER 及口音、噪声、时长和说话人 cohort。",
     ],
@@ -518,7 +518,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "说话人片段随机切分让同一声音出现在训练与测试。",
     ],
     example:
-      "10 小时领域语音先用预训练 wav2vec 2.0，冻结 encoder 训练 CTC head；验证删除率高时先查帧/标签长度和 blank，再调 beam。",
+      "目标 ll 有两个 l，不能去重成 l。路径 [l,l] 折叠为 l，而 [l,blank,l] 才折叠为 ll，所以至少需要 3 帧。折叠先合并路径中连续相同符号，再移除 blank；顺序反过来会丢掉合法重复。领域 ASR 微调时先检查这个帧长条件，再调 blank 与 beam。",
     compareTo: ["rnn", "contrastive-learning", "whisper"],
   },
   {
@@ -987,13 +987,13 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "用独立 calibration set 的 nonconformity 分数构造有限样本预测集，并用 coverage、set size 与 selective risk 管理拒答。",
     intuition:
       "不强迫模型每次给一个答案；先看正确答案在校准样本中通常有多‘不像’，再给新样本足够大的候选集合覆盖真实标签。",
-    core: "split conformal 在可交换性下选择有限样本校正分位数 q̂。分类把概率不足的标签加入集合，回归给区间。保证是边际 coverage，不能自动保证每个 subgroup、每个样本或 shift 后仍成立；OOD detection 是不同目标。",
+    core: "split conformal 在可交换性下选择有限样本校正阈值 q̂。本章分类评分 s(x,y)=1−p(y|x)，因此保留低 nonconformity 的标签，即 p(y|x)≥1−q̂。其他 score 有不同集合规则。回归可构造区间；保证是边际 coverage，不自动覆盖每个 subgroup、每个样本或 shift 后的分布。OOD detection 是不同目标。",
     equation:
-      "q̂=Quantileceil((n+1)(1−α))/n({sᵢ}); C(x)={y:s(x,y)≤q̂}; P(Y∈C(X))≥1−α",
+      "k=ceil((n+1)(1−α)); q̂=s_(k)（升序；k>n 时用 +∞）；C(x)={y:s(x,y)≤q̂}; P(Y∈C(X))≥1−α",
     mechanicsSteps: [
       "训练模型后保留从未用于拟合/调参的 calibration set。",
       "为每个校准样本计算 nonconformity，例如分类 s=1−ptrue。",
-      "按有限样本修正索引取 1−α 分位数 q̂；新样本保留 s(x,y)≤q̂ 的标签。",
+      "将校准分数升序排列，取第 k=ceil((n+1)(1−α)) 个。若 k>n，用 +∞ 返回全集，不能截断索引后仍声称同样保证。新样本保留 s(x,y)≤q̂ 的标签。",
       "报告 coverage、平均集合大小、空/全标签比例，并按 subgroup 与 shift 压力测试。",
     ],
     whenToUse: [
@@ -1042,7 +1042,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "把 softmax 最大值当成经证明的 OOD detector。",
     ],
     example:
-      "目标 90% coverage 时，模型可返回 {猫,狐} 而非强给单类；若新相机使 coverage 降到 76%，说明 exchangeability 已破坏，需要重新校准或回退。",
+      "教学例：新样本 p=[0.6,0.3,0.1]，若独立校准得到 q̂=0.8，则分数 [0.4,0.7,0.9] 中前两个≤0.8，返回 {A,B}。q̂ 必须来自 calibration，不能由这一个样本猜出。新相机若 coverage 明显下降，需检查分布变化与抽样不确定性，重新校准或回退。",
     compareTo: [
       "calibration-uncertainty",
       "deep-ensembles",

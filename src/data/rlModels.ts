@@ -450,14 +450,14 @@ export const rlLessons: Lesson[] = [
     level: "高级",
     duration: "11 分钟",
     icon: "◈",
-    summary: "把 Double、Dueling、优先回放、分布式价值等 DQN 改进组合评估。",
+    summary: "把 Double、Dueling、优先回放、回报分布建模等 DQN 改进组合评估。",
     intuition:
       "DQN 的问题不止一种：高估、样本利用率、探索和回报分布都可能影响表现。Rainbow 像工具箱，把针对不同问题的零件装到一起。",
     core: "原论文组合 Double Q-learning、prioritized replay、dueling networks、multi-step learning、distributional RL 与 noisy networks。仍是离散动作的 model-free value-based 路线。",
     equation: "DQN backbone + Double + Dueling + PER + n-step + C51 + NoisyNet",
     mechanicsSteps: [
       "先确定可复现的 DQN 基线，再加入 Double target 与 dueling head。",
-      "按 TD error 优先采样 replay，并对采样偏差使用 importance weight。",
+      "原版 distributional Rainbow 按投影后的目标分布与预测分布之间的 KL loss 设置 replay priority，并用 importance weight 修正采样偏差；标量 TD error 是标准 PER 的另一种定义。",
       "用 n-step return 传播较远奖励；distributional head 预测固定支持上的回报分布并投影 Bellman target。",
       "以 NoisyNet 提供参数噪声探索；逐组件消融并报告每环境步的实际收益。",
     ],
@@ -468,7 +468,7 @@ export const rlLessons: Lesson[] = [
     settings: [
       {
         name: "PER 优先指数",
-        start: "先关闭 PER 建基线，再小幅增加对大 TD error 的偏好。",
+        start: "先关闭 PER 建基线，再小幅增加对大 distributional KL loss 的采样偏好。",
         adjust: "少数异常样本反复占据 batch 就降低；重要转移学得慢则提高。",
       },
       {
