@@ -1,0 +1,95 @@
+.foundation-contrast {
+  border: 1px solid #b9cbe2;
+  padding: 24px;
+  background: #fbfdff;
+  min-width: 0;
+}
+.foundation-contrast h2 {
+  margin-top: 0;
+}
+.contrast-control {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-weight: 700;
+  margin: 20px 0;
+}
+.contrast-control input {
+  flex: 1;
+  min-width: 140px;
+  max-width: 330px;
+  accent-color: #218776;
+}
+.contrast-control select {
+  max-width: 100%;
+  padding: 8px;
+  border: 1px solid #b9cbe2;
+  background: #fff;
+  color: #183c38;
+}
+.contrast-control output {
+  font-variant-numeric: tabular-nums;
+}
+.contrast-plot-scroll,
+.contrast-table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.contrast-plot-scroll:focus-visible {
+  outline: 2px solid #218776;
+  outline-offset: 2px;
+}
+.contrast-plot-scroll svg {
+  display: block;
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+  fill: #183c38;
+}
+.contrast-plot-scroll text {
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+}
+.contrast-plot-scroll .contrast-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+.contrast-axis {
+  stroke: #9ab4b1;
+  stroke-width: 1.5;
+  fill: none;
+}
+.contrast-node {
+  fill: #fff;
+  stroke: #9ab4b1;
+  stroke-width: 1.5;
+}
+.foundation-contrast table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 450px;
+  font-variant-numeric: tabular-nums;
+}
+.foundation-contrast caption {
+  text-align: left;
+  font-weight: 700;
+  padding: 14px 0;
+}
+.foundation-contrast th,
+.foundation-contrast td {
+  padding: 10px;
+  border-bottom: 1px solid #d9e5f2;
+  text-align: left;
+}
+.foundation-contrast .contrast-result {
+  font-variant-numeric: tabular-nums;
+  color: #183c38;
+  background: #e9f3f0;
+  padding: 12px;
+}
+@media (max-width: 600px) {
+  .foundation-contrast {
+    padding: 16px;
+  }
+}

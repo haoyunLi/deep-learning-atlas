@@ -1,6 +1,6 @@
 # Atlas 逐课审阅记录
 
-本轮清单：177 课。已逐章阅读并判断：12；结论/修改验证完成：9；尚待阅读：165。
+本轮清单：177 课。已逐章阅读并判断：12；结论/修改验证完成：12；尚待阅读：165。
 
 状态只依据实际阅读正文、公式/例子、图表/实验和练习后手工写入的结论。自动清单导出、渲染检查或通用修复不代表章节已审阅。未改章节也记录保留理由；章节原有来源不等于本轮已逐条访问核验。
 
@@ -10,9 +10,9 @@
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [neural-networks · 神经网络从哪来](https://haoyunli.github.io/deep-learning-atlas/#/lesson/neural-networks) | 已审阅 · 待修改 | 正文解释线性层塌缩，已有可调2→2→1 forward；题目有代数证明，但尚无保持同一权重、去掉 activation 的表达能力对照。 | 补四个 XOR 点在 input/hidden space 的同权重对照，明确示例权重人为构造、没有训练。 | 待数学核对与浏览器验证 | — |
-| [loss-functions · 损失函数定方向](https://haoyunli.github.io/deep-learning-atlas/#/lesson/loss-functions) | 已审阅 · 待修改 | loss/label粒度与CE接口说明准确，quiz有−log p数值；现有图只展示MSE/Huber，分类的logits→probability→loss→gradient链仍需脑补。 | 补3类CE联动读图，改变一个错误类logit，显示p与p−onehot梯度。 | 待梯度和数值检查 | — |
-| [backpropagation · 反向传播与局部敏感度](https://haoyunli.github.io/deep-learning-atlas/#/lesson/backpropagation) | 已审阅 · 待修改 | 已有单链数值、清零顺序与双层tanh训练图；责任分摊类比可能误导为因果归因，多路径相加只在文字提到。 | 改为局部敏感度解释；补共享参数双分支图与合计梯度。 | 因果归因措辞已修正；共享参数双分支图待完成 | [1](https://docs.pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html) |
+| [neural-networks · 神经网络从哪来](https://haoyunli.github.io/deep-learning-atlas/#/lesson/neural-networks) | 已修改并验证 | 正文解释线性层塌缩，已有可调2→2→1 forward；题目有代数证明，但尚无保持同一权重、去掉 activation 的表达能力对照。 | 补四个 XOR 点在 input/hidden space 的同权重对照，明确示例权重人为构造、没有训练。 | 数学不变量/有限差分通过；全站build通过；1440/375px控制操作、SVG文字≥13px、无裁切/重叠/横向溢出、无脚本错误；原创图截图已目视检查。 | — |
+| [loss-functions · 损失函数定方向](https://haoyunli.github.io/deep-learning-atlas/#/lesson/loss-functions) | 已修改并验证 | loss/label粒度与CE接口说明准确，quiz有−log p数值；现有图只展示MSE/Huber，分类的logits→probability→loss→gradient链仍需脑补。 | 补3类CE联动读图，改变一个错误类logit，显示p与p−onehot梯度。 | 数学不变量/有限差分通过；全站build通过；1440/375px控制操作、SVG文字≥13px、无裁切/重叠/横向溢出、无脚本错误；原创图截图已目视检查。 | — |
+| [backpropagation · 反向传播与局部敏感度](https://haoyunli.github.io/deep-learning-atlas/#/lesson/backpropagation) | 已修改并验证 | 已有单链数值、清零顺序与双层tanh训练图；责任分摊类比可能误导为因果归因，多路径相加只在文字提到。 | 改为局部敏感度解释；补共享参数双分支图与合计梯度。 | 数学不变量/有限差分通过；全站build通过；1440/375px控制操作、SVG文字≥13px、无裁切/重叠/横向溢出、无脚本错误；原创图截图已目视检查。 | [1](https://docs.pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html) |
 
 ## training
 
