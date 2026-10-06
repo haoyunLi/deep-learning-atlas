@@ -629,7 +629,7 @@ export const classicalRepresentationLessons: Lesson[] = [
         name: "margin",
         start: "先根据 embedding 是否归一化与距离尺度设置可满足的 margin。",
         adjust:
-          "有效三元组过少时降低或加强 mining；所有三元组都违反且训练不稳时检查噪声并减小。",
+          "固定距离下，有效三元组过少时可适度增大 margin 或加强合理的 mining；所有三元组都违反且训练不稳时检查噪声并减小 margin。",
       },
       {
         name: "mining 策略",

@@ -1438,9 +1438,9 @@ function MetaLearningSandbox() {
       english: "Build tasks and data splits",
       explanation: (
         <>
-          两个未见任务共享初始化 θ={number(result.theta)}。每个任务用 K=
-          {shots} 个 support 估计任务目标；query
-          仍使用真实目标，只用于适配后检验。
+          两个教学 meta-train tasks 共享初始化 θ={number(result.theta)}。每个任务用 K=
+          {shots} 个 support 估计任务目标；query target 不参与 inner update，
+          但其 loss 会在本例的 outer loop 中更新共享初始化。
         </>
       ),
     },
@@ -1480,7 +1480,7 @@ function MetaLearningSandbox() {
     <SandboxFrame
       title="MAML：Support Set → Inner Loop → Query Set → Outer Loop"
       english="Few-Shot Meta-Gradient walkthrough"
-      scope="两个一维回归任务；support estimate 含随 K 减小的固定采样误差。"
+      scope="本例展示 meta-training 的两个一维回归任务；support estimate 含随 K 减小的固定采样误差。"
       steps={steps}
       controls={
         <>
@@ -1623,6 +1623,10 @@ function MetaLearningSandbox() {
                 <strong>{number(result.theta)}</strong> 更新到
                 <strong>{number(result.nextTheta, 4)}</strong>。
               </Result>
+              <p className="sandbox-inline-note">
+                Held-out meta-test 时冻结学到的共享初始化 θ，仅从新任务 support
+                做 inner adaptation；query 标签用于评分，不能再做本例的 outer update。
+              </p>
             </>
           )}
         </>

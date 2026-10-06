@@ -877,10 +877,10 @@ export const metaLearningExpansionLessons: Lesson[] = [
     intuition:
       "预训练模型像已经学会通用视觉或语言的员工。新任务相近时只换工作说明；差异大时需要重训后层甚至底层，但样本少时改得太多会忘掉原能力。",
     core: "底层特征通常更通用，高层更任务相关，但具体可迁移性取决于架构与域。冻结 backbone 只训练 head 是低方差基线；discriminative learning rates 与 gradual unfreezing 可降低破坏；全量 fine-tuning 容量最大也最易过拟合。",
-    equation: "θ* = argminθtask Ltarget(θpretrained,θtask)+λ‖θ−θpretrained‖²",
+    equation: "Head-only: min_w Ltarget(fθ₀,w)，θ₀ 固定；Fine-tune: min_θ,w Ltarget(fθ,w)，θ 初始化于 θ₀",
     mechanicsSteps: [
       "选与输入模态和预训练目标相符的 checkpoint，复现其预处理与 tokenizer。",
-      "冻结 backbone 训练 head，建立 linear probe；记录 train/eval mode 和 normalization。",
+      "冻结 backbone 参数 θ₀，只训练任务 head 参数 w，建立 linear probe；记录 train/eval mode 和 normalization。全量微调则允许 θ 与 w 都变化。",
       "按从高到低逐块解冻，用较小 backbone LR，并比较验证曲线与遗忘。",
       "最终与从头训练和参数高效适配比较质量、数据、显存、延迟和维护成本。",
     ],
@@ -923,6 +923,7 @@ export const metaLearningExpansionLessons: Lesson[] = [
     modifications: [
       "LoRA、adapter、prompt tuning 限制可训练参数。",
       "先做目标域自监督继续预训练，再用少量标签微调。",
+      "可选在微调目标中加入 λ‖θ−θ₀‖²，约束对应 backbone 参数靠近预训练值；这不是普通 weight decay，也不是所有迁移学习都必需。新 head w 不与不同形状的 θ₀ 相减，λ=0 仍是合法微调。",
     ],
     pitfalls: [
       "只把 requires_grad=False，却让 BatchNorm running stats 持续变化。",
@@ -1043,7 +1044,7 @@ export const metaLearningExpansionLessons: Lesson[] = [
       "怀疑环境间变化可帮助识别稳定预测关系时。",
     ],
     limits: [
-      "环境划分无信息或伪相关在所有 source 同方向时，无法辨别。",
+      "若所有 source 的伪相关机制与强度相同，且缺少其他有信息的环境变化，仅靠不变性约束难以辨别稳定与伪相关。",
       "IRM 近似目标优化困难，可能不优于调好的 ERM。",
     ],
     howToUse: [
@@ -1265,11 +1266,11 @@ export const metaLearningExpansionLessons: Lesson[] = [
     intuition:
       "相关任务可以共享基础能力，但一个老师要求边缘敏感，另一个要求纹理不变，梯度也可能互相拉扯。共享不是越多越好。",
     core: "Hard sharing 用一个 backbone 接多个 task heads，总 loss 为加权和。任务频率、loss 量纲与梯度方向共同决定实际更新。Uncertainty weighting 学 log variance 调整权重；PCGrad 等方法处理冲突梯度。应比较每任务 single-task baseline 与 Pareto trade-off。",
-    equation: "Ltotal=Σt wtLt;  Luncertainty=Σt Lt/(2σt²)+logσt",
+    equation: "Ltotal=Σₜ wₜLₜ；Gaussian regression 示例：Luncertainty=Σₜ [Lₜ/(2σₜ²)+logσₜ]，sₜ=logσₜ²",
     mechanicsSteps: [
       "为每任务定义独立 head、loss、metric 和可用样本掩码，先训练 single-task baselines。",
       "共享 backbone 后按任务或混合 batch 采样，计算各任务 loss 与 backbone gradient。",
-      "检查 loss 尺度、梯度 norm 与 cosine；用固定、uncertainty 或动态权重平衡。",
+      "检查 loss 尺度、梯度 norm 与 cosine；用固定、uncertainty 或动态权重平衡。上式限定独立 Gaussian regression likelihood，Lₜ 是相应 squared-error 项；学习 sₜ=logσₜ² 保证 variance 为正。分类 likelihood 需对应推导，不能把同一 1/2 系数当通用精确公式。",
       "在每任务独立 test 上比较收益/退化，并报告总体 Pareto 前沿。",
     ],
     whenToUse: [

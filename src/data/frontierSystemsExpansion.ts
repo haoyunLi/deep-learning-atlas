@@ -93,10 +93,10 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
     intuition:
       "固定滤波器会对所有 token 用同一种记忆规则。Mamba 像带内容控制的阀门：标点可以让状态慢下来，关键信息可以强写入，噪声可以快速忘掉。",
     core: "选择性使 Δ、B、C 随 xₜ 变化，因此不能直接使用固定卷积核。实现以 associative scan、kernel fusion 和 recomputation 控制 HBM 读写；线性序列复杂度来自 scan，不代表所有矩阵运算都消失。",
-    equation: "hₜ=Ā(Δₜ)hₜ₋₁+B̄(Δₜ)B(xₜ)xₜ; yₜ=C(xₜ)hₜ+D xₜ",
+    equation: "Āₜ=exp(ΔₜA); B̄ₜ=Discretize(A,Δₜ,Bₜ); hₜ=Āₜhₜ₋₁+B̄ₜxₜ; yₜ=Cₜhₜ+Dskip xₜ",
     mechanicsSteps: [
       "输入 [B,L,D] 先做投影并分成内容支路与门控支路，局部 depthwise convolution 注入短程顺序。",
-      "内容支路生成逐 token 的 Δ、B、C；softplus 等约束让有效步长为正，再据此离散化连续状态。",
+      "内容支路生成逐 token 的 Δₜ、Bₜ、Cₜ；softplus 等约束让有效步长为正，再据此离散化连续状态。公式中的 B̄ₜ 已包含 Bₜ 的离散化结果，不能再乘一次 Bₜ；Dskip 是直接输入到输出的支路系数。",
       "selective scan 沿 L 递推 N 维状态；训练用并行 scan，autoregressive 推理缓存每层状态和局部卷积窗口。",
       "扫描输出经过门控和输出投影，再与残差相加；逐层重复形成语言、音频或视觉 backbone。",
     ],
@@ -166,12 +166,12 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "用 time-mixing 的指数加权状态替代完整注意力矩阵，训练时可并行表达，推理时像 RNN 一样保存固定状态。",
     intuition:
       "每个通道保留一份衰减的 key-value 摘要，receptance 决定当前 token 读取多少。不同通道可学习不同记忆半衰期。",
-    core: "RWKV 的 time mixing 累积带指数衰减的 key/value，并用数值稳定形式维护分子、分母和最大项；channel mixing 类似带门控的逐 token FFN。token shift 混合当前与前一位置。",
+    core: "本课公式对应 2023 原始 RWKV：历史 token 按通道衰减，当前 token 单独使用可学习 bonus u，不能把它们合成同一个无标记的衰减求和。time mixing 用数值稳定形式维护分子、分母和最大项；channel mixing 类似带门控的逐 token FFN。token shift 混合当前与前一位置；后续 RWKV 版本的状态与公式需按对应实现核对。",
     equation:
-      "wkvₜ=(Σᵢ≤ₜ exp(kᵢ−(t−i)w)vᵢ)/(Σᵢ≤ₜ exp(kᵢ−(t−i)w)); yₜ=σ(rₜ)⊙wkvₜ",
+      "wkvₜ=[Σᵢ₌₁ᵗ⁻¹ exp(kᵢ−(t−1−i)w)⊙vᵢ+exp(u+kₜ)⊙vₜ]/[Σᵢ₌₁ᵗ⁻¹ exp(kᵢ−(t−1−i)w)+exp(u+kₜ)]; oₜ=Wₒ(σ(rₜ)⊙wkvₜ)",
     mechanicsSteps: [
       "对输入与前一 token 表示做可学习线性混合，分别生成 r、k、v。",
-      "按通道累计指数衰减的 key-value 分子和权重分母，用 log-sum-exp 风格状态避免溢出。",
+      "按通道累计历史 key-value 分子和权重分母：历史索引 i<t，最近的历史 token i=t−1 的衰减指数为 0；当前 token 的权重是 exp(u+kₜ)。所有 exp、乘法与除法逐通道计算，用 log-sum-exp 风格状态避免溢出。",
       "receptance sigmoid 门控当前读出；输出投影与残差形成 time-mix block。",
       "channel-mix 在每个位置做门控非线性；生成时每层只更新 time/channel state。",
     ],
@@ -222,7 +222,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "只测短 prompt，忽略状态误差随生成长度累计。",
     ],
     example:
-      "聊天服务每层保存固定状态；在 1k、16k、64k token 后插入同一事实查询，绘制准确率与状态精度关系。",
+      "单通道 t=2、k₁=k₂=0、v₁=2、v₂=6、u=ln2 时，历史权重为 1、当前权重为 2，wkv₂=(2+2×6)/(1+2)=14/3；若 u=0 则为 4。t=2 的最近历史项尚未衰减，w 会从更早历史项开始起作用。读出还需 receptance gate 与输出投影。聊天服务可另在 1k、16k、64k token 后查询同一事实，检查固定状态的记忆限制。",
     compareTo: ["rnn", "transformer", "mamba"],
   },
   {

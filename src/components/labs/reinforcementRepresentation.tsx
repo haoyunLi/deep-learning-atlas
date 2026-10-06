@@ -698,7 +698,7 @@ function ActorCriticLab({ step, value }: LabProps) {
 function SacLab({ step, value }: LabProps) {
   const result = rlLabCalculations.sac(value);
   return (
-    <LabCanvas label="Soft Actor Critic 的双 Q 下界与 entropy 系数 alpha">
+    <LabCanvas label="Soft Actor Critic 的双 Q 较小估计与 entropy 系数 alpha">
       <VizNode
         x={29}
         y={33}

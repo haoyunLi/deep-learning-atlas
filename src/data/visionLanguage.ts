@@ -920,7 +920,7 @@ export const visionLanguageLessons: Lesson[] = [
     equation: "yₜ = Σⱼ wⱼ x₍ₜ₋d·j₎; stride 1 时 R = 1 + (K−1)Σₗ mₗdₗ",
     mechanicsSteps: [
       "每层只取当前位置及之前的位置做 causal convolution；通过左侧 padding 保证不接触未来。",
-      "dilated convolution 隔 d 个时间步取样，常逐层增加 dilation，使有效历史窗口快速增长。",
+      "dilated convolution 隔 d 个时间步取样，常逐层增加 dilation，使历史窗口快速增长。公式中 K 是核宽，dₗ 是该组 dilation，mₗ 是采用该 dilation 的连续 stride=1 卷积数；例如 K=3、d=[1,2,4]、每组两次卷积时，R=1+2×2×(1+2+4)=29。",
       "残差块把输入与卷积输出相加或投影后相加，以便训练更深的时间卷积堆栈。",
       "最后取预测时刻的表示接回归／分类 head；整段训练可并行，线上每次仅输入当时可见历史。",
     ],

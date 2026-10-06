@@ -14,10 +14,10 @@ const specs: Record<string, QuizSpec> = {
       "N-way K-shot 的 support 大小是 N×K，因此 5×3=15；query 必须另行采样。",
     ],
     decision: [
-      "同一患者的一次检查进了 support，另一次检查进了 meta-test query。主要问题是什么？",
+      "目标是泛化到新患者。同一患者的一次检查已用于 meta-training support，另一次又进入 meta-test query。主要问题是什么？",
       ["学习率太小", "任务/实体泄漏使新任务评估虚高", "类别太少", "query 太多"],
       1,
-      "meta split 应按真正的新任务单位隔离；同一患者跨集合会泄漏个体特征。",
+      "当目标是新患者泛化时，该患者不能同时跨 meta-training 与 meta-test；否则个体特征会让新患者评估虚高。若整个新患者只属于一个 held-out meta-test task，同患者的 support/query 则可以构成合法的患者内快速适配，两层划分不能混同。",
     ],
   },
   "fomaml-reptile": {
@@ -167,10 +167,10 @@ const specs: Record<string, QuizSpec> = {
       "Hypernetwork 根据 task/context embedding 生成 target network 权重、adapter 或 head。",
     ],
     decision: [
-      "新任务表现异常好，但 task embedding 用了整个 query 集的均值。问题是什么？",
+      "协议声明 support-only inductive 适配，task embedding 却使用整个 query 集的输入均值。问题是什么？",
       ["query 信息泄漏进入适配", "batch 太小", "参数太少", "没有 softmax"],
       0,
-      "适配器只能读取 support 或部署可得上下文；query 统计会污染外层评估。",
+      "这违反了声明的 support-only inductive 协议。若协议明确允许 transductive 批量输入、且不读取 query 标签，无标签 query 统计可以合法使用；它与 query-label 泄漏是不同问题，必须分别报告协议与部署可得信息。",
     ],
   },
   "memory-augmented-meta-learning": {
@@ -306,15 +306,15 @@ const specs: Record<string, QuizSpec> = {
       "原始 IRM 约束共享 classifier 的环境最优性；IRMv1 将 Φ 视为整个预测器，用固定标量 w=1 的风险梯度构造可微惩罚。两种目标的变量不能混写。",
     ],
     decision: [
-      "所有 source 环境的伪相关方向都相同。IRM 能否可靠识别？",
+      "所有 source 的伪相关机制与强度都相同，也没有其他有信息的环境差异。仅靠 IRM 能保证识别稳定规律吗？",
       [
-        "通常不能，环境变化没有暴露冲突",
+        "不能保证；环境未提供区分这条伪相关的变化",
         "一定可以",
         "只需把 λ 设无限大",
         "删除 ERM",
       ],
       0,
-      "没有环境间变化就缺少识别稳定与伪相关的信号。",
+      "缺少有信息的环境变化就缺少辨别线索。‘方向相同’不等于‘机制与强度相同’：例如颜色与标签同向相关从 80% 变到 90%，已有强度变化；这提供环境差异，但仍不保证 IRM 找到因果特征。",
     ],
   },
   "continual-learning": {
@@ -331,7 +331,7 @@ const specs: Record<string, QuizSpec> = {
     ],
     decision: [
       "方法保存 10 倍 replay 数据却只与零内存基线比较准确率。缺少什么？",
-      ["同内存预算对照与存储成本", "更大的 test", "更小模型名称", "更多颜色"],
+      ["同内存预算对照与存储成本", "只增加随机 seeds 就能消除内存预算差异", "只匹配 backbone 参数量就足够公平", "只报准确率均值即可，无需报告保留样本数"],
       0,
       "Continual Learning 必须在相同 memory/参数/计算预算下比较。",
     ],
@@ -341,9 +341,9 @@ const specs: Record<string, QuizSpec> = {
       "BALD 试图选择哪类样本？",
       [
         "模型参数不确定性导致预测分歧大的样本",
-        "最短文件",
-        "已经标注的样本",
-        "固定类别第一张",
+        "总预测熵高，但后验成员一致、条件熵也高的样本",
+        "只按预测熵排序，不减平均条件熵",
+        "只按 embedding 密度排序，不考虑后验预测分歧",
       ],
       0,
       "BALD 衡量预测熵与条件熵之差，近似参数后验带来的信息增益。",
@@ -352,9 +352,9 @@ const specs: Record<string, QuizSpec> = {
       "entropy 策略反复选异常损坏图。合理修复是什么？",
       [
         "加入 OOD/density 过滤与 diversity，并保留随机基线",
-        "降低所有分辨率",
-        "删除 validation",
-        "只选最高 entropy",
+        "继续只选最高 entropy，相信任何不确定样本都更有价值",
+        "把每个 acquisition batch 加大，忽略异常比例与冗余",
+        "只替换 backbone，保持异常数据和 acquisition 规则不变",
       ],
       0,
       "不确定性高可能来自无价值异常点，应结合代表性和可标注性。",
@@ -395,9 +395,9 @@ const specs: Record<string, QuizSpec> = {
       "搜索 10,000 个配置后只报最佳 validation 与一次 test。最大风险是什么？",
       [
         "对 validation 过拟合与 winner's curse",
-        "参数太少",
-        "无法用 GPU",
-        "query 太多",
+        "验证样本越多越一定无法收敛，与搜索次数无关",
+        "随机搜索天然不会利用 validation 噪声，无需额外检查",
+        "只要最佳 validation 很高，就能保证新队列同样高",
       ],
       0,
       "大量尝试会选择到验证噪声赢家，需要额外 holdout、多 seed 重训并报告总试验数。",
@@ -408,9 +408,9 @@ const specs: Record<string, QuizSpec> = {
       "Curriculum 与 self-paced 的主要区别是什么？",
       [
         "前者外部定义难度/顺序，后者按当前模型 loss 选择",
-        "前者无数据",
-        "后者不训练",
-        "没有区别",
+        "前者按当前模型 loss 选样，后者只能由人固定顺序",
+        "两者都要求始终保留最低 loss 子集，最终不扩展覆盖",
+        "两者只改变 learning rate，不改变样本顺序或权重",
       ],
       0,
       "self-paced 的样本权重依赖模型当前状态，而 curriculum 可由人或外部规则预设。",
@@ -419,9 +419,9 @@ const specs: Record<string, QuizSpec> = {
       "高 loss 样本主要来自少数群体，self-paced 长期不纳入。应怎么做？",
       [
         "按群体审计并保证最终覆盖，必要时改难度规则",
-        "永久删除",
-        "只看平均",
-        "缩小 test",
+        "继续降低选样阈值，让总体训练 loss 看起来更小",
+        "只检查已选子集的平均 loss，不检查群体覆盖",
+        "把高 loss 一律标作噪声，不核实少数群体的有效样本",
       ],
       0,
       "难度选择可能放大代表性偏差，必须看群体覆盖和最终性能。",
@@ -432,9 +432,9 @@ const specs: Record<string, QuizSpec> = {
       "FedAvg 为什么按客户端样本数加权？",
       [
         "近似集中数据上的样本平均目标",
-        "让小客户端永远消失",
-        "保证差分隐私",
-        "减少模型层数",
+        "保证每个客户端在目标中权重相同，与样本数无关",
+        "单靠加权就保证 updates 满足样本级差分隐私",
+        "自动消除所有 non-IID client drift，无需限制 local steps",
       ],
       0,
       "按 nk 加权使每个本地样本在全局目标中获得相近权重，但不自动解决公平性。",
@@ -443,9 +443,9 @@ const specs: Record<string, QuizSpec> = {
       "数据不离开设备，能否直接声称完全隐私？",
       [
         "不能，updates 仍可能泄漏，还需安全聚合/DP与治理",
-        "能",
-        "只有 GPU 才能",
-        "取决于 batch 颜色",
+        "可以，模型 updates 不会包含任何训练记录信息",
+        "只需把 local batch 加大，就自动满足差分隐私",
+        "使用 TLS 加密传输就等同于样本级差分隐私",
       ],
       0,
       "Federated learning 是数据位置架构，不等于形式化隐私保证。",
@@ -527,10 +527,13 @@ const specs: Record<string, QuizSpec> = {
 
 export const metaLearningExercises: Record<string, Exercise[]> =
   Object.fromEntries(
-    Object.entries(specs).map(([lessonId, spec]) => [
+    Object.entries(specs).map(([lessonId, spec], lessonIndex) => [
       lessonId,
-      (["mechanism", "decision"] as const).map((kind) => {
-        const [question, options, answer, explanation] = spec[kind];
+      (["mechanism", "decision"] as const).map((kind, kindIndex) => {
+        const [question, authoredOptions, authoredAnswer, explanation] = spec[kind];
+        const answer = (lessonIndex * 2 + kindIndex) % authoredOptions.length;
+        const options = [...authoredOptions];
+        [options[answer], options[authoredAnswer]] = [options[authoredAnswer], options[answer]];
         return {
           id: `${lessonId}-${kind}`,
           kind,
