@@ -1,6 +1,6 @@
 # Atlas 逐课审阅记录
 
-本轮清单：177 课。已逐章阅读并判断：12；结论/修改验证完成：12；尚待阅读：165。
+本轮清单：177 课。已逐章阅读并判断：52；结论/修改验证完成：51；尚待阅读：125。
 
 状态只依据实际阅读正文、公式/例子、图表/实验和练习后手工写入的结论。自动清单导出、渲染检查或通用修复不代表章节已审阅。未改章节也记录保留理由；章节原有来源不等于本轮已逐条访问核验。
 
@@ -19,111 +19,111 @@
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
 | [gradient-descent · 梯度下降怎么走](https://haoyunli.github.io/deep-learning-atlas/#/lesson/gradient-descent) | 已审阅 · 无实质补充需要 | 正文、练习与精确二次轨迹区分跨谷、振荡收敛、等幅及发散，稳定区间0<η<2已交代曲率条件，无需重复新增步长图。 | 保留当前内容 | θ更新与loss值手算核对；已有数值validator保留 | — |
-| [adamw · AdamW 为什么好用](https://haoyunli.github.io/deep-learning-atlas/#/lesson/adamw) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [regularization · 让模型学规律而非记答案](https://haoyunli.github.io/deep-learning-atlas/#/lesson/regularization) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [model-evaluation · 评估模型到底会不会](https://haoyunli.github.io/deep-learning-atlas/#/lesson/model-evaluation) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [adamw · AdamW 为什么好用](https://haoyunli.github.io/deep-learning-atlas/#/lesson/adamw) | 已审阅 · 无实质补充需要 | bias-corrected m/v、adaptive+ηλθ与L2不等价说清；固定四梯度toy用old θ收缩，m/v不受λ且明确真实g随θ变；恢复optimizer state与parameter groups有说明。 | 保留现有机制、数值实验与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer已读，AdamW toy helper另读；已有全目录桌面/手机渲染通过。 | — |
+| [regularization · 让模型学规律而非记答案](https://haoyunli.github.io/deep-learning-atlas/#/lesson/regularization) | 已审阅 · 无实质补充需要 | 训练/eval dropout与语义保持增强、early stop验证协议完整；ridge toy采用½λw²，导数(w−2)+λw和w*=2/(1+λ)一致，纵轴缩放已标，较小权重不保证泛化。 | 保留现有机制、数值实验与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer已读，AdamW toy helper另读；已有全目录桌面/手机渲染通过。 | — |
+| [model-evaluation · 评估模型到底会不会](https://haoyunli.github.io/deep-learning-atlas/#/lesson/model-evaluation) | 已审阅 · 无实质补充需要 | 主体/时间split与仅train fit preprocessing清楚，test选择污染、validation阈值和calibration/uncertainty均覆盖；新患者影像题匹配部署单位。 | 保留现有机制、数值实验与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer已读，AdamW toy helper另读；已有全目录桌面/手机渲染通过。 | — |
 
 ## vision
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [cnn · 卷积为何懂图像](https://haoyunli.github.io/deep-learning-atlas/#/lesson/cnn) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [resnet · 残差网络搭一条近路](https://haoyunli.github.io/deep-learning-atlas/#/lesson/resnet) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [cnn · 卷积为何懂图像](https://haoyunli.github.io/deep-learning-atlas/#/lesson/cnn) | 已审阅 · 无实质补充需要 | 跨相关kernel不翻转明确；4×4输入/2×2kernel→3×3窗口每项可手算，32/3/2/pad1→16的shape题正确；分割标签几何、stride损失与grid先验限定。 | 保留现有机制、数值实验与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer已读，AdamW toy helper另读；已有全目录桌面/手机渲染通过。 | — |
+| [resnet · 残差网络搭一条近路](https://haoyunli.github.io/deep-learning-atlas/#/lesson/resnet) | 已审阅 · 无实质补充需要 | identity/projection/add而非concat、dy/dx含I、激活依block版本说明；toy固定F和可调α不声称训练效果，向量数值含负修正并匹配x+αF。 | 保留现有机制、数值实验与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer已读，AdamW toy helper另读；已有全目录桌面/手机渲染通过。 | — |
 
 ## sequence
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [rnn · 循环网络逐步读序列](https://haoyunli.github.io/deep-learning-atlas/#/lesson/rnn) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [lstm-gru · LSTM 与 GRU 的门](https://haoyunli.github.io/deep-learning-atlas/#/lesson/lstm-gru) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [attention · 注意力是按需查找](https://haoyunli.github.io/deep-learning-atlas/#/lesson/attention) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [transformer · Transformer 的积木](https://haoyunli.github.io/deep-learning-atlas/#/lesson/transformer) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [encoder-models · Encoder 擅长读懂](https://haoyunli.github.io/deep-learning-atlas/#/lesson/encoder-models) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [decoder-models · Decoder 擅长续写](https://haoyunli.github.io/deep-learning-atlas/#/lesson/decoder-models) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [encoder-decoder · Encoder–Decoder 做转换](https://haoyunli.github.io/deep-learning-atlas/#/lesson/encoder-decoder) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [rnn · 循环网络逐步读序列](https://haoyunli.github.io/deep-learning-atlas/#/lesson/rnn) | 已审阅 · 无实质补充需要 | 参数共享/BPTT/detach前向记忆与梯度窗口区分，bidirectional非causal；toy h=tanh(x+whprev)、h0=0和x[1,0,0,0]一致，饱和与跨样本state风险说明。 | 保留现有机制、数值实验与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer已读，AdamW toy helper另读；已有全目录桌面/手机渲染通过。 | — |
+| [lstm-gru · LSTM 与 GRU 的门](https://haoyunli.github.io/deep-learning-atlas/#/lesson/lstm-gru) | 已审阅 · 无实质补充需要 | c/h分路与GRU不同gate组织明确；toy cprev=.8、固定write=.15、o=.7逐步公式匹配，gate为直接可调教学值非真实学习；state边界与因果回放例具体。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
+| [attention · 注意力是按需查找](https://haoyunli.github.io/deep-learning-atlas/#/lesson/attention) | 已审阅 · 无实质补充需要 | QKV/source、按key softmax、mask在softmax前、稳定softmax常数不变和未来token扰动测试明确；dense平方compute与Flash显存不物化区分，权重非完整因果解释。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
+| [transformer · Transformer 的积木](https://haoyunli.github.io/deep-learning-atlas/#/lesson/transformer) | 已审阅 · 无实质补充需要 | attention跨token/FFN逐token、preNorm示意与originalencoderdecoder区分；4×4 mask行query列key、causal c≤r正确，token无position/no mask仅排列等变；L加倍score4倍题限定逻辑形状。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
+| [encoder-models · Encoder 擅长读懂](https://haoyunli.github.io/deep-learning-atlas/#/lesson/encoder-models) | 已审阅 · 无实质补充需要 | bidirectional/MLM分类NER与retrieval目标分开，pooling不是任意句向量就有效；input truncation/similarity非校准概率、只看有效左右context的练习明确。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
+| [decoder-models · Decoder 擅长续写](https://haoyunli.github.io/deep-learning-atlas/#/lesson/decoder-models) | 已审阅 · 无实质补充需要 | 输入[A,B,C]→[B,C,EOS]与内部shift不可重复解释完整；train各位置并行、inference自回归/cache不同，sampling不能修复事实问题，mask/stop/template有具体检查。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
+| [encoder-decoder · Encoder–Decoder 做转换](https://haoyunli.github.io/deep-learning-atlas/#/lesson/encoder-decoder) | 已审阅 · 无实质补充需要 | [BOS,A,B]→[A,B,EOS]、decoder query/encoder KV与source/target长度分开；teacher forcing与真实生成条件不同，并要求真实autoregressive评估与忠实度。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
 
 ## generative
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [autoencoder-vae · VAE 把数据放进连续空间](https://haoyunli.github.io/deep-learning-atlas/#/lesson/autoencoder-vae) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [gan · GAN 用对抗学习生成](https://haoyunli.github.io/deep-learning-atlas/#/lesson/gan) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [diffusion · 扩散模型一步步去噪](https://haoyunli.github.io/deep-learning-atlas/#/lesson/diffusion) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [autoencoder-vae · VAE 把数据放进连续空间](https://haoyunli.github.io/deep-learning-atlas/#/lesson/autoencoder-vae) | 已修改并验证 | ELBO公式、reparameterization和一维gaussianKL toy正确，KL/decoder collapse与异常score限制具体；tuning把ELBO下降写成loss改善方向，须分清符号。 | 明确最大化ELBO=最小化负ELBO；监控句改为负ELBO下降，不改正确概率公式。 | 完整正文/两题/lab及相关helper已核对；全站build通过；1440/375px关键文字、键盘range两端输出与页面溢出/脚本错误检查通过；桌面/手机截图已目视核对，手机图可横向滚动，说明换行完整。 | [1](https://arxiv.org/html/1312.6114v11) |
+| [gan · GAN 用对抗学习生成](https://haoyunli.github.io/deep-learning-atlas/#/lesson/gan) | 已审阅 · 无实质补充需要 | originalminimax与non-saturating G目标区别；固定sigmoidD/real2单样本loss计算与真实交替训练分开，低loss不保证分布逼近和mode覆盖，helper梯度/概率一致。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
+| [diffusion · 扩散模型一步步去噪](https://haoyunli.github.io/deep-learning-atlas/#/lesson/diffusion) | 已审阅 · 无实质补充需要 | forward闭式x_t、ε/x0/v target与训练scheduler/推理sampler匹配、train步数≠sample步数；guidance的质量/覆盖tradeoff及fixed seed评估完整，细化DDPM/DDIM另有课程。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
 
 ## frontiers
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [gnn · 图神经网络在关系中学习](https://haoyunli.github.io/deep-learning-atlas/#/lesson/gnn) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [gnn · 图神经网络在关系中学习](https://haoyunli.github.io/deep-learning-atlas/#/lesson/gnn) | 已审阅 · 无实质补充需要 | message/update/readout、inductive/transductive与目标边泄漏清楚；toy同步oldstate mean self+neighbor，hop距离/target高亮正确，明示非标准symnormGCN。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
 
 ## representation
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [contrastive-learning · 对比学习让相似靠近](https://haoyunli.github.io/deep-learning-atlas/#/lesson/contrastive-learning) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [contrastive-learning · 对比学习让相似靠近](https://haoyunli.github.io/deep-learning-atlas/#/lesson/contrastive-learning) | 已审阅 · 无实质补充需要 | positive/false-negative/语义保留定义明确；lab选pairwise margin非InfoNCE，d+=.8→.64、m1.5负项与箭头/零梯度阈值一致，raw投影loss非下游质量。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
 
 ## frontiers
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [transfer-lora · 预训练模型怎么适配新任务](https://haoyunli.github.io/deep-learning-atlas/#/lesson/transfer-lora) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [transfer-lora · 预训练模型怎么适配新任务](https://haoyunli.github.io/deep-learning-atlas/#/lesson/transfer-lora) | 已修改并验证 | shape A r×8/B8×r、16r参数、α/r和base冻结说明正确；toy Δy坐标未披露Ax/B数值，且只交adapter给optimizer遗漏新head可需训练。 | 给现有toy补Ax/B首行数值与Δy1=(1/r)ΣB1i(Ax)i来源；明确需学习的任务head显式纳入optimizer。 | 完整正文/两题/lab及相关helper已核对；全站build通过；1440/375px关键文字、键盘range两端输出与页面溢出/脚本错误检查通过；桌面/手机截图已目视核对，手机图可横向滚动，说明换行完整。 | [1](https://arxiv.org/html/2106.09685v2) |
 
 ## reinforcement
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [reinforcement-learning · 强化学习从反馈中决策](https://haoyunli.github.io/deep-learning-atlas/#/lesson/reinforcement-learning) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [reinforcement-learning · 强化学习从反馈中决策](https://haoyunli.github.io/deep-learning-atlas/#/lesson/reinforcement-learning) | 已审阅 · 无实质补充需要 | state/action/longreturn与historical support边界具体；三步reward1,2,4 toy G=1+2γ+4γ²，finitegamma1有效且无训练曲线；训练探索return与eval return区分。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
 
 ## frontiers
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [mixture-of-experts · MoE 让专家分工](https://haoyunli.github.io/deep-learning-atlas/#/lesson/mixture-of-experts) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [mixture-of-experts · MoE 让专家分工](https://haoyunli.github.io/deep-learning-atlas/#/lesson/mixture-of-experts) | 已审阅 · 无实质补充需要 | router topk输出、total/active/storage/真实compute分开，load/capacity/overflow与通信wait均覆盖；同token/hardware dense比较，expert领域分工不是硬编码标签。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
 
 ## classical
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [expectation-maximization · EM：猜隐藏变量，再更新参数](https://haoyunli.github.io/deep-learning-atlas/#/lesson/expectation-maximization) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [knn · kNN：看附近样本怎么说](https://haoyunli.github.io/deep-learning-atlas/#/lesson/knn) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [k-means · K-means：找 K 个代表点](https://haoyunli.github.io/deep-learning-atlas/#/lesson/k-means) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [gaussian-mixture-model · GMM：软分群的概率模型](https://haoyunli.github.io/deep-learning-atlas/#/lesson/gaussian-mixture-model) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [pca · PCA：保留最大变化方向](https://haoyunli.github.io/deep-learning-atlas/#/lesson/pca) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [svm · SVM：把分类边界撑开](https://haoyunli.github.io/deep-learning-atlas/#/lesson/svm) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [expectation-maximization · EM：猜隐藏变量，再更新参数](https://haoyunli.github.io/deep-learning-atlas/#/lesson/expectation-maximization) | 已审阅 · 无实质补充需要 | fixedq Q最大化与observed likelihood不降前提及approx/GEM不同分清；mean-only toy固定π=.5/σ1、责任度加权均值与before/afterLL一致，明确仅一轮非全GMM。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
+| [knn · kNN：看附近样本怎么说](https://haoyunli.github.io/deep-learning-atlas/#/lesson/knn) | 已审阅 · 无实质补充需要 | trainonly scale/库版本与欧氏metric正确，regression[2,4,9]uniform5；九点toy等比例轴、真实hypot排名、k奇数避免tie，circle为第k距离而非任意装饰。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
+| [k-means · K-means：找 K 个代表点](https://haoyunli.github.io/deep-learning-atlas/#/lesson/k-means) | 已审阅 · 无实质补充需要 | 平方距离目标→[0,2,10]均值4，inertia非天然类别证明；toy确定初始化oneLloyd assign/update/reassign同步、更新空簇保留原中心，equalaxis/硬分配与未收敛声明充分。 | 保留现有章内机制、可检查例子与两道区分性练习 | 完整正文/公式/使用限制/settings/练习逐课已读；有lab者步骤/参数/renderer与相关helper已读；已有全目录桌面/手机渲染通过。 | — |
+| [gaussian-mixture-model · GMM：软分群的概率模型](https://haoyunli.github.io/deep-learning-atlas/#/lesson/gaussian-mixture-model) | 已审阅 · 无实质补充需要 | 正文区分 mixture density 与 posterior responsibility，固定均值/权重的可调σ图按πN(x)算r，协方差奇异与held-out likelihood限制已明确；无需重复新增EM示例。 | 保留当前正文、可控例子与练习 | 全文、两道练习、lab renderer及相关计算helper已逐一核对；全目录桌面/手机渲染通过。 | — |
+| [pca · PCA：保留最大变化方向](https://haoyunli.github.io/deep-learning-atlas/#/lesson/pca) | 已审阅 · 无实质补充需要 | 中心化、训练集fit后共享投影、SVD与方差/预测信息边界完整；8点对称零均值，n归一化投影方差及atan2主轴正确，图中两轴同尺度正交投影。 | 保留当前正文、可控例子与练习 | 全文、两道练习、lab renderer及相关计算helper已逐一核对；全目录桌面/手机渲染通过。 | — |
+| [svm · SVM：把分类边界撑开](https://haoyunli.github.io/deep-learning-atlas/#/lesson/svm) | 已审阅 · 无实质补充需要 | 软间隔目标½\|\|w\|\|²+CΣhinge及支持向量范围明确；1D固定b=0以w∈[0,4]网格求解。核对C∈[.1,5]最优w≥.5，绘图margin上限不触发；黑圈只标hinge>0已披露。 | 保留当前正文、可控例子与练习 | 全文、两道练习、lab renderer及相关计算helper已逐一核对；全目录桌面/手机渲染通过。 | — |
 
 ## generative
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [energy-based-models · EBM：给状态打一个能量分数](https://haoyunli.github.io/deep-learning-atlas/#/lesson/energy-based-models) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [energy-based-models · EBM：给状态打一个能量分数](https://haoyunli.github.io/deep-learning-atlas/#/lesson/energy-based-models) | 已审阅 · 无实质补充需要 | 能量只定相对密度，Z、采样/负相位与score matching/NCE路线区别已交代；e²比值题抵消同一Z，扰动构象捷径例子和独立排序验证完整。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
 
 ## representation
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [infonce · InfoNCE：在候选里认出正样本](https://haoyunli.github.io/deep-learning-atlas/#/lesson/infonce) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [triplet-loss · Triplet：让正样本比负样本更近](https://haoyunli.github.io/deep-learning-atlas/#/lesson/triplet-loss) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [simclr · SimCLR：同一图像的两种视角](https://haoyunli.github.io/deep-learning-atlas/#/lesson/simclr) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [moco · MoCo：用队列保存更多对照](https://haoyunli.github.io/deep-learning-atlas/#/lesson/moco) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [clip · CLIP：让图片和文字相遇](https://haoyunli.github.io/deep-learning-atlas/#/lesson/clip) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [byol · BYOL：不靠负样本的自监督](https://haoyunli.github.io/deep-learning-atlas/#/lesson/byol) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [barlow-twins · Barlow Twins：既一致，也少重复](https://haoyunli.github.io/deep-learning-atlas/#/lesson/barlow-twins) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [mae · MAE：遮住图像，再补回来](https://haoyunli.github.io/deep-learning-atlas/#/lesson/mae) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [vicreg · VICReg：防止表示全部一样](https://haoyunli.github.io/deep-learning-atlas/#/lesson/vicreg) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [dino · DINO：让学生预测老师的视角](https://haoyunli.github.io/deep-learning-atlas/#/lesson/dino) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [infonce · InfoNCE：在候选里认出正样本](https://haoyunli.github.io/deep-learning-atlas/#/lesson/infonce) | 已审阅 · 无实质补充需要 | 分母含正例及负例，多正例概率和与逐正例平均已区分；4个固定similarity通过稳定softmax精确计算，温度不改变排序，题目ln3与false negatives正确。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
+| [triplet-loss · Triplet：让正样本比负样本更近](https://haoyunli.github.io/deep-learning-atlas/#/lesson/triplet-loss) | 已审阅 · 待修改 | 平方距离lab的m>.8激活阈值、原文一般d定义及数值题正确；margin设置中“有效三元组过少时降低”方向反了：固定距离下降低m会减少active triplets。 | 改为适度增大margin或加强合理mining，保留所有违反/不稳定时减小margin的分支。 | 已完整读正文、练习及固定距离平方lab/helper；FaceNet§3.1公式与§3.2选择原则直接核对。 | [1](https://arxiv.org/html/1503.03832) |
+| [simclr · SimCLR：同一图像的两种视角](https://haoyunli.github.io/deep-learning-atlas/#/lesson/simclr) | 已审阅 · 无实质补充需要 | 共享encoder+projector、2N视图排除自身后2N−2负例，原版无队列、probe取encoder输出已明确；4图例子6负例7候选正确。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
+| [moco · MoCo：用队列保存更多对照](https://haoyunli.github.io/deep-learning-atlas/#/lesson/moco) | 已审阅 · 无实质补充需要 | query梯度、key停梯度/EMA和FIFO字典解耦正确，2/.9/4→2.2数值正确；过时键与false negative限制具体。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
+| [clip · CLIP：让图片和文字相遇](https://haoyunli.github.io/deep-learning-atlas/#/lesson/clip) | 已审阅 · 无实质补充需要 | 归一化双塔与双向row/column CE、learned scale、候选prompt和校准限制完整；合成3×3矩阵仅画第1行精确softmax，4对图文[4,4]题正确。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
+| [byol · BYOL：不靠负样本的自监督](https://haoyunli.github.io/deep-learning-atlas/#/lesson/byol) | 已审阅 · 无实质补充需要 | online独有predictor、target projector stop-gradient+EMA、交换视图方向明确，低MSE常数塌缩用方差/probe诊断，未把EMA本身当理论保证。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
+| [barlow-twins · Barlow Twins：既一致，也少重复](https://haoyunli.github.io/deep-learning-atlas/#/lesson/barlow-twins) | 已审阅 · 无实质补充需要 | 跨视图按batch中心化/标准化相关矩阵，diag→1与offdiag→0目标正确，区别单视图协方差；小batch统计/下游局限和两道题覆盖关键误解。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
+| [mae · MAE：遮住图像，再补回来](https://haoyunli.github.io/deep-learning-atlas/#/lesson/mae) | 已审阅 · 无实质补充需要 | 原版encoder只看visible patches、decoder补mask并仅masked像素loss明确；196×.25=49例子正确，重建质量和下游可分性未混同。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
+| [vicreg · VICReg：防止表示全部一样](https://haoyunli.github.io/deep-learning-atlas/#/lesson/vicreg) | 已审阅 · 无实质补充需要 | invariance、每路维度std下限、每路offdiag covariance三项明确；常数输出前后二项可零而variance触发题正确，统计形态不保证语义已交代。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
+| [dino · DINO：让学生预测老师的视角](https://haoyunli.github.io/deep-learning-atlas/#/lesson/dino) | 已审阅 · 无实质补充需要 | teacher global/student global+local、cross-view CE、stop-gradient+EMA、centering和sharpening完整；注意力图不直接当分割结果，输出熵塌缩题有效。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
 
 ## classical
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [logistic-regression · 逻辑回归：简单而可靠的分类起点](https://haoyunli.github.io/deep-learning-atlas/#/lesson/logistic-regression) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [random-forest · 随机森林：让很多树一起判断](https://haoyunli.github.io/deep-learning-atlas/#/lesson/random-forest) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [logistic-regression · 逻辑回归：简单而可靠的分类起点](https://haoyunli.github.io/deep-learning-atlas/#/lesson/logistic-regression) | 已审阅 · 无实质补充需要 | logit/sigmoid/CE、inverse C、预处理训练内fit、重加权后校准与阈值拆开；固定b=−1/x=1.2图的(p−1)x梯度及ln3→.75题正确。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
+| [random-forest · 随机森林：让很多树一起判断](https://haoyunli.github.io/deep-learning-atlas/#/lesson/random-forest) | 已审阅 · 无实质补充需要 | bootstrap+split随机feature、概率平均和多数票区别明确，0.2/.6/.9平均.567；OOB行级不可代表新个体题避免层级泄漏，特征重要性不冒充因果。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
 
 ## representation
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [supervised-contrastive · SupCon：同类样本都是正例](https://haoyunli.github.io/deep-learning-atlas/#/lesson/supervised-contrastive) | 待审阅 | 尚未逐章审阅 | — | — | — |
+| [supervised-contrastive · SupCon：同类样本都是正例](https://haoyunli.github.io/deep-learning-atlas/#/lesson/supervised-contrastive) | 已审阅 · 无实质补充需要 | 全positive log概率逐项平均且分母含所有除自身候选，粗类亚型和错标风险明确；缺正例batch题与标签[A,A,B,C]两正例题正确。 | 保留现有解释、例子与练习 | 完整正文、公式、设置/局限、两道练习已逐课核对；有lab者同时核对renderer及外部计算helper。 | — |
 
 ## vision
 

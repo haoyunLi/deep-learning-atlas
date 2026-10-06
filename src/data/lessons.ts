@@ -1338,7 +1338,7 @@ const coreLessons: Lesson[] = [
     summary: "编码成潜变量，再解码重建；VAE 进一步约束潜空间的分布。",
     intuition:
       "普通 autoencoder 像把图片压成一串摘要再复原。VAE 要求这些摘要在一个较平滑的 latent space 中分布，使我们能从潜空间采样并生成新样本。",
-    core: "Encoder 输出 qφ(z|x) 的均值与方差，用 reparameterization trick 采样 z；decoder 学 pθ(x|z)。训练优化 reconstruction term 与 KL divergence 的权衡。KL 约束过强可能导致 posterior collapse，解码器忽略 z。",
+    core: "Encoder 输出 qφ(z|x) 的均值与方差，用 reparameterization trick 采样 z；decoder 学 pθ(x|z)。训练最大化 ELBO，等价于最小化负 ELBO（reconstruction loss + KL divergence）；两项需要权衡。KL 约束过强可能导致 posterior collapse，解码器忽略 z。",
     equation: "ELBO = E_q[log pθ(x|z)] − KL(qφ(z|x) ‖ p(z))",
     whenToUse: [
       "需要连续潜空间、重建或可控生成的基础模型时；也可探索异常检测，但必须单独验证异常分数。",
@@ -1353,7 +1353,7 @@ const coreLessons: Lesson[] = [
     tuning: [
       "调 KL 权重 β，平衡重建精度与潜空间规则性。",
       "潜变量维度太小欠表达，太大可能使先验约束变弱。",
-      "同时画重建项、KL 项及活跃潜维度；总 ELBO 下降但 KL 塌缩时需要检查表示是否仍有用。",
+      "同时画重建项、KL 项及活跃潜维度；负 ELBO（loss）下降但 KL 塌缩时需要检查表示是否仍有用。",
     ],
     modifications: [
       "β-VAE 强调潜变量约束；conditional VAE 在类别或其他条件下生成。",
@@ -1742,7 +1742,7 @@ const coreLessons: Lesson[] = [
     mechanicsSteps: [
       "确定目标任务、数据量与与预训练域的差异，选择冻结特征、部分微调、全量微调或 LoRA。",
       "LoRA 冻结原矩阵 W，在选定线性层旁学习低秩增量 ΔW=BA；前向传播使用 W+缩放后的 ΔW。",
-      "只把 adapter 参数交给优化器，核对可训练参数比例、checkpoint 与 tokenizer/processor 一致性。",
+      "冻结 LoRA 对应的基础矩阵，将 adapter 与需学习的新任务 head 显式纳入 optimizer；核对可训练参数、checkpoint 与 tokenizer/processor 一致性。",
       "用独立验证集比较 adapter、全量微调和简单任务头的效果、显存与推理延迟。",
     ],
     limits: [

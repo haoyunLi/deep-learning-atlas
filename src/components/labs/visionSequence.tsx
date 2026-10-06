@@ -1568,7 +1568,7 @@ export const visionSequenceLabs: Record<string, LabDefinition> = {
       initial: 2,
       hint: "改变中间维度；α 固定为 1，所以同时包含 α/r 缩放。",
     },
-    note: "示例只演示一层与一个输出坐标，省略 bias；更多 rank 扩大可表达更新空间，但不保证更好表现。",
+    note: "固定 Ax 的前 r 个坐标来自 [1, −0.5, 0.25, 0.75]，B 第一行来自 [0.4, 0.2, −0.3, 0.1]；α=1，故 Δy₁=(1/r)Σᵢ B₁ᵢ(Ax)ᵢ。仅展示一层一个输出坐标，省略 bias；更多 rank 不保证更好表现。",
     render: LoRA,
   },
   "prediction-heads": {
