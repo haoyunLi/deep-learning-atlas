@@ -177,7 +177,7 @@
 | [dqn · 让神经网络估 Q：DQN](https://haoyunli.github.io/deep-learning-atlas/#/lesson/dqn) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [double-dqn · 拆开选择与打分：Double DQN](https://haoyunli.github.io/deep-learning-atlas/#/lesson/double-dqn) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [dueling-dqn · 状态好坏与动作差别分开学](https://haoyunli.github.io/deep-learning-atlas/#/lesson/dueling-dqn) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [rainbow-dqn · 组合式 DQN：Rainbow](https://haoyunli.github.io/deep-learning-atlas/#/lesson/rainbow-dqn) | 已修改并验证 | 六组件组合与消融题准确；原版 Rainbow 的 replay priority 写成标量 TD error，混淆标准 PER 与 distributional KL loss。 | 改 KL priority 和设置说明；用回报分布建模消除分布式计算歧义。 | 正文、公式、例子及两道练习已核对；待构建与浏览器验证；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://arxiv.org/html/1710.02298) |
+| [rainbow-dqn · 组合式 DQN：Rainbow](https://haoyunli.github.io/deep-learning-atlas/#/lesson/rainbow-dqn) | 已修改并验证 | 六组件组合与消融题准确；原版 Rainbow 的 replay priority 写成标量 TD error，混淆标准 PER 与 distributional KL loss。 | 改 KL priority 和设置说明；用回报分布建模消除分布式计算歧义。 | 正文、公式、例子及两道练习已核对；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://arxiv.org/html/1710.02298) |
 | [reinforce · 直接学动作概率：REINFORCE](https://haoyunli.github.io/deep-learning-atlas/#/lesson/reinforce) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [actor-critic · 一个行动，一个评分：Actor-Critic](https://haoyunli.github.io/deep-learning-atlas/#/lesson/actor-critic) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [trpo · 限制策略走太远：TRPO](https://haoyunli.github.io/deep-learning-atlas/#/lesson/trpo) | 待审阅 | 尚未逐章审阅 | — | — | — |
@@ -199,7 +199,7 @@
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [prediction-heads · Prediction head：最后一步怎么预测](https://haoyunli.github.io/deep-learning-atlas/#/lesson/prediction-heads) | 已审阅 · 无实质补充需要 | 已区分预测粒度、pooling、linear probe和attention head；题目核对[B,T,5]，可调类别数实际重算logits和softmax，当前无实质补充需要。 | 保留现有正文、lab与练习 | 正文、维度例子、两道题及renderer逻辑已核对；后续批次做渲染检查 | — |
+| [prediction-heads · Prediction head：最后一步怎么预测](https://haoyunli.github.io/deep-learning-atlas/#/lesson/prediction-heads) | 已审阅 · 无实质补充需要 | 已区分预测粒度、pooling、linear probe和attention head；题目核对[B,T,5]，可调类别数实际重算logits和softmax，当前无实质补充需要。 | 保留现有正文、lab与练习 | 正文、维度例子、两道题及renderer逻辑已核对；全目录1440/375px渲染与资源检查通过 | — |
 
 ## sequence
 
@@ -327,7 +327,7 @@
 
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
-| [ctc-wav2vec · CTC 与 wav2vec 2.0：从声音到文字](https://haoyunli.github.io/deep-learning-atlas/#/lesson/ctc-wav2vec) | 已修改并验证 | 原文要求去重目标标签，会错误删除 ll 等重复字符；blank 的路径折叠顺序需明确。 | 改为 T≥U+相邻重复对数；补 ll 的2/3帧对照并改为可计算练习。 | 正文、公式、例子及两道练习已核对；待构建与浏览器验证；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://www.cs.toronto.edu/~graves/icml_2006.pdf) |
+| [ctc-wav2vec · CTC 与 wav2vec 2.0：从声音到文字](https://haoyunli.github.io/deep-learning-atlas/#/lesson/ctc-wav2vec) | 已修改并验证 | 原文要求去重目标标签，会错误删除 ll 等重复字符；blank 的路径折叠顺序需明确。 | 改为 T≥U+相邻重复对数；补 ll 的2/3帧对照并改为可计算练习。 | 正文、公式、例子及两道练习已核对；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://www.cs.toronto.edu/~graves/icml_2006.pdf) |
 | [whisper · Whisper：把 ASR 变成多任务序列生成](https://haoyunli.github.io/deep-learning-atlas/#/lesson/whisper) | 待审阅 | 尚未逐章审阅 | — | — | — |
 
 ## representation
@@ -349,7 +349,7 @@
 | 章节 | 实际状态 | 具体发现 / 保留理由 | 计划或已做修改 | 验证 | 本轮核验来源 |
 | --- | --- | --- | --- | --- | --- |
 | [deep-ensembles · Deep Ensembles：用多个解表达模型不确定性](https://haoyunli.github.io/deep-learning-atlas/#/lesson/deep-ensembles) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [conformal-selective-prediction · Conformal、拒答与 OOD：知道何时不确定](https://haoyunli.github.io/deep-learning-atlas/#/lesson/conformal-selective-prediction) | 已修改并验证 | s=1−p 的例子却称加入低概率标签，筛选方向反了；有限样本分位数缺 k>n 的全集情况，单次coverage降低不能直接证明交换性破坏。 | 明确 p≥1−q̂，补三类集合计算及 +∞ 边界；校准/域变化解释与练习同步修正。 | 正文、公式、例子及两道练习已核对；待构建与浏览器验证；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://arxiv.org/html/2107.07511) |
+| [conformal-selective-prediction · Conformal、拒答与 OOD：知道何时不确定](https://haoyunli.github.io/deep-learning-atlas/#/lesson/conformal-selective-prediction) | 已修改并验证 | s=1−p 的例子却称加入低概率标签，筛选方向反了；有限样本分位数缺 k>n 的全集情况，单次coverage降低不能直接证明交换性破坏。 | 明确 p≥1−q̂，补三类集合计算及 +∞ 边界；校准/域变化解释与练习同步修正。 | 正文、公式、例子及两道练习已核对；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://arxiv.org/html/2107.07511) |
 
 ## classical
 
@@ -384,21 +384,21 @@
 | [meta-sgd-anil · Meta-SGD 与 ANIL：学更新规则或只改 head](https://haoyunli.github.io/deep-learning-atlas/#/lesson/meta-sgd-anil) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [learned-optimizers · Learned Optimizer：让网络提出更新量](https://haoyunli.github.io/deep-learning-atlas/#/lesson/learned-optimizers) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [hypernetworks-meta-gradients · Hypernetworks 与 Meta-Gradient：参数也可以由模型产生](https://haoyunli.github.io/deep-learning-atlas/#/lesson/hypernetworks-meta-gradients) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [memory-augmented-meta-learning · Memory-Augmented Meta-Learning：把新标签写进外部记忆](https://haoyunli.github.io/deep-learning-atlas/#/lesson/memory-augmented-meta-learning) | 已修改并验证 | 当前 xₜ 与延迟 yₜ₋₁ 错配，破坏 one-shot 标签绑定；正文的临时memory/session边界其余正确。 | 绑定缓存 xₜ₋₁ 与 yₜ₋₁；补 A/B 三时刻例子与时间配对题。 | 正文、公式、例子及两道练习已核对；待构建与浏览器验证；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://arxiv.org/html/1605.06065) |
+| [memory-augmented-meta-learning · Memory-Augmented Meta-Learning：把新标签写进外部记忆](https://haoyunli.github.io/deep-learning-atlas/#/lesson/memory-augmented-meta-learning) | 已修改并验证 | 当前 xₜ 与延迟 yₜ₋₁ 错配，破坏 one-shot 标签绑定；正文的临时memory/session边界其余正确。 | 绑定缓存 xₜ₋₁ 与 yₜ₋₁；补 A/B 三时刻例子与时间配对题。 | 正文、公式、例子及两道练习已核对；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://arxiv.org/html/1605.06065) |
 | [meta-reinforcement-learning · Meta-RL：让 agent 学会快速探索新任务](https://haoyunli.github.io/deep-learning-atlas/#/lesson/meta-reinforcement-learning) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [cross-domain-few-shot · Cross-Domain Few-Shot：新类别还来自新领域](https://haoyunli.github.io/deep-learning-atlas/#/lesson/cross-domain-few-shot) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [transfer-learning-strategies · Transfer Learning：Freeze、Fine-Tune 还是 Train from Scratch](https://haoyunli.github.io/deep-learning-atlas/#/lesson/transfer-learning-strategies) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [domain-adaptation-dann · DANN：让特征能做任务却难分领域](https://haoyunli.github.io/deep-learning-atlas/#/lesson/domain-adaptation-dann) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [domain-generalization-irm · Domain Generalization 与 IRM：目标域不可见怎么办](https://haoyunli.github.io/deep-learning-atlas/#/lesson/domain-generalization-irm) | 已修改并验证 | 公式混合原始 IRM 的可优化 classifier 和 IRMv1 固定标量 w=1；环境/因果限制其余准确。 | 分清两种目标，改为只优化 Φ 的 IRMv1 方程；题目检查固定求导点。 | 正文、公式、例子及两道练习已核对；待构建与浏览器验证；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://arxiv.org/html/1907.02893) |
+| [domain-generalization-irm · Domain Generalization 与 IRM：目标域不可见怎么办](https://haoyunli.github.io/deep-learning-atlas/#/lesson/domain-generalization-irm) | 已修改并验证 | 公式混合原始 IRM 的可优化 classifier 和 IRMv1 固定标量 w=1；环境/因果限制其余准确。 | 分清两种目标，改为只优化 Φ 的 IRMv1 方程；题目检查固定求导点。 | 正文、公式、例子及两道练习已核对；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://arxiv.org/html/1907.02893) |
 | [continual-learning · Continual Learning：在学新任务时别忘旧任务](https://haoyunli.github.io/deep-learning-atlas/#/lesson/continual-learning) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [active-learning · Active Learning：下一笔标注花在哪里](https://haoyunli.github.io/deep-learning-atlas/#/lesson/active-learning) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [multi-task-learning · Multi-Task Learning：共享什么，冲突怎么办](https://haoyunli.github.io/deep-learning-atlas/#/lesson/multi-task-learning) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [automl-hpo-nas · AutoML：HPO、Hypergradient 与 NAS](https://haoyunli.github.io/deep-learning-atlas/#/lesson/automl-hpo-nas) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [curriculum-self-paced · Curriculum 与 Self-Paced Learning：先学什么](https://haoyunli.github.io/deep-learning-atlas/#/lesson/curriculum-self-paced) | 已修改并验证 | 章节正确区分预设 curriculum 与按当前loss筛选 self-paced、尾部能力风险；引用 arXiv 指向无关论文。 | 替换为 Bengio 等 Curriculum Learning 的准确 DOI；保留正文与练习。 | 正文、公式、例子及两道练习已核对；待构建与浏览器验证；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://doi.org/10.1145/1553374.1553380) |
+| [curriculum-self-paced · Curriculum 与 Self-Paced Learning：先学什么](https://haoyunli.github.io/deep-learning-atlas/#/lesson/curriculum-self-paced) | 已修改并验证 | 章节正确区分预设 curriculum 与按当前loss筛选 self-paced、尾部能力风险；引用 arXiv 指向无关论文。 | 替换为 Bengio 等 Curriculum Learning 的准确 DOI；保留正文与练习。 | 正文、公式、例子及两道练习已核对；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://doi.org/10.1145/1553374.1553380) |
 | [federated-learning · Federated Learning 与 FedAvg：数据不集中时怎样共同训练](https://haoyunli.github.io/deep-learning-atlas/#/lesson/federated-learning) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [test-time-adaptation · Test-Time Adaptation 与 TENT：模型上线后还能改什么](https://haoyunli.github.io/deep-learning-atlas/#/lesson/test-time-adaptation) | 待审阅 | 尚未逐章审阅 | — | — | — |
 | [semi-supervised-self-training · Semi-Supervised Learning 与 Self-Training：使用无标签数据](https://haoyunli.github.io/deep-learning-atlas/#/lesson/semi-supervised-self-training) | 待审阅 | 尚未逐章审阅 | — | — | — |
-| [online-learning-drift · Online Learning 与 Concept Drift：数据流里持续更新](https://haoyunli.github.io/deep-learning-atlas/#/lesson/online-learning-drift) | 已修改并验证 | prequential评估、监督延迟和漂移类型边界清楚；概念漂移综述引用 arXiv 指向无关论文。 | 替换为 Gama 等2014综述 DOI；保留已有机制与题目。 | 正文、公式、例子及两道练习已核对；待构建与浏览器验证；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://doi.org/10.1145/2523813) |
+| [online-learning-drift · Online Learning 与 Concept Drift：数据流里持续更新](https://haoyunli.github.io/deep-learning-atlas/#/lesson/online-learning-drift) | 已修改并验证 | prequential评估、监督延迟和漂移类型边界清楚；概念漂移综述引用 arXiv 指向无关论文。 | 替换为 Gama 等2014综述 DOI；保留已有机制与题目。 | 正文、公式、例子及两道练习已核对；本批构建/内容回归通过；1440/375px浏览器HTTP200、无横向溢出、无脚本错误或失败请求。 | [1](https://doi.org/10.1145/2523813) |
 
 ## classical
 
