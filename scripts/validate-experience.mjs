@@ -565,6 +565,157 @@ assert.equal(
   "Repeating the same filter state does not dispatch again",
 );
 
+// Practice choices must survive main-tab changes, reloads, and history traversal.
+const practiceListeners = new Set();
+const practiceHistory = [
+  "#/practice?lab=transport&research=pathway&note=a%3Fb%26c",
+];
+let practicePosition = 0;
+const practiceWindow = {
+  location: { hash: practiceHistory[0] },
+  addEventListener(type, listener) {
+    assert.equal(type, "hashchange");
+    practiceListeners.add(listener);
+  },
+  removeEventListener(type, listener) {
+    assert.equal(type, "hashchange");
+    practiceListeners.delete(listener);
+  },
+  dispatchEvent(event) {
+    assert.equal(event.type, "hashchange");
+    for (const listener of practiceListeners) listener();
+  },
+  history: {
+    pushState(_state, _title, hash) {
+      practiceHistory.splice(++practicePosition);
+      practiceHistory.push(hash);
+      practiceWindow.location.hash = hash;
+    },
+  },
+};
+const observedPracticeHashes = [];
+let unsubscribePractice;
+const practiceEnvironment = {
+  window: practiceWindow,
+  HashChangeEvent: class {
+    constructor(type) {
+      this.type = type;
+    }
+  },
+  react: {
+    useSyncExternalStore(subscribe, snapshot) {
+      unsubscribePractice = subscribe(() =>
+        observedPracticeHashes.push(snapshot()),
+      );
+      return snapshot();
+    },
+  },
+};
+const practiceRouting = createLoader(practiceEnvironment)(
+  "src/lib/practiceRouting.ts",
+);
+const currentPractice = () =>
+  practiceRouting.readPracticeRoute(practiceWindow.location.hash);
+assert.deepEqual(
+  practiceRouting.usePracticeRoute(),
+  {
+    tab: "bench",
+    lab: "transport",
+    research: "pathway",
+  },
+  "Existing lab-only deep links still select the bench",
+);
+practiceRouting.navigatePractice({ tab: "case" });
+assert.equal(currentPractice().tab, "case");
+assert.equal(
+  currentPractice().lab,
+  "transport",
+  "A main-tab switch retains the selected lab",
+);
+assert.equal(
+  currentPractice().research,
+  "pathway",
+  "A main-tab switch retains the research path",
+);
+assert.equal(
+  hashParts(practiceWindow.location.hash).params.get("note"),
+  "a?b&c",
+);
+assert.equal(
+  observedPracticeHashes.at(-1),
+  practiceWindow.location.hash,
+  "Mounted selectors observe pushState navigation immediately",
+);
+const lengthBeforeNoOp = practiceHistory.length;
+practiceRouting.navigatePractice({ tab: "case" });
+assert.equal(
+  practiceHistory.length,
+  lengthBeforeNoOp,
+  "Repeated selections do not pollute history",
+);
+practiceRouting.navigatePractice({ tab: "research" });
+practiceRouting.navigatePractice({ tab: "research", research: "methylation" });
+practiceRouting.navigatePractice({ tab: "bench", lab: "threshold" });
+assert.deepEqual(currentPractice(), {
+  tab: "bench",
+  lab: "threshold",
+  research: "methylation",
+});
+function traversePractice(delta) {
+  practicePosition += delta;
+  practiceWindow.location.hash = practiceHistory[practicePosition];
+  practiceWindow.dispatchEvent({ type: "hashchange" });
+}
+traversePractice(-1);
+assert.deepEqual(
+  currentPractice(),
+  {
+    tab: "research",
+    lab: "transport",
+    research: "methylation",
+  },
+  "Back restores the earlier active tab and both independent choices",
+);
+traversePractice(-1);
+assert.equal(currentPractice().research, "pathway");
+traversePractice(1);
+assert.equal(currentPractice().research, "methylation");
+assert.equal(
+  observedPracticeHashes.at(-1),
+  practiceWindow.location.hash,
+  "History traversal updates mounted selectors through hashchange",
+);
+unsubscribePractice();
+assert.equal(practiceListeners.size, 0, "Unmount removes the URL subscription");
+const reloadedPractice = createLoader({
+  ...practiceEnvironment,
+  react: {
+    useSyncExternalStore(_subscribe, snapshot) {
+      return snapshot();
+    },
+  },
+})("src/lib/practiceRouting.ts");
+assert.deepEqual(
+  reloadedPractice.usePracticeRoute(),
+  currentPractice(),
+  "A fresh mount restores the same visible tab and selections from the URL",
+);
+assert.equal(
+  practiceRouting.readPracticeRoute("#/practice?tab=bogus").tab,
+  "research",
+);
+assert.equal(
+  practiceRouting.readPracticeRoute("#/practice?tab=language&lab=transport")
+    .tab,
+  "language",
+  "An explicit main tab takes precedence over a retained lab choice",
+);
+assert.equal(
+  practiceRouting.practiceHash("#/atlas?q=knn", { tab: "research" }),
+  "#/practice?tab=research",
+  "Entering practice does not inherit unrelated atlas filters",
+);
+
 const catalog = load("src/data/animationCatalog.ts");
 const labs = load("src/components/labs/index.ts");
 const sandboxes = load("src/components/HandCalculationSandbox.tsx");
@@ -602,5 +753,5 @@ for (const lesson of lessons)
 assert.equal(catalog.animationKind("missing-course"), "steps");
 
 console.log(
-  `Validated experience: ${glossaryEntries.length} glossary terms, ${guideTasks.length} guide tasks/${guideTasks.reduce((sum, task) => sum + task.contexts.length, 0)} contexts, corrupted/legacy study recovery, denied storage and cross-tab updates, question signatures, ${searchCases.length} search aliases, encoded/malformed routes, and ${Object.keys(catalog.animationCatalog).length} catalog entries against live labs.`,
+  `Validated experience: ${glossaryEntries.length} glossary terms, ${guideTasks.length} guide tasks/${guideTasks.reduce((sum, task) => sum + task.contexts.length, 0)} contexts, corrupted/legacy study recovery, denied storage and cross-tab updates, question signatures, ${searchCases.length} search aliases, encoded/malformed routes, practice URL selection/reload/history/subscription recovery, and ${Object.keys(catalog.animationCatalog).length} catalog entries against live labs.`,
 );

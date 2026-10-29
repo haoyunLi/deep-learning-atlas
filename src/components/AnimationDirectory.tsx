@@ -49,7 +49,7 @@ export default function AnimationDirectory() {
           </div>
           <div>
             <dt>{mechanismCount}</dt>
-            <dd>专属机制图</dd>
+            <dd>专属机制动效</dd>
           </div>
           <div>
             <dt>{Object.keys(animationCatalog).length}</dt>
@@ -66,6 +66,9 @@ export default function AnimationDirectory() {
       </div>
       <section className="animation-starts" aria-label="动效学习起点">
         <strong>从一个问题开始</strong>
+        <a href="#/bio-algorithms?lab=em">
+          EM 如何分配 molecules，GNN 如何跨边界传播？ ↗
+        </a>
         <a href="#/studio/training">误差怎样变成一次权重更新？ ↗</a>
         <a href="#/lesson/gradient-descent?animation=1">学习率太大会怎样？ ↗</a>
         <a href="#/lesson/knn?animation=1">k 如何改变近邻投票？ ↗</a>

@@ -218,3 +218,14 @@ Prediction checks use a fieldset and radio labels; checking stays disabled until
 - **Don't** use playback to advance generic outlines or research stages automatically.
 - **Don't** present diagram color, animation, toy weights or synthetic error metrics as validated scientific evidence.
 - **Don't** copy a decorative label, unused selector or isolated color value into a new global convention.
+
+
+## Biological Algorithm Lab
+
+`#/bio-algorithms?lab=em` extends the established Read/Operate surface with six question-led experiments. The three-column experiment selector becomes two columns on phones; parameter controls become one column below 700px. Two computed figures per experiment are stacked so intermediate quantities remain readable. Each SVG retains a 660px internal width in a keyboard-focusable local scroll region; prose stays inside the viewport. Numerical readouts outside SVG provide the current result. Blue/teal/orange encode labeled components within each figure.
+
+EM, GAE and GCN offer explicit manual steps plus optional 1700ms playback. Parameter changes reset the sequence, page visibility changes pause playback, and reduced motion disables playback and transitions. Native radio groups support a prediction check. Disclosure sections retain method assumptions, starting settings, limitations and primary-source links. Twelve lesson flow figures connect input, intermediate calculation and output using semantic ordered lists, with numerical examples and an explicit synthetic boundary.
+
+Practice tab, path and bench selection share URL state; history navigation and reload restore the selected view while preserving other choices.
+
+The Biological Algorithm Lab intentionally uses 14px controls/diagram labels, 16px diagram titles, 12px readout labels and 18px values. Its page title ranges 30–46px and experiment title 23–31px within the existing editorial hierarchy. The pale plot surface is #f7f9fc; component markers use scientific, local blue/teal/orange rather than a new navigation palette.

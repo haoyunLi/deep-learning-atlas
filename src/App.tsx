@@ -29,6 +29,8 @@ const GlossaryPage = lazy(() => import("./components/GlossaryPage"));
 const ModelGuide = lazy(() => import("./components/ModelGuide"));
 const PracticeHub = lazy(() => import("./components/PracticeHub"));
 const StudioPage = lazy(() => import("./components/studio/StudioPage"));
+const BioAlgorithmLab = lazy(() => import("./components/BioAlgorithmLab"));
+const BioLessonFigure = lazy(() => import("./components/BioLessonFigure"));
 
 const repoUrl = "https://github.com/haoyunLi/deep-learning-atlas";
 const codeLabLessonIds = new Set([
@@ -443,7 +445,7 @@ function Home({
         <div className="animation-promo-heading">
           <h2 id="animation-promo-title">跟着动效，看懂算法的每一步。</h2>
           <a className="animation-all-link" href="#/animations">
-            {lessons.length} 节步骤导览 · {mechanismCount} 张机制图 ·{" "}
+            {lessons.length} 节步骤导览 · {mechanismCount} 组机制动效 ·{" "}
             {Object.keys(animationCatalog).length} 个参数实验　浏览全部 →
           </a>
         </div>
@@ -488,6 +490,9 @@ function Home({
             </p>
           </div>
           <a href="#/practice?research=spatial">Spatial / Age 科研实践 →</a>
+          <a href="#/bio-algorithms?lab=em">
+            Single-cell / Spatial：EM、RL、GNN 数值实验 →
+          </a>
           <a href="#/practice?lab=bayes">机制推演：改参数、读图与检验证据 →</a>
         </div>
         <div className="atlas-heading">
@@ -834,6 +839,9 @@ function Detail({
           </h2>
           <p>{lesson.intuition}</p>
         </section>
+        <Suspense fallback={null}>
+          <BioLessonFigure lessonId={lesson.id} />
+        </Suspense>
         <Suspense
           fallback={
             <section className="detail-section" role="status">
@@ -1421,6 +1429,7 @@ function App() {
     "/path": "学习路径",
     "/animations": "动效实验室",
     "/practice": "实践工坊",
+    "/bio-algorithms": "Single-cell / Spatial 算法实验",
     "/compare": "算法对比",
     "/guide": "选型指南",
     "/glossary": "术语表",
@@ -1452,6 +1461,8 @@ function App() {
     );
   else if (path === "/animations") page = <AnimationDirectory />;
   else if (path === "/practice") page = <PracticeHub />;
+  else if (path === "/bio-algorithms")
+    page = <BioAlgorithmLab query={routeQuery} />;
   else if (path === "/compare") page = <Compare routeQuery={routeQuery} />;
   else if (path === "/guide") page = <ModelGuide />;
   else if (path === "/glossary") page = <GlossaryPage />;

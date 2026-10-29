@@ -68,7 +68,12 @@ export const researchPaths: ResearchPath[] = [
           "以 radius 或 polygon overlap 生成稀疏候选；为无候选对象留 unmatched 路径。",
         ],
         check: "如果 x/y 交换后算法仍有漂亮图，图的美观没有验证 registration。",
-        lessonIds: ["spatial-assignment", "data-leakage", "knn"],
+        lessonIds: [
+          "spatial-assignment",
+          "data-leakage",
+          "knn",
+          "bio-graph-construction",
+        ],
       },
       {
         title: "Baseline 先暴露哪里困难",
@@ -96,6 +101,10 @@ export const researchPaths: ResearchPath[] = [
           "expectation-maximization",
           "count-likelihoods",
           "spatial-assignment",
+          "em-objective-diagnostics",
+          "count-mixture-background",
+          "structured-assignment-inference",
+          "bio-count-vae",
         ],
       },
       {
@@ -113,6 +122,8 @@ export const researchPaths: ResearchPath[] = [
           "ppo",
           "reward-model",
           "optimal-transport",
+          "spatial-mdp-design",
+          "reward-shaping-constraints",
         ],
       },
       {
@@ -129,6 +140,8 @@ export const researchPaths: ResearchPath[] = [
           "nested-group-validation",
           "external-validation",
           "cohort-design",
+          "spatial-policy-ope",
+          "bio-graphsage-sampling",
         ],
       },
       {
@@ -145,6 +158,9 @@ export const researchPaths: ResearchPath[] = [
           "spatial-assignment",
           "active-learning",
           "calibration-uncertainty",
+          "bio-gcn-propagation",
+          "bio-gat-attention",
+          "bio-contrastive-design",
         ],
       },
     ],
@@ -181,6 +197,15 @@ export const researchPaths: ResearchPath[] = [
         cost: "reward hacking、环境偏差与训练开销",
         settings: "先验证 state/action/reward；与 greedy 同预算比较",
         lessonId: "ppo",
+      },
+      {
+        name: "GNN / learned representation",
+        use: "可信 graph 提供单点 feature 以外的局部 context",
+        strength: "显式建模 neighbors，可用 relation/head 处理多种关系",
+        cost: "错误边、boundary mixing、sampling bias；embedding 本身不是 assignment",
+        settings:
+          "先试 MLP 与 1–2 layer GCN；检查 radius/k、self-loop、boundary error；按 donor 留出",
+        lessonId: "bio-graph-construction",
       },
     ],
     challenge: {

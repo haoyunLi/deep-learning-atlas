@@ -15,6 +15,8 @@ const files = [
   ["src/data/metaLearningExpansion.ts", "metaLearningExpansionLessons"],
   ["src/data/researchExpansion.ts", "researchExpansionLessons"],
   ["src/data/mechanismExpansion.ts", "mechanismExpansionLessons"],
+  ["src/data/bioInferenceControl.ts", "bioInferenceControlLessons"],
+  ["src/data/bioGraphRepresentation.ts", "bioGraphRepresentationLessons"],
 ];
 const requiredText = [
   "id",

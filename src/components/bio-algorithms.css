@@ -1,0 +1,294 @@
+.bio-lab {
+  max-width: 1160px;
+  margin: auto;
+  padding-top: 44px;
+  padding-bottom: 70px;
+  color: var(--ink, #14284b);
+}
+.bio-lab h1 {
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.3;
+  margin: 12px 0 20px;
+}
+.bio-lab h2 {
+  font-size: clamp(23px, 3vw, 31px);
+  line-height: 1.45;
+}
+.bio-lab p {
+  max-width: 85ch;
+  line-height: 1.9;
+}
+.bio-lab a {
+  color: #245fbd;
+}
+.bio-lab-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 30px 0;
+}
+.bio-lab-tabs a {
+  border: 1px solid #d6dfe9;
+  padding: 12px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 14px;
+}
+.bio-lab-tabs a[aria-current] {
+  background: #14284b;
+  color: white;
+  border-color: #14284b;
+}
+.bio-experiment {
+  border-top: 1px solid #d6dfe9;
+  padding-top: 16px;
+  min-width: 0;
+}
+.bio-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 24px 0;
+  align-items: start;
+}
+.bio-range,
+.bio-choice {
+  display: grid;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.bio-range > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.bio-range output {
+  color: #245fbd;
+  font-variant-numeric: tabular-nums;
+}
+.bio-range small {
+  font-weight: 400;
+  line-height: 1.65;
+  color: #60708b;
+}
+.bio-range input {
+  width: 100%;
+  accent-color: #245fbd;
+  min-height: 24px;
+}
+.bio-choice select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #d6dfe9;
+  background: white;
+  color: #14284b;
+  padding: 9px;
+  font: inherit;
+  font-weight: 400;
+}
+.bio-lab button,
+.bio-stepper button {
+  border: 1px solid #d6dfe9;
+  color: #14284b;
+  background: white;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+}
+.bio-lab button:hover:not(:disabled) {
+  background: #ecf3ff;
+}
+.bio-lab button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+.bio-lab :is(button, a, input, select, summary, [tabindex]):focus-visible,
+.bio-lesson-figure a:focus-visible {
+  outline: 3px solid #245fbd;
+  outline-offset: 3px;
+}
+.bio-equation {
+  padding: 16px 0;
+  border-block: 1px solid #d6dfe9;
+  overflow-wrap: anywhere;
+  font-family: Georgia, serif;
+}
+.bio-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 20px 0;
+}
+.bio-stepper output {
+  padding: 0 8px;
+  font-variant-numeric: tabular-nums;
+}
+.bio-figure-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+.bio-plot {
+  overflow-x: auto;
+  background: #f7f9fc;
+  border-block: 1px solid #d6dfe9;
+}
+.bio-plot svg {
+  width: 100%;
+  min-width: 660px;
+  display: block;
+  max-height: 360px;
+}
+.bio-plot text {
+  font-size: 14px;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "PingFang SC",
+    sans-serif;
+  fill: #14284b;
+}
+.bio-plot .bio-svg-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+.bio-plot rect,
+.bio-plot circle,
+.bio-plot line {
+  transition:
+    width 220ms ease,
+    height 220ms ease,
+    opacity 220ms ease,
+    fill 220ms ease;
+}
+.bio-readout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 15px;
+  border-bottom: 1px solid #d6dfe9;
+  padding: 15px 0 20px;
+}
+.bio-readout dt {
+  color: #60708b;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.bio-readout dd {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.bio-interpretation {
+  padding: 16px 0;
+  border-bottom: 1px solid #d6dfe9;
+}
+.bio-notes {
+  margin: 22px 0;
+  border-block: 1px solid #d6dfe9;
+  padding: 16px 0;
+}
+.bio-notes summary {
+  cursor: pointer;
+  line-height: 1.65;
+  font-weight: 600;
+}
+.bio-notes a {
+  display: inline-block;
+  margin-right: 12px;
+}
+.bio-question {
+  border: 1px solid #d6dfe9;
+  padding: 20px;
+  margin: 30px 0;
+}
+.bio-question legend {
+  padding: 0 8px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+.bio-question label {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 15px 0;
+  line-height: 1.7;
+}
+.bio-question input {
+  flex-shrink: 0;
+  accent-color: #245fbd;
+}
+.bio-lab-footer {
+  border-top: 1px solid #d6dfe9;
+  margin-top: 40px;
+  padding-top: 20px;
+}
+.bio-lesson-figure {
+  margin: 30px 0;
+  border-block: 1px solid #d6dfe9;
+  padding: 18px 0;
+}
+.bio-lesson-figure ol {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  counter-reset: flow;
+}
+.bio-lesson-figure li {
+  counter-increment: flow;
+  padding: 14px;
+  background: #f1f5fb;
+  border-top: 2px solid #245fbd;
+  overflow-wrap: anywhere;
+}
+.bio-lesson-figure li::before {
+  content: "0" counter(flow);
+  color: #245fbd;
+  font:
+    20px Georgia,
+    serif;
+  display: block;
+  margin-bottom: 12px;
+}
+.bio-lesson-figure strong {
+  display: block;
+  line-height: 1.5;
+}
+.bio-lesson-figure p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+.bio-lesson-figure small {
+  color: #60708b;
+  line-height: 1.7;
+  display: block;
+}
+@media (max-width: 700px) {
+  .bio-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bio-lab-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bio-lab {
+    padding-top: 26px;
+  }
+  .bio-lesson-figure ol {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bio-plot * {
+    transition: none !important;
+  }
+}

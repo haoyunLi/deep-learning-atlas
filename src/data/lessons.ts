@@ -9,6 +9,8 @@ import { frontierSystemsExpansionLessons } from "./frontierSystemsExpansion";
 import { metaLearningExpansionLessons } from "./metaLearningExpansion";
 import { researchExpansionLessons } from "./researchExpansion";
 import { mechanismExpansionLessons } from "./mechanismExpansion";
+import { bioInferenceControlLessons } from "./bioInferenceControl";
+import { bioGraphRepresentationLessons } from "./bioGraphRepresentation";
 
 export type Lesson = {
   id: string;
@@ -1934,6 +1936,8 @@ export const lessons: Lesson[] = [
   ...metaLearningExpansionLessons,
   ...researchExpansionLessons,
   ...mechanismExpansionLessons,
+  ...bioInferenceControlLessons,
+  ...bioGraphRepresentationLessons,
 ].sort(
   (a, b) =>
     categories.findIndex((category) => category.id === a.category) -

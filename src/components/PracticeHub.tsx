@@ -3,6 +3,7 @@ import LanguageBudgetLab from "./LanguageBudgetLab";
 import DiagnosticTree from "./DiagnosticTree";
 import ResearchWorkbench from "./ResearchWorkbench";
 import ExperimentBench from "./ExperimentBench";
+import { navigatePractice, usePracticeRoute } from "../lib/practiceRouting";
 import {
   caseRows,
   caseSplit,
@@ -444,14 +445,7 @@ function PracticalCase() {
 }
 
 export default function PracticeHub() {
-  const [tab, setTab] = useState<
-    "research" | "bench" | "case" | "diagnostic" | "language"
-  >(() =>
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.hash.split("?")[1]).has("lab")
-      ? "bench"
-      : "research",
-  );
+  const { tab } = usePracticeRoute();
   return (
     <main
       className={`practice-page page-gutter${tab === "research" || tab === "bench" ? " research-entry-page" : ""}`}
@@ -462,6 +456,12 @@ export default function PracticeHub() {
           计算中间值，比较算法，再把模型放回完整工作流程。每节课程末尾也有两道可交互练习。
         </p>
       </header>
+      <p className="lesson-research-context">
+        <a href="#/bio-algorithms?lab=em">
+          Single-cell / Spatial 算法实验：Count
+          EM、Assignment、GAE、GCN、GAT、Contrastive →
+        </a>
+      </p>
       <div className="practice-tabs practice-main-tabs">
         {(
           [
@@ -475,7 +475,7 @@ export default function PracticeHub() {
           <button
             key={item.id}
             aria-pressed={tab === item.id}
-            onClick={() => setTab(item.id)}
+            onClick={() => navigatePractice({ tab: item.id })}
           >
             {item.title}
           </button>

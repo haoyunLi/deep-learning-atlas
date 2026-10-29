@@ -8,6 +8,8 @@ import { frontierSystemsExercises } from "./exercisesFrontierSystems";
 import { metaLearningExercises } from "./exercisesMetaLearning";
 import { researchExercises } from "./exercisesResearch";
 import { mechanismExercises } from "./exercisesMechanism";
+import { bioInferenceControlExercises } from "./exercisesBioInferenceControl";
+import { bioGraphRepresentationExercises } from "./exercisesBioGraphRepresentation";
 
 export const exerciseGroups: Record<string, Exercise[]>[] = [
   coreExercises,
@@ -19,6 +21,8 @@ export const exerciseGroups: Record<string, Exercise[]>[] = [
   metaLearningExercises,
   researchExercises,
   mechanismExercises,
+  bioInferenceControlExercises,
+  bioGraphRepresentationExercises,
 ];
 export const exercises: Record<string, Exercise[]> = Object.assign(
   {},

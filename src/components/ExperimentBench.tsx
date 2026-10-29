@@ -7,6 +7,7 @@ import {
   bootstrapExperiment,
 } from "./experimentBenchMath";
 import "./experiment-bench.css";
+import { navigatePractice, usePracticeRoute } from "../lib/practiceRouting";
 
 type Kind = "bayes" | "threshold" | "transport" | "bootstrap";
 const names: Record<Kind, string> = {
@@ -828,9 +829,10 @@ function Bootstrap() {
     <>
       <h2>把同一批 cells 复制十遍，interval 为什么会“更精确”？</h2>
       <p>
-        Input：4 个 donors，每个3个 synthetic values：A=[1,2,3]，B=[3,4,5]，C=[7,8,9]，D=[9,10,11]。Output：row bootstrap 与
-        donor cluster bootstrap 的 mean distributions。固定 seed 和 512 次
-        resamples，方便复算。
+        Input：4 个 donors，每个3个 synthetic
+        values：A=[1,2,3]，B=[3,4,5]，C=[7,8,9]，D=[9,10,11]。Output：row
+        bootstrap 与 donor cluster bootstrap 的 mean distributions。固定 seed 和
+        512 次 resamples，方便复算。
       </p>
       <Check
         question="增加完全相同的 cell rows，独立 donor 仍为4，哪个 interval 应保持？"
@@ -1006,13 +1008,8 @@ function Bootstrap() {
   );
 }
 export default function ExperimentBench() {
-  const [kind, setKind] = useState<Kind>(() => {
-    const value =
-      typeof window === "undefined"
-        ? null
-        : new URLSearchParams(window.location.hash.split("?")[1]).get("lab");
-    return value && value in names ? (value as Kind) : "bayes";
-  });
+  const { lab } = usePracticeRoute();
+  const kind: Kind = lab && Object.hasOwn(names, lab) ? (lab as Kind) : "bayes";
   return (
     <section className="experiment-bench" aria-label="机制推演实验室">
       <div className="bench-picker" role="group" aria-label="选择机制实验">
@@ -1022,8 +1019,7 @@ export default function ExperimentBench() {
             type="button"
             aria-pressed={kind === id}
             onClick={() => {
-              setKind(id as Kind);
-              window.history.replaceState(null, "", "#/practice?lab=" + id);
+              navigatePractice({ tab: "bench", lab: id });
             }}
           >
             {title}

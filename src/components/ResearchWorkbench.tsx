@@ -7,6 +7,7 @@ import {
 } from "../data/researchPaths";
 import AnimatedExplainer from "./AnimatedExplainer";
 import { hierarchySplit } from "./researchMath";
+import { navigatePractice, usePracticeRoute } from "../lib/practiceRouting";
 import "../research.css";
 
 const protocolFields = [
@@ -313,16 +314,12 @@ function ResearchProtocol({ path }: { path: ResearchPath }) {
 }
 
 export default function ResearchWorkbench() {
-  const requested =
-    typeof window === "undefined"
-      ? "spatial"
-      : new URLSearchParams(window.location.hash.split("?")[1] || "").get(
-          "research",
-        );
-  const [pathId, setPathId] = useState(
-    researchPaths.some((p) => p.id === requested) ? requested! : "spatial",
-  );
+  const { research: requested } = usePracticeRoute();
+  const pathId = researchPaths.some((p) => p.id === requested)
+    ? requested!
+    : "spatial";
   const [stageIndex, setStageIndex] = useState(0);
+  useEffect(() => setStageIndex(0), [pathId]);
   const path = researchPaths.find((p) => p.id === pathId)!;
   const stage = path.stages[stageIndex];
   const mechanismId =
@@ -333,9 +330,8 @@ export default function ResearchWorkbench() {
         : "elastic-net";
   const mechanism = lessons.find((l) => l.id === mechanismId);
   function choosePath(id: string) {
-    setPathId(id);
     setStageIndex(0);
-    window.history.replaceState(null, "", `#/practice?research=${id}`);
+    navigatePractice({ tab: "research", research: id });
   }
   return (
     <section className="research-workbench" aria-labelledby="research-title">
