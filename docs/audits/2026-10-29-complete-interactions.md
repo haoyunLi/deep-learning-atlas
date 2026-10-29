@@ -40,6 +40,10 @@ Runtime playback reached stage 4 and stopped, with the control returning to Play
 
 A downloaded JSON file parsed successfully and contained current and reference parameter sets and four-stage calculation results for both. The inspected download reflected default values following development hot reload; preservation of a particular nondefault chosen parameter in the exported file is **not** established by that check.
 
-## Remaining verification
+## Public release and verification bounds
 
-**Public deployment and verification of this release on the public URL are pending.** The build and browser evidence above apply to the local implementation. Hidden-tab/offscreen pauses, each playback speed, Reduced Motion behavior, nondefault-value export fidelity and a full screen-reader pass have not been established by the recorded browser checks; implementation and server-render checks should not be substituted for those runtime observations.
+Code commit [`d3e0bb1abfa553524c7d2ce4f8ba03dd520d7c49`](https://github.com/haoyunLi/deep-learning-atlas/commit/d3e0bb1abfa553524c7d2ce4f8ba03dd520d7c49) was pushed to `main`. [GitHub Actions run 40884560242](https://github.com/haoyunLi/deep-learning-atlas/actions/runs/40884560242) completed both build and deploy successfully; deployment completed on 2026-10-29 at 13:44:37 UTC.
+
+The public BatchNorm course loaded `assets/index-BmDX3WMU.js`, matching the local production build. With b=10 against the default b=4 reference, the live third stage showed mean=4 and variance=12.5; training x1 changed from -1.3416 to -0.8485, while evaluation x1 remained -1. The production page had no horizontal page overflow at the tested desktop size and no captured browser console errors. The live screenshot is retained locally in the ignored review folder.
+
+Verification bounds: Hidden-tab/offscreen pauses, each playback speed, Reduced Motion behavior, nondefault-value export fidelity and a full screen-reader pass have not been established by the recorded browser checks; implementation and server-render checks should not be substituted for those runtime observations.
