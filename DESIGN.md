@@ -190,6 +190,16 @@ The donor split example aligns each donor with its row of train/test circles, a 
 
 Transfer questions use a fieldset, legend and radio labels; a check button exposes feedback through a status message. Research protocols place labeled fields in a two column grid, offer Markdown download and restore actions, and show whether the browser saved the draft. Source links and evidence boundaries sit in the same reading flow as the teaching examples.
 
+### Experiment Bench
+
+The Experiment Bench extends the same reading surface with four selectable experiments: Bayesian Update, Threshold & Base Rate, Sinkhorn Transport and Donor Bootstrap. Its source is `src/components/ExperimentBench.tsx` and `src/components/experiment-bench.css`. A concrete question and input/output statement lead into a prediction, labeled parameters, two linked computed figures, numerical readouts, manual derivation and a native disclosure for settings, limits and sources. The cross-site link connects the calculation to the Bio/CS mechanism workbench.
+
+The bench is centered at a maximum width of (1050px), with prose limited to (75ch). Controls use two columns, collapsing to one at or below (640px); the experiment selector becomes two columns at the same breakpoint. Outlined buttons have small corners (4px), a minimum height of (44px), pale blue hover and navy selected states expressed with `aria-pressed`. The blue focus outline is (3px) with a (3px) offset. Plots use pale surfaces and horizontal rules; each SVG retains a minimum width of (640px) inside a labeled, keyboard focusable local scroll region.
+
+Current parameter values appear in native outputs beside their labels. The result definition list uses tabular numerals and polite live announcements outside the SVG; diagram names include current values where supplied by the individual experiment. Keep the paired figures tied to the same calculation: prior/posterior and predictive probabilities, score distributions and confusion counts, transport flow and marginal masses, or resampled means and interval comparisons. Categorical blue and teal remain figure-specific, with labels and numerical meaning alongside them.
+
+Prediction checks use a fieldset and radio labels; checking stays disabled until an answer is selected and then exposes explanatory status text. Choosing a different answer clears that feedback. Derivation steps are manual and announce the selected explanation. Sinkhorn offers one full iteration or a (100-iteration) comparison; changing its regularization or target mass restarts the iteration count. Reset buttons restore each experiment's parameters, including Sinkhorn's iteration count, while retaining the prediction and derivation state. Changing experiment mounts a fresh experiment view. There is no automatic playback in this bench; geometry transitions last (240ms) and are removed under reduced motion. Synthetic-data notices and interpretation boundaries remain part of the reading flow.
+
 ## Do's and Don'ts
 
 ### Do:

@@ -6,7 +6,7 @@
 
 ## 学什么
 
-网站目前包含 177 篇课程，按基础原理、训练与泛化、经典基线、视觉模型、语言与序列、生成模型、表示学习、强化学习、更多架构、Meta-Learning 与 Adaptation 这十条路线组织。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、Continual Learning、Active Learning、Domain Adaptation、AutoML、Federated Learning 与 Test-Time Adaptation。每篇回答七个问题：
+网站目前包含 185 篇课程，按基础原理、训练与泛化、经典基线、视觉模型、语言与序列、生成模型、表示学习、强化学习、更多架构、Meta-Learning 与 Adaptation 这十条路线组织。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、Continual Learning、Active Learning、Domain Adaptation、AutoML、Federated Learning 与 Test-Time Adaptation。每篇回答七个问题：
 
 1. 一句话怎样理解？
 2. 内部机制如何运作？
@@ -20,7 +20,7 @@
 
 还包括兼容常用缩写的关键词搜索、分类与学习状态筛选、可分享的两算法对比、关键概念路径，以及保存在本机浏览器的阅读与答题记录。124 项中英术语都能跳到相关课程；选型指南从 15 类任务的 39 种具体情境出发，给出可比较的基线、第一轮设置、适用边界和评估方法。每篇课程都链接到原始论文或官方文档。
 
-全部 177 节课程都有步骤导览；其中 56 节配有专属机制图，53 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
+全部 185 节课程都有步骤导览；其中 56 节配有专属机制图，53 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
 
 [动效实验室](https://haoyunli.github.io/deep-learning-atlas/#/animations) 支持关键词、学习方向与动效类型筛选。机制实验提供四步中英说明、滑块或图解、播放/暂停、慢速/快速、手动跳步与重置；也可切换到完整课程步骤。手机上支持图内横向滑动。自动播放只在图进入视野时运行；系统启用减少动态效果时关闭自动播放和过渡。参数实验使用可手算的合成案例，清楚说明哪些公式在实时计算、哪些示意并未运行模型训练。
 
@@ -30,7 +30,7 @@
 
 ## 手算、练习与实践工坊
 
-全部 177 节课各有一题机制题和一题选型/排错题，共 354 题；提交后显示解释，可重新作答。最近一次答案保存在当前浏览器，“学习记录与错题复习”页会汇总阅读标记、作答情况和待复习题目；课程题目修订后，旧答案不会误算进新题。
+全部 185 节课各有一题机制题和一题选型/排错题，共 370 题；提交后显示解释，可重新作答。最近一次答案保存在当前浏览器，“学习记录与错题复习”页会汇总阅读标记、作答情况和待复习题目；课程题目修订后，旧答案不会误算进新题。
 
 [实践工坊](https://haoyunli.github.io/deep-learning-atlas/#/practice) 包含：
 
@@ -76,7 +76,7 @@ npm run preview
 - [`src/data/learningConcepts.ts`](src/data/learningConcepts.ts)：head、zero/few-shot、in-context learning 等概念课程。
 - [`src/data/dataConcepts.ts`](src/data/dataConcepts.ts)：cohort、数据泄漏、分布变化与可信评估课程。
 - [`src/data/trainingLanguageExpansion.ts`](src/data/trainingLanguageExpansion.ts)、[`src/data/modelFamilyExpansion.ts`](src/data/modelFamilyExpansion.ts)：新增 22 节专题。
-- [`src/data/exercises.ts`](src/data/exercises.ts)：354 道题的统一注册；题目分文件维护。
+- [`src/data/exercises.ts`](src/data/exercises.ts)：370 道题的统一注册；题目分文件维护。
 - [`src/components/HandCalculationSandbox.tsx`](src/components/HandCalculationSandbox.tsx)、[`src/components/sandboxMath.ts`](src/components/sandboxMath.ts)：六个沙盘及纯数值计算。
 - [`src/components/PracticeHub.tsx`](src/components/PracticeHub.tsx)：完整实验案例、诊断与 LM 预算工坊。
 - [`src/data/conceptPaths.ts`](src/data/conceptPaths.ts)：把模型课与概念课串成17 条逐步学习路径。
@@ -108,3 +108,9 @@ npm run preview
 ## 说明
 
 网站用于学习与方法选择，不承诺单一算法适用于所有数据。具体参数以数据规模、验证集表现、延迟、内存和任务目标为准。课程中的超参数范围是实验起点。
+
+## 机制推演扩展 · 2026-10-28
+
+[进入交互实验](https://haoyunli.github.io/deep-learning-atlas/#/practice?lab=bayes)：Bayesian Update、Threshold & Base Rate、Sinkhorn Transport、Donor Bootstrap。四组实验有八幅实时计算图、参数控制、预测反馈、四步推导、设置建议与适用边界，另有跨站 Bio/CS 机制实验入口。它们独立于原有53个课程参数实验计数。
+
+新课程包括 Bayesian Updating、Gaussian Processes、Bayesian Optimization、MCMC/HMC、Importance Sampling、Particle Filters、Neural ODEs 与 Hierarchical Bootstrap。所有数值为显式 synthetic examples；不声称复现真实生物结果。

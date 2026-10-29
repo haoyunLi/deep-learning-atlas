@@ -1,0 +1,218 @@
+/* Read / Operate extension: preserve the atlas editorial system. Predict → manipulate → inspect two linked figures → derive → transfer. */
+.experiment-bench {
+  color: var(--ink, #14284b);
+  max-width: 1050px;
+  margin: 28px auto;
+}
+.experiment-bench h2 {
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.5;
+  max-width: 32em;
+}
+.experiment-bench p {
+  max-width: 75ch;
+  line-height: 1.85;
+}
+.experiment-bench button {
+  border: 1px solid #b9c8da;
+  background: #fff;
+  color: #14284b;
+  padding: 11px 15px;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+  min-height: 44px;
+}
+.experiment-bench button:hover {
+  background: #edf3fc;
+}
+.experiment-bench button[aria-pressed="true"] {
+  color: white;
+  background: #14284b;
+  border-color: #14284b;
+}
+.experiment-bench button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.experiment-bench :focus-visible {
+  outline: 3px solid #245fbd;
+  outline-offset: 3px;
+}
+.experiment-bench ::selection {
+  background: #c9ddfa;
+  color: #14284b;
+}
+.bench-picker,
+.bench-derivation [role="group"],
+.bench-iteration {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.bench-picker {
+  border-bottom: 1px solid #d6dfe9;
+  padding-bottom: 20px;
+}
+.bench-note,
+.bench-range small {
+  color: #526784;
+  font-size: 13px;
+}
+.bench-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+.bench-range {
+  display: grid;
+  gap: 12px;
+  margin: 22px 0;
+  min-width: 0;
+}
+.bench-range > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  font-weight: 700;
+}
+.bench-range output,
+.bench-readout dd {
+  font-variant-numeric: tabular-nums;
+}
+.bench-range input {
+  width: 100%;
+  accent-color: #245fbd;
+  min-height: 30px;
+}
+.bench-range small {
+  line-height: 1.7;
+}
+.bench-plot {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: #718198 #edf3fc;
+  background: #f8fbff;
+  margin: 20px 0;
+  border-block: 1px solid #d6dfe9;
+}
+.bench-plot svg {
+  display: block;
+  width: 100%;
+  min-width: 640px;
+  fill: #14284b;
+  font:
+    14px system-ui,
+    sans-serif;
+}
+.bench-plot rect,
+.bench-plot circle,
+.bench-plot line {
+  transition:
+    x 240ms ease-out,
+    y 240ms ease-out,
+    width 240ms ease-out,
+    height 240ms ease-out;
+}
+.bench-axis {
+  fill: none;
+  stroke: #718198;
+  stroke-width: 1;
+}
+.bench-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 30px;
+  padding: 12px 0 24px;
+  border-bottom: 1px solid #d6dfe9;
+}
+.bench-readout dt {
+  color: #526784;
+  font-size: 13px;
+}
+.bench-readout dd {
+  margin: 8px 0 0;
+  font-weight: 700;
+  font-size: 19px;
+}
+.bench-check {
+  margin: 22px 0;
+  padding-block: 16px;
+  border-block: 1px solid #d6dfe9;
+}
+.bench-check fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0 0 14px;
+  min-width: 0;
+}
+.bench-check legend {
+  font-weight: 700;
+  padding: 0 0 12px;
+  line-height: 1.6;
+}
+.bench-check label {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 0;
+  cursor: pointer;
+}
+.bench-check input {
+  accent-color: #245fbd;
+}
+.bench-check p[role="status"] {
+  background: #edf3fc;
+  padding: 14px;
+}
+.bench-derivation {
+  padding: 12px 0;
+}
+.bench-derivation p {
+  min-height: 4em;
+}
+.bench-details {
+  border-block: 1px solid #d6dfe9;
+  padding: 20px 0;
+  margin-bottom: 22px;
+}
+.bench-details summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.bench-details a {
+  margin-right: 18px;
+  display: inline-block;
+  padding: 8px 0;
+}
+.bench-bridge {
+  margin-top: 32px;
+  border-top: 1px solid #d6dfe9;
+  padding-top: 22px;
+}
+@media (max-width: 640px) {
+  .bench-controls {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .bench-picker {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .bench-picker button {
+    padding: 10px 7px;
+    font-size: 13px;
+  }
+  .bench-readout {
+    gap: 20px;
+  }
+  .experiment-bench {
+    margin-top: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bench-plot * {
+    transition: none !important;
+  }
+}

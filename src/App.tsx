@@ -488,6 +488,7 @@ function Home({
             </p>
           </div>
           <a href="#/practice?research=spatial">Spatial / Age 科研实践 →</a>
+          <a href="#/practice?lab=bayes">机制推演：改参数、读图与检验证据 →</a>
         </div>
         <div className="atlas-heading">
           <div className="section-intro">
@@ -781,6 +782,28 @@ function Detail({
           <span>{lesson.englishTitle}</span>
         </h1>
         <p className="detail-summary">{lesson.summary}</p>
+        {[
+          "bayesian-updating",
+          "hierarchical-bootstrap",
+          "optimal-transport",
+          "class-imbalance",
+        ].includes(lesson.id) && (
+          <p className="lesson-research-context">
+            <a
+              href={
+                "#/practice?lab=" +
+                ({
+                  "bayesian-updating": "bayes",
+                  "hierarchical-bootstrap": "bootstrap",
+                  "optimal-transport": "transport",
+                  "class-imbalance": "threshold",
+                }[lesson.id] || "bayes")
+              }
+            >
+              打开本课交互推演：先预测、改参数、查看中间数值 →
+            </a>
+          </p>
+        )}
         {researchConnections.length > 0 && (
           <section className="lesson-research-context">
             <h2>把这节课放回你的研究问题</h2>

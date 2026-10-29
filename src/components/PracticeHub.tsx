@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import LanguageBudgetLab from "./LanguageBudgetLab";
 import DiagnosticTree from "./DiagnosticTree";
 import ResearchWorkbench from "./ResearchWorkbench";
+import ExperimentBench from "./ExperimentBench";
 import {
   caseRows,
   caseSplit,
@@ -444,11 +445,16 @@ function PracticalCase() {
 
 export default function PracticeHub() {
   const [tab, setTab] = useState<
-    "research" | "case" | "diagnostic" | "language"
-  >("research");
+    "research" | "bench" | "case" | "diagnostic" | "language"
+  >(() =>
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.hash.split("?")[1]).has("lab")
+      ? "bench"
+      : "research",
+  );
   return (
     <main
-      className={`practice-page page-gutter${tab === "research" ? " research-entry-page" : ""}`}
+      className={`practice-page page-gutter${tab === "research" || tab === "bench" ? " research-entry-page" : ""}`}
     >
       <header className="practice-page-header">
         <h1>从懂原理，到做对实验。</h1>
@@ -460,6 +466,7 @@ export default function PracticeHub() {
         {(
           [
             { id: "research", title: "科研项目：Spatial / Age" },
+            { id: "bench", title: "机制推演：参数与证据" },
             { id: "case", title: "完整实验案例" },
             { id: "diagnostic", title: "训练诊断树" },
             { id: "language", title: "LM 显存与形状" },
@@ -476,6 +483,9 @@ export default function PracticeHub() {
       </div>
       <div hidden={tab !== "research"}>
         <ResearchWorkbench />
+      </div>
+      <div hidden={tab !== "bench"}>
+        <ExperimentBench />
       </div>
       <div hidden={tab !== "case"}>
         <PracticalCase />

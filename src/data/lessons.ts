@@ -8,6 +8,7 @@ import { modelFamilyExpansionLessons } from "./modelFamilyExpansion";
 import { frontierSystemsExpansionLessons } from "./frontierSystemsExpansion";
 import { metaLearningExpansionLessons } from "./metaLearningExpansion";
 import { researchExpansionLessons } from "./researchExpansion";
+import { mechanismExpansionLessons } from "./mechanismExpansion";
 
 export type Lesson = {
   id: string;
@@ -1932,6 +1933,7 @@ export const lessons: Lesson[] = [
   ...frontierSystemsExpansionLessons,
   ...metaLearningExpansionLessons,
   ...researchExpansionLessons,
+  ...mechanismExpansionLessons,
 ].sort(
   (a, b) =>
     categories.findIndex((category) => category.id === a.category) -
