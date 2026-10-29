@@ -457,6 +457,9 @@ export default function PracticeHub() {
         </p>
       </header>
       <p className="lesson-research-context">
+        <a href="#/ai-labs?lab=tree">
+          AI 跨领域实验：Tree、A*、NMS、Hybrid Retrieval 与 Agent reliability →
+        </a>
         <a href="#/bio-algorithms?lab=em">
           Single-cell / Spatial 算法实验：Count
           EM、Assignment、GAE、GCN、GAT、Contrastive →

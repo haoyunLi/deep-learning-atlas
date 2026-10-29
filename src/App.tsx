@@ -10,6 +10,8 @@ import { categories, lessons, type Lesson } from "./data/lessons";
 import { conceptPaths } from "./data/conceptPaths";
 import { researchLinksForLesson } from "./data/researchPaths";
 import AnimationDirectory from "./components/AnimationDirectory";
+import AIScopeDiagram from "./components/AIScopeDiagram";
+import "./components/ai-landscape.css";
 import {
   mechanismCount,
   animationCatalog,
@@ -31,6 +33,11 @@ const PracticeHub = lazy(() => import("./components/PracticeHub"));
 const StudioPage = lazy(() => import("./components/studio/StudioPage"));
 const BioAlgorithmLab = lazy(() => import("./components/BioAlgorithmLab"));
 const BioLessonFigure = lazy(() => import("./components/BioLessonFigure"));
+const AILandscape = lazy(() => import("./components/AILandscape"));
+const AIBreadthLab = lazy(() => import("./components/AIBreadthLab"));
+const BreadthLessonFigure = lazy(
+  () => import("./components/BreadthLessonFigure"),
+);
 
 const repoUrl = "https://github.com/haoyunLi/deep-learning-atlas";
 const codeLabLessonIds = new Set([
@@ -81,8 +88,8 @@ function Logo({ onClick }: { onClick?: () => void }) {
 function Header({ route }: { route: string }) {
   const [open, setOpen] = useState(false);
   const links = [
+    { href: "#/landscape", label: "AI 全景" },
     { href: "#/studio", label: "学习工作台" },
-    { href: "#/path", label: "学习路径" },
     { href: "#/animations", label: "动效实验室" },
     { href: "#/practice", label: "实践工坊" },
     { href: "#/concepts", label: "关键概念" },
@@ -133,126 +140,6 @@ function Header({ route }: { route: string }) {
         </nav>
       </div>
     </header>
-  );
-}
-
-function NetworkDiagram() {
-  const layers = [
-    { x: 55, ys: [102, 164, 226, 288] },
-    { x: 205, ys: [72, 122, 172, 222, 272, 322] },
-    { x: 355, ys: [72, 122, 172, 222, 272, 322] },
-    { x: 505, ys: [142, 242] },
-  ];
-  return (
-    <div
-      className="network-wrap"
-      aria-label="神经网络前向传播与反向传播示意图"
-      role="img"
-    >
-      <svg
-        className="network-svg"
-        viewBox="0 0 570 405"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        <g className="network-labels">
-          <text x="55" y="30">
-            输入层
-          </text>
-          <text x="205" y="30">
-            隐藏层
-          </text>
-          <text x="355" y="30">
-            隐藏层
-          </text>
-          <text x="505" y="30">
-            输出层
-          </text>
-          <text x="55" y="49">
-            Input
-          </text>
-          <text x="205" y="49">
-            Hidden
-          </text>
-          <text x="355" y="49">
-            Hidden
-          </text>
-          <text x="505" y="49">
-            Output
-          </text>
-        </g>
-        <g className="network-edges">
-          {layers
-            .slice(0, -1)
-            .flatMap((layer, i) =>
-              layer.ys.flatMap((y, a) =>
-                layers[i + 1].ys.map((nextY, b) => (
-                  <line
-                    key={`${i}-${a}-${b}`}
-                    x1={layer.x + 10}
-                    y1={y}
-                    x2={layers[i + 1].x - 10}
-                    y2={nextY}
-                  />
-                )),
-              ),
-            )}
-        </g>
-        <g className="network-nodes">
-          {layers.flatMap((layer, i) =>
-            layer.ys.map((y, j) => (
-              <circle key={`${i}-${j}`} cx={layer.x} cy={y} r="10" />
-            )),
-          )}
-        </g>
-        <g className="network-tokens">
-          {["x₁", "x₂", "x₃", "x₄"].map((t, i) => (
-            <text key={t} x="20" y={layers[0].ys[i] + 5}>
-              {t}
-            </text>
-          ))}
-          <text x="529" y="147">
-            ŷ₁
-          </text>
-          <text x="529" y="247">
-            ŷ₂
-          </text>
-        </g>
-        <line
-          className="network-flow"
-          x1="85"
-          y1="367"
-          x2="475"
-          y2="367"
-          markerEnd="url(#arrow)"
-        />
-        <line
-          className="network-flow backward"
-          x1="475"
-          y1="390"
-          x2="85"
-          y2="390"
-          markerEnd="url(#arrow)"
-        />
-        <text className="flow-text" x="230" y="359">
-          前向传播 · Forward pass
-        </text>
-        <text className="flow-text" x="218" y="385">
-          反向传播 · Backprop
-        </text>
-        <defs>
-          <marker
-            id="arrow"
-            markerWidth="8"
-            markerHeight="8"
-            refX="7"
-            refY="4"
-            orient="auto"
-          >
-            <path d="M0 0 8 4 0 8" fill="none" stroke="#254f91" />
-          </marker>
-        </defs>
-      </svg>
-    </div>
   );
 }
 
@@ -341,20 +228,21 @@ function Home({
     <main>
       <section className="hero page-gutter">
         <div className="hero-copy">
-          <h1>把深度学习看懂，再用对。</h1>
-          <p className="hero-en">
-            From intuition to implementation — 一次理清原理、选择与调参。
-          </p>
+          <h1>
+            从 AI 全景，
+            <br />
+            看懂每种方法
+          </h1>
+          <p className="hero-en">AI · ML · Computer Vision · Agents</p>
           <p className="hero-description">
-            从 kNN、EM 到 BERT、U-Net、PPO 与 Reward Model，再到
-            head、zero/few-shot 与
-            cohort，用直觉、逐步机制、对比和调参步骤看懂方法，并在真实问题中做出合适的选择。
+            从统计学习、搜索与推理，到视觉、语言、生成模型和 Agent
+            系统。先建立知识地图，再用逐步推导、对比与实验理解原理、设置和使用边界。
           </p>
-          <a className="primary-button" href="#/atlas">
-            开始学习 <ArrowIcon />
+          <a className="primary-button" href="#/landscape">
+            探索 AI 全景 <ArrowIcon />
           </a>
         </div>
-        <NetworkDiagram />
+        <AIScopeDiagram />
       </section>
 
       <section className="study-summary" aria-label="我的学习进度">
@@ -483,12 +371,14 @@ function Home({
       <section className="atlas-section page-gutter" id="atlas">
         <div className="practice-promo">
           <div>
-            <strong>新：手算、练习与完整实践闭环</strong>
+            <strong>从 AI 全景，走到手算与实践</strong>
             <p>
               六个逐步计算沙盘 · 每课两题 · 可复现选型案例 · 训练诊断树 · LM
               显存计算器
             </p>
           </div>
+          <a href="#/landscape">AI / ML / CV / Agent 全景 →</a>
+          <a href="#/ai-labs?lab=tree">跨领域算法实验 →</a>
           <a href="#/practice?research=spatial">Spatial / Age 科研实践 →</a>
           <a href="#/bio-algorithms?lab=em">
             Single-cell / Spatial：EM、RL、GNN 数值实验 →
@@ -841,6 +731,7 @@ function Detail({
         </section>
         <Suspense fallback={null}>
           <BioLessonFigure lessonId={lesson.id} />
+          <BreadthLessonFigure lessonId={lesson.id} />
         </Suspense>
         <Suspense
           fallback={
@@ -1430,6 +1321,8 @@ function App() {
     "/animations": "动效实验室",
     "/practice": "实践工坊",
     "/bio-algorithms": "Single-cell / Spatial 算法实验",
+    "/landscape": "AI / ML 全景",
+    "/ai-labs": "AI 跨领域机制实验",
     "/compare": "算法对比",
     "/guide": "选型指南",
     "/glossary": "术语表",
@@ -1461,6 +1354,8 @@ function App() {
     );
   else if (path === "/animations") page = <AnimationDirectory />;
   else if (path === "/practice") page = <PracticeHub />;
+  else if (path === "/landscape") page = <AILandscape query={routeQuery} />;
+  else if (path === "/ai-labs") page = <AIBreadthLab query={routeQuery} />;
   else if (path === "/bio-algorithms")
     page = <BioAlgorithmLab query={routeQuery} />;
   else if (path === "/compare") page = <Compare routeQuery={routeQuery} />;

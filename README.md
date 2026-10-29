@@ -1,12 +1,12 @@
 # 深度学习图谱 · Deep Learning Atlas
 
-一个中英混合的深度学习学习网站，用直觉、机制、选择和实践步骤解释算法。
+一个中英混合的 AI / ML 学习网站，覆盖 Classical ML、Deep Learning、Computer Vision、Search / Reasoning 和 Agents，用直觉、机制、选择和实践步骤解释算法。
 
 在线阅读：[Deep Learning Atlas](https://haoyunli.github.io/deep-learning-atlas/)
 
 ## 学什么
 
-网站目前包含 197 篇课程，按基础原理、训练与泛化、经典基线、视觉模型、语言与序列、生成模型、表示学习、强化学习、更多架构、Meta-Learning 与 Adaptation 这十条路线组织。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、Continual Learning、Active Learning、Domain Adaptation、AutoML、Federated Learning 与 Test-Time Adaptation。每篇回答七个问题：
+网站目前包含 233 篇课程，按 12 个分类组织：基础原理、训练与泛化、Classical ML、Computer Vision、语言与序列、生成模型、表示学习、Reinforcement Learning、扩展模型与系统、Meta-Learning / Adaptation、Search / Reasoning 和 Agents。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、Continual Learning、Active Learning、Domain Adaptation、AutoML、Federated Learning 与 Test-Time Adaptation。每篇回答七个问题：
 
 1. 一句话怎样理解？
 2. 内部机制如何运作？
@@ -20,7 +20,7 @@
 
 还包括兼容常用缩写的关键词搜索、分类与学习状态筛选、可分享的两算法对比、关键概念路径，以及保存在本机浏览器的阅读与答题记录。124 项中英术语都能跳到相关课程；选型指南从 15 类任务的 39 种具体情境出发，给出可比较的基线、第一轮设置、适用边界和评估方法。每篇课程都链接到原始论文或官方文档。
 
-全部 197 节课程都有步骤导览；原有 56 节配有机制动效图，另新增 12 节 Biological methods 的静态机制图，53 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
+全部 233 节课程都有步骤导览；原有 56 节配有机制动效图，另新增 12 节 Biological methods 的静态机制图，53 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
 
 [动效实验室](https://haoyunli.github.io/deep-learning-atlas/#/animations) 支持关键词、学习方向与动效类型筛选。机制实验提供四步中英说明、滑块或图解、播放/暂停、慢速/快速、手动跳步与重置；也可切换到完整课程步骤。手机上支持图内横向滑动。自动播放只在图进入视野时运行；系统启用减少动态效果时关闭自动播放和过渡。参数实验使用可手算的合成案例，清楚说明哪些公式在实时计算、哪些示意并未运行模型训练。
 
@@ -30,7 +30,7 @@
 
 ## 手算、练习与实践工坊
 
-全部 197 节课各有一题机制题和一题选型/排错题，共 394 题；提交后显示解释，可重新作答。最近一次答案保存在当前浏览器，“学习记录与错题复习”页会汇总阅读标记、作答情况和待复习题目；课程题目修订后，旧答案不会误算进新题。
+全部 233 节课各有一题机制题和一题选型/排错题，共 466 题；提交后显示解释，可重新作答。最近一次答案保存在当前浏览器，“学习记录与错题复习”页会汇总阅读标记、作答情况和待复习题目；课程题目修订后，旧答案不会误算进新题。
 
 [实践工坊](https://haoyunli.github.io/deep-learning-atlas/#/practice) 包含：
 
@@ -76,7 +76,7 @@ npm run preview
 - [`src/data/learningConcepts.ts`](src/data/learningConcepts.ts)：head、zero/few-shot、in-context learning 等概念课程。
 - [`src/data/dataConcepts.ts`](src/data/dataConcepts.ts)：cohort、数据泄漏、分布变化与可信评估课程。
 - [`src/data/trainingLanguageExpansion.ts`](src/data/trainingLanguageExpansion.ts)、[`src/data/modelFamilyExpansion.ts`](src/data/modelFamilyExpansion.ts)：新增 22 节专题。
-- [`src/data/exercises.ts`](src/data/exercises.ts)：394 道题的统一注册；题目分文件维护。
+- [`src/data/exercises.ts`](src/data/exercises.ts)：466 道题的统一注册；题目分文件维护。
 - [`src/components/HandCalculationSandbox.tsx`](src/components/HandCalculationSandbox.tsx)、[`src/components/sandboxMath.ts`](src/components/sandboxMath.ts)：六个沙盘及纯数值计算。
 - [`src/components/PracticeHub.tsx`](src/components/PracticeHub.tsx)：完整实验案例、诊断与 LM 预算工坊。
 - [`src/data/conceptPaths.ts`](src/data/conceptPaths.ts)：把模型课与概念课串成17 条逐步学习路径。
@@ -132,3 +132,18 @@ npm run preview
 这些是 synthetic teaching models，不声称复现 scVI、cell2location 或训练后的 biological GNN/RL。GAE/GCN/EM 支持手动步骤与可暂停播放；减少动态效果时保留手动操作。图保持标签字号，仅在图内横向滚动。Practice tab/path/lab 同步 URL，支持刷新与 Back/Forward。
 
 独立数值检查 `scripts/validate-bio-algorithms.mjs` 覆盖守恒、极限与差分梯度；课程 fixtures 另以 `validate-bio-inference-content.mjs` 与 `validate-bio-graph-lessons.mjs` 检查。新实验计数独立于已有 53 parameter labs 与 4 个 Experiment Bench 实验。
+
+
+## AI / ML breadth expansion
+
+[AI 全景](https://haoyunli.github.io/deep-learning-atlas/#/landscape) 将方法、任务与系统分开解释：Machine Learning / Deep Learning 是方法家族；Computer Vision、Speech、Retrieval 是任务领域；Workflow / Agent 是系统组织方式；RL 与 Self-supervised 是学习方式。它们可以交叉组合。原站名、GitHub URL、课程 IDs 与浏览器学习记录保持可用。
+
+新增36节课（每节有完整机制、设置、适用条件、优缺点、两道课程练习与三阶段机制图）：
+
+- Classical ML / Probability：OLS、Naive Bayes、Decision Tree、Boosting families、DBSCAN、t-SNE/UMAP、Anomaly Detection、Probabilistic Graphical Models、HMM、Kalman Filter、Causal Graph、Learning Paradigms。
+- Computer Vision：Camera Geometry、Local Features、RANSAC、Detection Metrics / NMS、Segmentation Metrics、Optical Flow、Tracking、Stereo Depth、Point Clouds、NeRF / 3DGS、Video、Document AI / OCR。
+- Agents / Reasoning：Workflow、Tool Contracts、ReAct、A*、Memory、Hybrid Retrieval、Evaluation、Security Boundaries、Multi-Agent、MCP、Knowledge Graph、Reliability Budgets。
+
+全景入口覆盖10个交叉领域、6种系统组合与4条有顺序的学习路线；课程选择显示已有学习状态。新[跨领域机制实验](https://haoyunli.github.io/deep-learning-atlas/#/ai-labs?lab=tree)提供 Decision Tree split、A* frontier、IoU/NMS、RRF ranking 和 Agent retry/correlation 的真实数值计算。所有 fixtures 均为明确标记的 synthetic examples，没有外部模型调用，也不声称是真实 Agent/CV benchmark。
+
+新增四个 validators 检查36课的算术、72道题、36幅机制图，以及数值实验、链接、SSR、异常路由回退与 radio groups。

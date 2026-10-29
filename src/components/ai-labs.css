@@ -1,0 +1,58 @@
+.ai-labs .bio-lab-tabs {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.ai-lab-table {
+  overflow-x: auto;
+  margin: 24px 0;
+}
+.ai-lab-table table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.ai-lab-table th,
+.ai-lab-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #d6dfe9;
+}
+.ai-lab-table caption {
+  text-align: left;
+  line-height: 1.8;
+  padding-bottom: 12px;
+}
+.ai-retrieval-lists {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+.ai-retrieval-lists strong {
+  display: block;
+  font-size: 13px;
+  color: #60708b;
+  margin-bottom: 8px;
+}
+@media (max-width: 760px) {
+  .ai-labs .bio-lab-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ai-retrieval-lists {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.ai-plot-hint {
+  display: none;
+}
+@media (max-width: 700px) {
+  .ai-plot-hint {
+    display: block;
+    padding: 12px 16px 0;
+    color: #60708b;
+    font-size: 12px;
+  }
+}

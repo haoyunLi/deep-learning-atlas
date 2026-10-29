@@ -1,0 +1,413 @@
+export type AIArea = {
+  id: string;
+  name: string;
+  question: string;
+  input: string;
+  output: string;
+  baseline: string;
+  upgrade: string;
+  boundary: string;
+  lessons: string[];
+};
+export const aiAreas: AIArea[] = [
+  {
+    id: "ml",
+    name: "Classical ML & Statistics",
+    question: "有样本、有目标，如何建立可解释的预测？",
+    input: "Tabular features、labels、sample/group IDs",
+    output: "Prediction、probability、cluster 或 anomaly score",
+    baseline: "先试 Linear/Logistic Regression、Decision Tree 与简单统计模型。",
+    upgrade:
+      "非线性、interaction、missingness 或复杂分布确实限制 baseline 时，再比较 ensembles、kernels 或 neural models。",
+    boundary:
+      "Training fit 不等于新群体泛化；cluster 不自动等于真实类别，相关也不等于 causal effect。",
+    lessons: [
+      "learning-paradigms",
+      "linear-regression-ols",
+      "logistic-regression",
+      "naive-bayes",
+      "decision-tree-splits",
+      "random-forest",
+      "boosting-families",
+      "xgboost",
+      "svm",
+      "dbscan-density",
+      "manifold-embeddings",
+      "anomaly-detection",
+    ],
+  },
+  {
+    id: "reasoning",
+    name: "Search, Reasoning & Probability",
+    question: "规则、状态与不确定性已知时，能否直接求解？",
+    input: "State space、rules、graph、observations 与 transition/likelihood",
+    output: "Path、proof/entailment、posterior 或 state estimate",
+    baseline: "显式规则、小图 exhaustive search、Bayesian update。",
+    upgrade:
+      "状态空间大时加入 heuristic；部分可观测时建 probabilistic state model；未知 dynamics 才需要学习相应部分。",
+    boundary:
+      "Search 的最优性依赖 cost 与 heuristic 条件；Knowledge Graph relation 不是 causal edge。",
+    lessons: [
+      "planning-search-astar",
+      "knowledge-graphs-reasoning",
+      "probabilistic-graphical-models",
+      "hidden-markov-models",
+      "kalman-filtering",
+      "particle-filters",
+      "bayesian-updating",
+      "causal-graphs-identifiability",
+      "causal-treatment-effects",
+      "gaussian-processes",
+      "mcmc-hmc",
+    ],
+  },
+  {
+    id: "deep",
+    name: "Deep Learning & Representation",
+    question: "如何从高维输入学到可复用的特征？",
+    input: "Tensors、objective、training distribution",
+    output: "Features、predictions 或 conditional distributions",
+    baseline: "先确认数据单位、loss 和简单模型，再建立 small neural baseline。",
+    upgrade:
+      "局部、序列、graph 或多模态结构需要合适 inductive bias；选择 CNN/Transformer/GNN，而非只比参数量。",
+    boundary:
+      "Architecture、learning paradigm 与 application 是不同轴。Self-supervised 可以使用 Deep Learning，RL 也可以用 table。",
+    lessons: [
+      "neural-networks",
+      "loss-functions",
+      "backpropagation",
+      "adamw",
+      "regularization",
+      "cnn",
+      "transformer",
+      "gnn",
+      "contrastive-learning",
+      "transfer-lora",
+      "meta-learning-maml",
+      "continual-learning",
+    ],
+  },
+  {
+    id: "vision",
+    name: "Computer Vision",
+    question: "图像中的几何、对象、运动与文字怎样变成结构化结果？",
+    input: "Images、video、camera calibration、depth/point cloud",
+    output: "Boxes、masks、tracks、3D geometry、text/layout",
+    baseline:
+      "先按 output 选任务；配准可先用 features+RANSAC，tracking 可先用 detection+association。",
+    upgrade:
+      "复杂视角、occlusion、长时视频或开放词表需求出现时，比较 learned features、temporal models 与 VLM。",
+    boundary:
+      "Score threshold、NMS IoU 和 evaluation IoU 含义不同；depth scale、身份保持与语言 grounding 各有独立误差。",
+    lessons: [
+      "camera-image-formation",
+      "local-features-matching",
+      "registration-ransac",
+      "detection-metrics-nms",
+      "faster-rcnn-yolo",
+      "segmentation-task-metrics",
+      "segment-anything",
+      "optical-flow-motion",
+      "multi-object-tracking",
+      "stereo-depth-geometry",
+      "point-cloud-learning",
+      "nerf-gaussian-splatting",
+      "video-understanding",
+      "document-ai-ocr",
+    ],
+  },
+  {
+    id: "language",
+    name: "Language, Speech & Multimodal",
+    question: "如何把文字、声音和图像接到同一个任务？",
+    input: "Tokens、audio frames、images 与 paired/unpaired data",
+    output: "Text、transcription、embedding 或 grounded answer",
+    baseline:
+      "先判断 classification、retrieval、transcription 还是 generation，再选 encoder/decoder/CTC 等机制。",
+    upgrade:
+      "跨模态对齐、长上下文或知识更新是不同需求，分别比较 fusion、context budget 和 retrieval。",
+    boundary:
+      "流畅回答不证明内容有来源；视觉与语言对齐也不证明每个细节都 grounded。",
+    lessons: [
+      "tokenization",
+      "bert",
+      "gpt-language-model",
+      "autoregressive-inference",
+      "kv-cache",
+      "ctc-wav2vec",
+      "whisper",
+      "clip",
+      "vision-language-models",
+      "document-ai-ocr",
+      "language-model-evaluation",
+    ],
+  },
+  {
+    id: "generation",
+    name: "Generative Modeling",
+    question: "要生成什么，怎样控制分布、质量与成本？",
+    input: "Training examples、noise/latent、condition",
+    output: "Samples 与可选 likelihood/latent representation",
+    baseline:
+      "小数据先考虑简单 probabilistic model；需要学复杂分布时比较 VAE/GAN/AR/Diffusion。",
+    upgrade:
+      "根据 fidelity、diversity、likelihood、controllability、sampling latency 的要求选训练目标与采样器。",
+    boundary:
+      "生成质量、记忆训练样本和真实分布覆盖是不同指标；漂亮 sample 不是完整评价。",
+    lessons: [
+      "autoencoder-vae",
+      "gan",
+      "gpt-language-model",
+      "diffusion",
+      "ddpm",
+      "ddim",
+      "latent-diffusion",
+      "flow-matching",
+      "energy-based-models",
+      "distillation-pruning",
+    ],
+  },
+  {
+    id: "decisions",
+    name: "RL, Control & Sequential Decisions",
+    question: "当前 action 会怎样改变未来 state 与 reward？",
+    input: "State/observation、actions、transition、reward、logs",
+    output: "Policy、value function 或 planned action sequence",
+    baseline:
+      "先比较 fixed policy、greedy、已知模型 planning 或 Behavior Cloning。",
+    upgrade:
+      "必须从 interaction 学习、存在延迟收益或未知 dynamics 时，才引入相应 RL 算法与 evaluation。",
+    boundary:
+      "Robot/Agent 不必用 RL；reward 可能偏离目标，Offline RL 受 support 与环境变化限制。",
+    lessons: [
+      "multi-armed-bandit",
+      "planning-search-astar",
+      "reinforcement-learning",
+      "q-learning",
+      "ppo",
+      "sac",
+      "model-based-rl",
+      "imitation-learning",
+      "offline-rl",
+      "off-policy-evaluation",
+      "safe-rl-pomdp",
+    ],
+  },
+  {
+    id: "agents",
+    name: "Agents & Tool-Using Systems",
+    question: "如何让系统可靠地完成多步任务？",
+    input: "Goal、context、tools/contracts、permissions、environment feedback",
+    output: "Observable actions、artifacts、verified task outcome",
+    baseline:
+      "先写 deterministic workflow 和 state machine；模型只承担需要判断的节点。",
+    upgrade:
+      "任务路径依 observation 改变时增加 bounded Agent loop；再按证据加入 retrieval、memory、planning 或 multi-agent。",
+    boundary:
+      "Tool call 不等于执行成功，MCP 不负责自动授权，更多 agents 和 retries 也不保证更好。",
+    lessons: [
+      "agent-workflows",
+      "tool-calling-contracts",
+      "react-agent-loop",
+      "planning-search-astar",
+      "agent-memory-context",
+      "hybrid-retrieval-reranking",
+      "model-context-protocol",
+      "multi-agent-orchestration",
+      "agent-evaluation",
+      "agent-security-boundaries",
+      "agent-reliability-budgets",
+    ],
+  },
+  {
+    id: "retrieval",
+    name: "Retrieval, Ranking & Recommendation",
+    question: "在大量候选中先找对，再排好，最后如何验证？",
+    input: "Query/user context、documents/items、interaction logs",
+    output: "Candidate set、ranking、recommendation 或 retrieved evidence",
+    baseline:
+      "Keyword search、popularity、Matrix Factorization 与 simple retrieval。",
+    upgrade:
+      "同义表达、personalization 或多来源候选出现瓶颈时，比较 dual encoder、hybrid retrieval 与 reranker。",
+    boundary:
+      "候选召回不足时后续 reranker 无法恢复；click logs 带 exposure bias；离线指标不等于长期用户价值。",
+    lessons: [
+      "matrix-factorization",
+      "two-tower-retrieval",
+      "learning-to-rank",
+      "hybrid-retrieval-reranking",
+      "retrieval-augmented-generation",
+      "multi-armed-bandit",
+      "model-evaluation",
+      "off-policy-evaluation",
+    ],
+  },
+  {
+    id: "reliable",
+    name: "Evaluation, Data & Deployment",
+    question: "模型何时可信，怎样让结果可复现并可持续使用？",
+    input: "Data contracts、splits、predictions、resources 与 feedback",
+    output: "Independent evaluation、uncertainty、deployment/monitoring plan",
+    baseline: "正确 split、简单 baseline、可复算 metrics 与 error slices。",
+    upgrade:
+      "再处理 calibration、conformal coverage、drift、serving 与 resource budgets。",
+    boundary:
+      "只测同分布平均 accuracy 不足以支持新群体、长时运行或高风险决策；统计保证有适用条件。",
+    lessons: [
+      "data-leakage",
+      "nested-group-validation",
+      "calibration-uncertainty",
+      "conformal-selective-prediction",
+      "external-validation",
+      "agent-evaluation",
+      "quantization",
+      "model-serving-monitoring",
+      "online-learning-drift",
+      "agent-security-boundaries",
+    ],
+  },
+];
+
+export const aiJourneys = [
+  {
+    id: "breadth",
+    title: "先建立 AI 全景",
+    why: "把问题、学习方式、模型与系统四个层次分开，再理解它们如何组合。",
+    ids: [
+      "learning-paradigms",
+      "decision-tree-splits",
+      "neural-networks",
+      "planning-search-astar",
+      "camera-image-formation",
+      "agent-workflows",
+      "model-evaluation",
+    ],
+  },
+  {
+    id: "cv",
+    title: "从图像到 3D / Video",
+    why: "先认识测量与几何，再沿 detection、segmentation、motion 和 reconstruction 走到应用。",
+    ids: [
+      "camera-image-formation",
+      "local-features-matching",
+      "registration-ransac",
+      "detection-metrics-nms",
+      "segmentation-task-metrics",
+      "optical-flow-motion",
+      "multi-object-tracking",
+      "stereo-depth-geometry",
+      "nerf-gaussian-splatting",
+      "video-understanding",
+    ],
+  },
+  {
+    id: "agents",
+    title: "从 Workflow 到可验证 Agent",
+    why: "先确定输入输出与 tool contract，再讨论 memory、retrieval、planning、评估和失败恢复。",
+    ids: [
+      "agent-workflows",
+      "tool-calling-contracts",
+      "react-agent-loop",
+      "planning-search-astar",
+      "agent-memory-context",
+      "hybrid-retrieval-reranking",
+      "model-context-protocol",
+      "agent-security-boundaries",
+      "agent-evaluation",
+      "agent-reliability-budgets",
+    ],
+  },
+  {
+    id: "research",
+    title: "把 AI 广度带回科研",
+    why: "统计、概率、causal graph 和 representation 提供不同假设，生物项目是可选实践分支。",
+    ids: [
+      "linear-regression-ols",
+      "probabilistic-graphical-models",
+      "causal-graphs-identifiability",
+      "count-mixture-background",
+      "bio-graph-construction",
+      "bio-count-vae",
+      "nested-group-validation",
+    ],
+  },
+];
+
+export const aiTaskCompositions = [
+  {
+    id: "tabular",
+    name: "Tabular prediction",
+    input: "Features + labels",
+    mechanism: "Linear / Tree / Boosting",
+    output: "Prediction + calibration",
+    why: "通常先比较统计/传统 ML；是否需要 neural representation 要由独立验证决定。",
+    ids: [
+      "linear-regression-ols",
+      "boosting-families",
+      "calibration-uncertainty",
+    ],
+    lab: "tree",
+  },
+  {
+    id: "tracking",
+    name: "Video object tracking",
+    input: "Video frames",
+    mechanism: "Detector + motion + association",
+    output: "Boxes + stable identities",
+    why: "Detection 负责在哪里，motion 预测下一帧，association 决定是谁；多个模块的误差会相互传递。",
+    ids: ["detection-metrics-nms", "kalman-filtering", "multi-object-tracking"],
+    lab: "nms",
+  },
+  {
+    id: "document",
+    name: "Document question answering",
+    input: "Documents + question",
+    mechanism: "OCR/layout + retrieval + generation",
+    output: "Answer + evidence",
+    why: "OCR、candidate recall、ranking 与 generation 都可能出错，必须分别测量。",
+    ids: [
+      "document-ai-ocr",
+      "hybrid-retrieval-reranking",
+      "retrieval-augmented-generation",
+    ],
+    lab: "retrieval",
+  },
+  {
+    id: "agent",
+    name: "Tool-using Agent",
+    input: "Goal + permissions",
+    mechanism: "Plan → act → observe → verify",
+    output: "Artifact + success evidence",
+    why: "Agent 是系统组织方式，可同时用规则、search、retrieval、LLM 和工具；不等于单独一种神经网络。",
+    ids: [
+      "agent-workflows",
+      "planning-search-astar",
+      "agent-reliability-budgets",
+    ],
+    lab: "reliability",
+  },
+  {
+    id: "robot",
+    name: "Navigation / control",
+    input: "State estimates + map",
+    mechanism: "Search / planning / policy",
+    output: "Action sequence",
+    why: "已知地图可先用 A*；未知 dynamics、部分可观测和 online interaction 会改变问题。",
+    ids: ["kalman-filtering", "planning-search-astar", "safe-rl-pomdp"],
+    lab: "search",
+  },
+  {
+    id: "causal",
+    name: "Scientific intervention question",
+    input: "Study design + observations",
+    mechanism: "Causal graph + identification + estimation",
+    output: "Effect + assumptions",
+    why: "预测模型与 causal effect 回答不同问题；图、design 和可识别性先于 estimator 复杂度。",
+    ids: [
+      "causal-graphs-identifiability",
+      "causal-treatment-effects",
+      "external-validation",
+    ],
+    lab: null,
+  },
+];

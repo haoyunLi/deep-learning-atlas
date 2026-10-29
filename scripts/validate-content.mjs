@@ -17,6 +17,9 @@ const files = [
   ["src/data/mechanismExpansion.ts", "mechanismExpansionLessons"],
   ["src/data/bioInferenceControl.ts", "bioInferenceControlLessons"],
   ["src/data/bioGraphRepresentation.ts", "bioGraphRepresentationLessons"],
+  ["src/data/mlBreadth.ts", "mlBreadthLessons"],
+  ["src/data/cvBreadth.ts", "cvBreadthLessons"],
+  ["src/data/agentBreadth.ts", "agentBreadthLessons"],
 ];
 const requiredText = [
   "id",

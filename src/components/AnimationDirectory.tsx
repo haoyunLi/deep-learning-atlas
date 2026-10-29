@@ -66,6 +66,9 @@ export default function AnimationDirectory() {
       </div>
       <section className="animation-starts" aria-label="动效学习起点">
         <strong>从一个问题开始</strong>
+        <a href="#/ai-labs?lab=tree">
+          Tree、A*、NMS、Retrieval 与 Agent reliability 怎样计算？ ↗
+        </a>
         <a href="#/bio-algorithms?lab=em">
           EM 如何分配 molecules，GNN 如何跨边界传播？ ↗
         </a>

@@ -229,3 +229,14 @@ EM, GAE and GCN offer explicit manual steps plus optional 1700ms playback. Param
 Practice tab, path and bench selection share URL state; history navigation and reload restore the selected view while preserving other choices.
 
 The Biological Algorithm Lab intentionally uses 14px controls/diagram labels, 16px diagram titles, 12px readout labels and 18px values. Its page title ranges 30–46px and experiment title 23–31px within the existing editorial hierarchy. The pale plot surface is #f7f9fc; component markers use scientific, local blue/teal/orange rather than a new navigation palette.
+
+
+## AI landscape and breadth experiments
+
+The home page now foregrounds AI / ML breadth while retaining the existing editorial brand and URL. Its semantic scope figure nests Deep Learning inside Machine Learning, places search/reasoning alongside learning as combinable approaches, and separates application domains from workflow/Agent systems. This is an explanatory map, not a mutually exclusive taxonomy.
+
+The new `#/landscape` route combines a ten-area selector, Input/Output contract, baseline/upgrade/limitation explanation, linked course lists, six task compositions and four ordered learning journeys. Query parameters preserve selected area and task through browser navigation. Selected controls use the existing blue pale surface and visible current state; course rows retain browser learning status. The two-column layout becomes one column on phones.
+
+`#/ai-labs` reuses the existing quantitative-lab controls, plot regions, native radio checks and disclosure styles. Five experiments expose computed intermediate values; A* and NMS offer manual steps and optional playback. Numerical diagrams retain 660px internal width with local keyboard-accessible scrolling, and text/readouts fit the viewport. The scope map uses HTML containment instead of tiny SVG labels, so its hierarchy stays readable on phones. Thirty-six lesson figures use the existing three-stage semantic flow pattern.
+
+The landscape uses a 32–48px page heading, 28px section headings, 23px question headings and 18px journey titles. Controls and diagram labels use 14px, with 12px secondary annotations and 11px compact Input/Output labels. The scope containment border (#b5c9e3) and task-flow surface (#f5f8fc) are intentional local variants of the existing blue-gray palette. Mobile quantitative plots expose a visible horizontal-scroll hint; the home headline balances lines to avoid a single-character orphan.

@@ -11,6 +11,9 @@ import { researchExpansionLessons } from "./researchExpansion";
 import { mechanismExpansionLessons } from "./mechanismExpansion";
 import { bioInferenceControlLessons } from "./bioInferenceControl";
 import { bioGraphRepresentationLessons } from "./bioGraphRepresentation";
+import { mlBreadthLessons } from "./mlBreadth";
+import { cvBreadthLessons } from "./cvBreadth";
+import { agentBreadthLessons } from "./agentBreadth";
 
 export type Lesson = {
   id: string;
@@ -52,15 +55,15 @@ export const categories = [
   },
   {
     id: "classical",
-    label: "经典基线",
-    englishLabel: "Classical Baselines",
-    description: "用简单方法建立参照，理解聚类、近邻与潜变量推断。",
+    label: "Classical ML 与统计",
+    englishLabel: "Classical ML & Statistics",
+    description: "回归、分类、树模型、聚类、异常检测与统计假设。",
   },
   {
     id: "vision",
     label: "视觉模型",
     englishLabel: "Computer Vision",
-    description: "从卷积到残差、分割与视觉 Transformer。",
+    description: "从视觉几何到检测、分割、Tracking、Video、3D 与 Document AI。",
   },
   {
     id: "sequence",
@@ -88,8 +91,8 @@ export const categories = [
   },
   {
     id: "frontiers",
-    label: "更多架构",
-    englishLabel: "More Architectures",
+    label: "扩展模型与系统",
+    englishLabel: "Models & Systems",
     description: "图网络、参数高效微调与专家模型。",
   },
   {
@@ -98,6 +101,19 @@ export const categories = [
     englishLabel: "Learning to Adapt",
     description:
       "从 Few-Shot Episode、Meta-Optimization 到 Domain Shift、Continual Learning 与 Federated Learning。",
+  },
+  {
+    id: "reasoning",
+    label: "Search、Reasoning 与 Probability",
+    englishLabel: "Search, Reasoning & Probability",
+    description: "A*、Knowledge Graph、概率图、状态估计与因果可识别性。",
+  },
+  {
+    id: "agents",
+    label: "Agents 与工具系统",
+    englishLabel: "Agents & Tool-Using Systems",
+    description:
+      "Workflow、Tool Contracts、Memory、Retrieval、MCP、评估与可靠性。",
   },
 ] as const;
 
@@ -1938,6 +1954,9 @@ export const lessons: Lesson[] = [
   ...mechanismExpansionLessons,
   ...bioInferenceControlLessons,
   ...bioGraphRepresentationLessons,
+  ...mlBreadthLessons,
+  ...cvBreadthLessons,
+  ...agentBreadthLessons,
 ].sort(
   (a, b) =>
     categories.findIndex((category) => category.id === a.category) -

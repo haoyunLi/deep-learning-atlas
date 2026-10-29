@@ -1,5 +1,21 @@
 import type { Lesson } from "../data/lessons";
 export const searchAliases: Record<string, string[]> = {
+  "learning-paradigms": [
+    "ai",
+    "ml",
+    "artificial intelligence",
+    "machine learning",
+    "人工智能",
+    "机器学习",
+    "学习范式",
+  ],
+  "agent-workflows": ["agent", "agents", "智能体", "工作流"],
+  "model-context-protocol": ["mcp", "协议"],
+  "planning-search-astar": ["a star", "astar", "a*", "搜索", "规划"],
+  "camera-image-formation": ["cv", "computer vision", "计算机视觉", "相机"],
+  "document-ai-ocr": ["ocr", "文档", "文字识别"],
+  "nerf-gaussian-splatting": ["nerf", "3dgs", "3d gaussian", "三维重建"],
+  "manifold-embeddings": ["umap", "tsne", "t-sne", "降维"],
   "gradient-descent": ["sgd", "随机梯度下降"],
   "expectation-maximization": ["em", "期望最大化"],
   "batch-normalization": ["bn", "batchnorm", "批归一化"],

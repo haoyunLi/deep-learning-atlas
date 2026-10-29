@@ -6,7 +6,7 @@
 web
 
 ## Users
-用户有 Computer Science 背景，正在做 Computational Biology 项目，希望理解算法机制、选型、设置、修改与评估。当前项目语境包括 Spatial bin-to-cell/Xenium、Pathway/Age 与 Methylation/Age。
+用户有 Computer Science 背景，正在做 Computational Biology 项目，希望理解算法机制、选型、设置、修改与评估。需要同时建立 AI / ML、Computer Vision、Search / Reasoning 与 Agent systems 的广泛知识面；Spatial bin-to-cell/Xenium、Pathway/Age 与 Methylation/Age 保留为科研应用分支。
 
 ## Product Purpose
 用中文解释和英文专名，把直觉、逐步计算、模型区别和科研实践接起来。成功标准是能说明一个方法的输入输出、适用条件、优缺点与验证方式，并能迁移到新情境。
@@ -27,4 +27,4 @@ React + TypeScript + Vite 静态网站，发布到 GitHub Pages。合成教学�
 - 从简单 baseline 开始，用正确的独立单位评估。
 
 ## Open Decisions
-用户已确认默认优先 Spatial bin-to-cell；三条路径都扩展，可在页面切换。
+用户最新要求以 AI / ML 全景扩展广度；首页提供全景入口，覆盖方法、任务与系统三个层次。原 Spatial 与 Age 路径、URL、课程 ID 和本机学习记录保留。

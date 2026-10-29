@@ -10,6 +10,9 @@ import { researchExercises } from "./exercisesResearch";
 import { mechanismExercises } from "./exercisesMechanism";
 import { bioInferenceControlExercises } from "./exercisesBioInferenceControl";
 import { bioGraphRepresentationExercises } from "./exercisesBioGraphRepresentation";
+import { mlBreadthExercises } from "./exercisesMLBreadth";
+import { cvBreadthExercises } from "./exercisesCVBreadth";
+import { agentBreadthExercises } from "./exercisesAgentBreadth";
 
 export const exerciseGroups: Record<string, Exercise[]>[] = [
   coreExercises,
@@ -23,6 +26,9 @@ export const exerciseGroups: Record<string, Exercise[]>[] = [
   mechanismExercises,
   bioInferenceControlExercises,
   bioGraphRepresentationExercises,
+  mlBreadthExercises,
+  cvBreadthExercises,
+  agentBreadthExercises,
 ];
 export const exercises: Record<string, Exercise[]> = Object.assign(
   {},
