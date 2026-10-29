@@ -1,3 +1,7 @@
+import { mlDepthFigures } from "../data/mlDepthFigures";
+import { cvDepthFigures } from "../data/cvDepthFigures";
+import { agentDepthFigures } from "../data/agentDepthFigures";
+import { linkedLabForLesson } from "../data/linkedLabs";
 import { mlBreadthFigures } from "../data/mlBreadthFigures";
 import { cvBreadthFigures } from "../data/cvBreadthFigures";
 import { agentBreadthFigures } from "../data/agentBreadthFigures";
@@ -6,20 +10,17 @@ const figures = {
   ...mlBreadthFigures,
   ...cvBreadthFigures,
   ...agentBreadthFigures,
-};
-const labs: Record<string, string> = {
-  "decision-tree-splits": "tree",
-  "planning-search-astar": "search",
-  "detection-metrics-nms": "nms",
-  "hybrid-retrieval-reranking": "retrieval",
-  "agent-reliability-budgets": "reliability",
+  ...mlDepthFigures,
+  ...cvDepthFigures,
+  ...agentDepthFigures,
 };
 export default function BreadthLessonFigure({
   lessonId,
 }: {
   lessonId: string;
 }) {
-  const figure = figures[lessonId];
+  const figure = figures[lessonId],
+    lab = linkedLabForLesson(lessonId);
   if (!figure) return null;
   return (
     <figure className="bio-lesson-figure">
@@ -35,11 +36,9 @@ export default function BreadthLessonFigure({
       </ol>
       <figcaption>
         <p>{figure.caption}</p>
-        {labs[lessonId] && (
+        {lab && (
           <p>
-            <a href={`#/ai-labs?lab=${labs[lessonId]}`}>
-              改变参数，逐步验证相关算法机制 →
-            </a>
+            <a href={lab.href}>改变参数，逐步验证相关算法机制 →</a>
           </p>
         )}
         <a href="#/landscape">这节课在 AI / ML 全景的什么位置？ →</a>

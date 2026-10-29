@@ -1,3 +1,4 @@
+import { linkedLabs, linkedLabForLesson } from "../data/linkedLabs";
 import { useMemo, useState } from "react";
 import { categories, lessons } from "../data/lessons";
 import {
@@ -20,10 +21,14 @@ export default function AnimationDirectory() {
   const filtered = useMemo(
     () =>
       lessons.filter((lesson) => {
-        const lab = animationCatalog[lesson.id];
+        const lab =
+          linkedLabForLesson(lesson.id) ?? animationCatalog[lesson.id];
         return (
           (category === "all" || lesson.category === category) &&
-          (kind === "all" || animationKind(lesson.id) === kind) &&
+          (kind === "all" ||
+            (linkedLabForLesson(lesson.id)
+              ? "parameter"
+              : animationKind(lesson.id)) === kind) &&
           matchesLesson(lesson, query, lab?.label || "")
         );
       }),
@@ -53,7 +58,7 @@ export default function AnimationDirectory() {
           </div>
           <div>
             <dt>{Object.keys(animationCatalog).length}</dt>
-            <dd>可调参数实验</dd>
+            <dd>课内参数实验 · 另有 {linkedLabs.length} 个跨课实验</dd>
           </div>
         </dl>
       </div>
@@ -66,6 +71,9 @@ export default function AnimationDirectory() {
       </div>
       <section className="animation-starts" aria-label="动效学习起点">
         <strong>从一个问题开始</strong>
+        <a href="#/ai-depth?lab=hmm">
+          HMM、Kalman、Assignment、Geometry、MCTS 与 Beam 怎样逐步运行？ ↗
+        </a>
         <a href="#/ai-labs?lab=tree">
           Tree、A*、NMS、Retrieval 与 Agent reliability 怎样计算？ ↗
         </a>
@@ -133,12 +141,13 @@ export default function AnimationDirectory() {
       </p>
       <div className="animation-library-grid">
         {filtered.map((lesson, index) => {
-          const lab = animationCatalog[lesson.id],
-            type = animationKind(lesson.id);
+          const external = linkedLabForLesson(lesson.id),
+            lab = external ?? animationCatalog[lesson.id],
+            type = external ? "parameter" : animationKind(lesson.id);
           return (
             <a
               className={`animation-library-card kind-${type}`}
-              href={`#/lesson/${lesson.id}?animation=1`}
+              href={external?.href ?? `#/lesson/${lesson.id}?animation=1`}
               key={lesson.id}
             >
               <div className="animation-card-top">

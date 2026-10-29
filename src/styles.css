@@ -800,6 +800,7 @@ svg {
 .detail-section {
   scroll-margin-top: 84px;
   margin: 35px 0 0;
+  overflow-wrap: anywhere;
 }
 .detail-section h2 {
   font-family: var(--serif);

@@ -22,6 +22,8 @@ export const aiAreas: AIArea[] = [
     boundary:
       "Training fit 不等于新群体泛化；cluster 不自动等于真实类别，相关也不等于 causal effect。",
     lessons: [
+      "quantile-regression",
+      "bayes-decision-thresholds",
       "learning-paradigms",
       "linear-regression-ols",
       "logistic-regression",
@@ -48,6 +50,8 @@ export const aiAreas: AIArea[] = [
     boundary:
       "Search 的最优性依赖 cost 与 heuristic 条件；Knowledge Graph relation 不是 causal edge。",
     lessons: [
+      "variational-inference-elbo",
+      "hierarchical-partial-pooling",
       "planning-search-astar",
       "knowledge-graphs-reasoning",
       "probabilistic-graphical-models",
@@ -100,6 +104,12 @@ export const aiAreas: AIArea[] = [
     boundary:
       "Score threshold、NMS IoU 和 evaluation IoU 含义不同；depth scale、身份保持与语言 grounding 各有独立误差。",
     lessons: [
+      "cv-preprocessing-augmentation",
+      "feature-pyramids-small-objects",
+      "box-regression-losses",
+      "hungarian-set-matching",
+      "dense-visual-correspondence",
+      "keypoint-heatmaps-pose",
       "camera-image-formation",
       "local-features-matching",
       "registration-ransac",
@@ -129,6 +139,9 @@ export const aiAreas: AIArea[] = [
     boundary:
       "流畅回答不证明内容有来源；视觉与语言对齐也不证明每个细节都 grounded。",
     lessons: [
+      "beam-search-decoding",
+      "grammar-constrained-decoding",
+      "speculative-decoding",
       "tokenization",
       "bert",
       "gpt-language-model",
@@ -180,6 +193,7 @@ export const aiAreas: AIArea[] = [
     boundary:
       "Robot/Agent 不必用 RL；reward 可能偏离目标，Offline RL 受 support 与环境变化限制。",
     lessons: [
+      "contextual-bandits-linucb",
       "multi-armed-bandit",
       "planning-search-astar",
       "reinforcement-learning",
@@ -206,6 +220,8 @@ export const aiAreas: AIArea[] = [
     boundary:
       "Tool call 不等于执行成功，MCP 不负责自动授权，更多 agents 和 retries 也不保证更好。",
     lessons: [
+      "mcts-uct-search",
+      "agent-state-checkpoints",
       "agent-workflows",
       "tool-calling-contracts",
       "react-agent-loop",
@@ -254,6 +270,8 @@ export const aiAreas: AIArea[] = [
     boundary:
       "只测同分布平均 accuracy 不足以支持新群体、长时运行或高风险决策；统计保证有适用条件。",
     lessons: [
+      "proper-scoring-rules",
+      "label-shift-correction",
       "data-leakage",
       "nested-group-validation",
       "calibration-uncertainty",

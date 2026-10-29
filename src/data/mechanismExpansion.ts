@@ -28,6 +28,7 @@ export const mechanismExpansionLessons: Lesson[] = [
       "相乘后把指数加起来，得到 posterior a′=a+k、b′=b+n−k；分批或一次更新应给出相同结果。",
       "输出 posterior mean、quantiles 与 predictive distribution，不能只报最大 density 位置。",
       "模拟 replicated outcomes 检查 dispersion、分组差异与极端值；再检查换一组合理 prior 是否改变结论。",
+      "若多个 groups 各有自己的 θ_g，进一步用 Partial Pooling 分享 population 信息。一个独立的 Normal toy 中，固定 μ=0、τ²=4、σ²=9，两组均值同为6但 n 分别为1与9，posterior means 分别为24/13与4.8；这解释信息量不同如何改变 shrinkage，不能直接把 Normal 公式套给 binary outcomes。",
     ],
     whenToUse: [
       "少量、定义清楚的 binary observations，需要保留参数 uncertainty。",
@@ -40,13 +41,14 @@ export const mechanismExpansionLessons: Lesson[] = [
       "共轭解来自指定 likelihood；把 related cells 当独立 trials 会产生过窄 posterior。",
       "Prior 不能修复 selection bias、label error 或未识别的 confounding。",
       "强 prior 可在小 n 时明显主导结果；posterior probability 仍以模型假设为条件。",
+      "层级模型中更多 within-group observations 可改善该组估计，但 population hyperparameter uncertainty 仍取决于 group diversity、数量与模型假设；fixed-hyperparameter toy 不能代表完整层级 uncertainty。",
     ],
     howToUse: [
       "保存 trial 定义、sampling unit、a,b、k,n 及来源；区分观察前设定与看数据后的选择。",
       "用解析 Beta update 做单元核验，再和通用推断工具对照。",
       "画 prior、normalized likelihood 与 posterior；注明 normalized likelihood 只是形状比较。",
       "对新 batch 做 posterior predictive check，查看模型是否低估 batch variability。",
-      "存在 donor/batch hierarchy 时改用 per-group rates 与 hyperprior，并按独立 donor 评估。",
+      "存在 donor/batch hierarchy 时改用 per-group rates 与 hyperprior，分别定义已见 group 的未来 trial 和全新 group prediction，并按部署目标留出完整 groups。",
     ],
     tuning: [
       "改变 concentration 保持 mean 不变，观察 prior strength 怎样影响 posterior。",
@@ -92,6 +94,8 @@ export const mechanismExpansionLessons: Lesson[] = [
       "mcmc-hmc",
       "gaussian-processes",
       "calibration-uncertainty",
+      "hierarchical-partial-pooling",
+      "hierarchical-bootstrap",
     ],
   },
   {

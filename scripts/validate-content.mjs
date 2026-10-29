@@ -3,6 +3,9 @@ import { resolve } from "node:path";
 import ts from "typescript";
 
 const files = [
+  ["src/data/mlDepth.ts", "mlDepthLessons"],
+  ["src/data/cvDepth.ts", "cvDepthLessons"],
+  ["src/data/agentDepth.ts", "agentDepthLessons"],
   ["src/data/lessons.ts", "coreLessons"],
   ["src/data/classicalRepresentation.ts", "classicalRepresentationLessons"],
   ["src/data/visionLanguage.ts", "visionLanguageLessons"],

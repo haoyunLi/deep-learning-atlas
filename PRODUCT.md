@@ -27,4 +27,4 @@ React + TypeScript + Vite 静态网站，发布到 GitHub Pages。合成教学�
 - 从简单 baseline 开始，用正确的独立单位评估。
 
 ## Open Decisions
-用户最新要求以 AI / ML 全景扩展广度；首页提供全景入口，覆盖方法、任务与系统三个层次。原 Spatial 与 Age 路径、URL、课程 ID 和本机学习记录保留。
+用户要求同时扩展 AI / ML / CV / Agent 的广度与机制细节；首页提供全景入口，课程通过数值图、直接实验链接、设置起点与调整信号解释方法、任务与系统三个层次。原 Spatial 与 Age 路径、URL、课程 ID 和本机学习记录保留。

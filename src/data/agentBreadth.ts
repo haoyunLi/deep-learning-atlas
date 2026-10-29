@@ -83,6 +83,7 @@ export const agentBreadthLessons: Lesson[] = [
       "react-agent-loop",
       "reinforcement-learning",
       "agent-reliability-budgets",
+      "agent-state-checkpoints",
     ],
   },
   {
@@ -168,6 +169,8 @@ export const agentBreadthLessons: Lesson[] = [
       "model-context-protocol",
       "agent-security-boundaries",
       "agent-reliability-budgets",
+      "grammar-constrained-decoding",
+      "agent-state-checkpoints",
     ],
   },
   {
@@ -340,6 +343,7 @@ export const agentBreadthLessons: Lesson[] = [
       "model-based-rl",
       "muzero",
       "knowledge-graphs-reasoning",
+      "mcts-uct-search",
     ],
   },
   {
@@ -427,6 +431,7 @@ export const agentBreadthLessons: Lesson[] = [
       "retrieval-augmented-generation",
       "react-agent-loop",
       "agent-security-boundaries",
+      "agent-state-checkpoints",
     ],
   },
   {
@@ -1033,6 +1038,7 @@ export const agentBreadthLessons: Lesson[] = [
       "tool-calling-contracts",
       "agent-evaluation",
       "multi-agent-orchestration",
+      "agent-state-checkpoints",
     ],
   },
 ];

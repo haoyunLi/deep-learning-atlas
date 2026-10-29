@@ -1,3 +1,6 @@
+import { mlDepthLessons } from "./mlDepth";
+import { cvDepthLessons } from "./cvDepth";
+import { agentDepthLessons } from "./agentDepth";
 import { classicalRepresentationLessons } from "./classicalRepresentation";
 import { dataConceptLessons } from "./dataConcepts";
 import { learningConceptLessons } from "./learningConcepts";
@@ -18,6 +21,7 @@ import { agentBreadthLessons } from "./agentBreadth";
 export type Lesson = {
   id: string;
   source: { label: string; url: string };
+  supplementarySources?: { label: string; url: string }[];
   title: string;
   englishTitle: string;
   category: string;
@@ -668,7 +672,7 @@ const coreLessons: Lesson[] = [
     summary: "局部连接与共享滤波器，让模型高效检测到处都可能出现的模式。",
     intuition:
       "同一种边缘可能出现在图像任何位置。CNN 用同一块小滤镜扫过整张图，不必为每个像素位置重新学习一套检测器。",
-    core: "Convolution kernel 只观察局部 receptive field，权重在空间位置共享。堆叠层会扩大有效感受野，形成从边缘、纹理到物体部件的层级。Pooling 或 stride 降低空间尺寸，但也可能丢失精细位置信息。",
+    core: "Convolution kernel 只观察局部 receptive field，权重在空间位置共享。堆叠层通常扩大 theoretical receptive field，形成从边缘、纹理到物体部件的层级；Effective Receptive Field 指实际影响分布，取决于权重、非线性与输入，不等于理论覆盖区域。Pooling 或 stride 降低空间尺寸，但也可能丢失精细位置信息。",
     equation: "y[i,j] = ΣₐΣᵦ K[a,b]·x[i+a,j+b] + b",
     whenToUse: [
       "图像分类、检测、分割，尤其当局部结构和位移相关性很重要时。",
@@ -725,7 +729,13 @@ const coreLessons: Lesson[] = [
         adjust: "训练好验证差时检查增强和域偏移；增强伤害语义时立即收窄。",
       },
     ],
-    compareTo: ["resnet", "transformer", "batch-normalization"],
+    compareTo: [
+      "resnet",
+      "transformer",
+      "batch-normalization",
+      "cv-preprocessing-augmentation",
+      "feature-pyramids-small-objects",
+    ],
   },
   {
     id: "resnet",
@@ -1357,7 +1367,7 @@ const coreLessons: Lesson[] = [
     summary: "编码成潜变量，再解码重建；VAE 进一步约束潜空间的分布。",
     intuition:
       "普通 autoencoder 像把图片压成一串摘要再复原。VAE 要求这些摘要在一个较平滑的 latent space 中分布，使我们能从潜空间采样并生成新样本。",
-    core: "Encoder 输出 qφ(z|x) 的均值与方差，用 reparameterization trick 采样 z；decoder 学 pθ(x|z)。训练最大化 ELBO，等价于最小化负 ELBO（reconstruction loss + KL divergence）；两项需要权衡。KL 约束过强可能导致 posterior collapse，解码器忽略 z。",
+    core: "Encoder 输出 qφ(z|x) 的均值与方差，用 reparameterization trick 采样 z；decoder 学 pθ(x|z)。标准训练最大化 ELBO，等价于最小化负 ELBO（expected negative log likelihood + KL to prior）。式中的 KL(qφ(z|x)‖p(z)) 与 lower-bound gap KL(qφ(z|x)‖pθ(z|x)) 是两个量；prior KL 小不证明近似 posterior 准确。改变 KL 权重 β 会改变原标准 ELBO objective；约束过强也可能促使 decoder 忽略 z。",
     equation: "ELBO = E_q[log pθ(x|z)] − KL(qφ(z|x) ‖ p(z))",
     whenToUse: [
       "需要连续潜空间、重建或可控生成的基础模型时；也可探索异常检测，但必须单独验证异常分数。",
@@ -1370,7 +1380,7 @@ const coreLessons: Lesson[] = [
       "分别可视化原图、重建图和从先验采样的图；三者回答不同问题，不能只展示最好看的重建。",
     ],
     tuning: [
-      "调 KL 权重 β，平衡重建精度与潜空间规则性。",
+      "先用 β=1 的标准 ELBO baseline；若改变 β，记录为 weighted objective，不能继续等同于原模型的标准 ELBO。KL warm-up 期间也应记录当前 β。",
       "潜变量维度太小欠表达，太大可能使先验约束变弱。",
       "同时画重建项、KL 项及活跃潜维度；负 ELBO（loss）下降但 KL 塌缩时需要检查表示是否仍有用。",
     ],
@@ -1389,6 +1399,7 @@ const coreLessons: Lesson[] = [
       "普通 autoencoder 用 encoder 把 x 压到 z，再用 decoder 重建 x；这只要求重建，不规定潜空间的概率形状。",
       "VAE 的 encoder 输出近似后验 qφ(z|x) 的分布参数，通常是均值和方差，而非单个固定编码。",
       "训练时用重参数化 z=μ+σ⊙ε 采样，使重建项和 KL(qφ(z|x)||p(z)) 都能通过梯度优化。",
+      "手算 lower-bound gap：固定 binary model 的 joint weights=[.4,.1]、q=[.6,.4]，ELBO≈−.797797，exact posterior=[.8,.2]；KL to posterior≈.104650，加回后等于 log evidence=ln(.5)≈−.693147。这个 KL 与式中的 KL to prior 不同；大模型通常无法直接计算 exact gap。",
       "生成时从先验 p(z) 采样送入 decoder；另用下游指标检查潜空间是否真的保留任务信息。",
     ],
     limits: [
@@ -1404,7 +1415,8 @@ const coreLessons: Lesson[] = [
       },
       {
         name: "KL 权重",
-        start: "先从标准 ELBO 起，分别监控 reconstruction 与 KL 两项。",
+        start:
+          "从 β=1 的标准 ELBO 起，统一 sum/mean convention，分别监控 likelihood 与 prior KL。",
         adjust:
           "KL 迅速接近零可能是 posterior collapse；可试退火或调整 decoder，而非只追总 loss。",
       },
@@ -1414,7 +1426,13 @@ const coreLessons: Lesson[] = [
         adjust: "生成模糊或误差尺度不合理时核对似然假设与输入预处理。",
       },
     ],
-    compareTo: ["gan", "diffusion", "latent-diffusion"],
+    compareTo: [
+      "gan",
+      "diffusion",
+      "latent-diffusion",
+      "variational-inference-elbo",
+      "bio-count-vae",
+    ],
   },
   {
     id: "gan",
@@ -1957,6 +1975,9 @@ export const lessons: Lesson[] = [
   ...mlBreadthLessons,
   ...cvBreadthLessons,
   ...agentBreadthLessons,
+  ...mlDepthLessons,
+  ...cvDepthLessons,
+  ...agentDepthLessons,
 ].sort(
   (a, b) =>
     categories.findIndex((category) => category.id === a.category) -

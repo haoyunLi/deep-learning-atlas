@@ -18,13 +18,13 @@ export const rlLessons: Lesson[] = [
       "每次只选一个动作并看即时收益，练习 exploration 与 exploitation 的取舍。",
     intuition:
       "像在几家餐厅间选晚饭：常去已知好店会错过更好的店；一直试新店又浪费机会。Bandit 把这个矛盾缩成最小实验。",
-    core: "为每个动作估计平均 reward。ε-greedy 以小概率随机探索、其余时间选当前最优；UCB 则给尝试较少的动作加不确定性奖励。没有会影响下一步的 state，因此还不是完整的 MDP。",
+    core: "为每个动作估计平均 reward。ε-greedy 以小概率随机探索、其余时间选当前最优；UCB 则给尝试较少的动作加不确定性奖励。Bandit 不建模 action 对未来 environment state 与 reward opportunity 的长期影响；每轮仍可有可观测 context，此时是 contextual bandit。",
     equation: "aₜ = argmaxₐ Qₜ(a)（概率 1−ε）；其余时间随机探索",
     mechanicsSteps: [
       "为每个 arm 维护选择次数 N(a) 与收益估计 Q(a)，先定义 reward 的时间窗口和延迟。",
       "每轮依据 ε-greedy 或 UCB 选 arm；UCB 的探索项随次数增加而缩小。",
       "观察反馈后，只更新所选 arm 的估计；平稳环境可用样本均值，非平稳环境用常数步长。",
-      "用累计 regret、分组收益和流量分配评估；记录每次被选概率以支持离线校正。",
+      "用累计 regret、分组收益和流量分配评估；记录真实 selection propensity 与可用 arms。UCB bonus 不是选择概率；deterministic argmax 对其它动作可给出零 support，不能据此无条件评价新策略。",
     ],
     limits: [
       "假定动作不会显著改变下一轮状态；若广告会改变用户长期偏好，应考虑 MDP。",
@@ -76,6 +76,8 @@ export const rlLessons: Lesson[] = [
       "q-learning",
       "reinforcement-learning",
       "off-policy-evaluation",
+      "contextual-bandits-linucb",
+      "mcts-uct-search",
     ],
   },
   {
@@ -1102,7 +1104,7 @@ export const rlLessons: Lesson[] = [
     equation: "h₀=hθ(o₀)；(hₜ₊₁,r̂ₜ)=gθ(hₜ,aₜ)；(p̂ₜ,v̂ₜ)=fθ(hₜ)",
     mechanicsSteps: [
       "representation h 把观测历史映射为隐状态；prediction f 输出 policy prior 和 value。",
-      "MCTS 在当前隐状态展开动作；dynamics g 为树中每一步预测下一隐状态与 reward。",
+      "MCTS 在当前隐状态展开动作；dynamics g 预测下一隐状态与 reward。MuZero 的 PUCT selection 将 policy prior P(s,a) 纳入探索项，并结合 visit counts 与 Q；它不同于基础 UCT 的 Q+c√(ln Nparent/Nchild)，不能直接互换公式。",
       "用搜索访问次数产生改进 policy target，同时用真实奖励与 n-step value target 监督网络 unroll。",
       "执行搜索选出的真实动作，回收环境数据入 replay，重复训练与搜索。",
     ],
@@ -1152,7 +1154,12 @@ export const rlLessons: Lesson[] = [
     ],
     example:
       "棋类中 MuZero 搜索不同落子在隐空间里的后续结果，再按搜索策略选择行动。",
-    compareTo: ["model-based-rl", "ppo", "reinforcement-learning"],
+    compareTo: [
+      "mcts-uct-search",
+      "model-based-rl",
+      "ppo",
+      "reinforcement-learning",
+    ],
   },
   {
     id: "behavior-cloning",

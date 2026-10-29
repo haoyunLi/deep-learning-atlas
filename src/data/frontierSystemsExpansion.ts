@@ -242,14 +242,14 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "比较先提 region 再分类的 two-stage 检测，与在密集网格直接预测类别和框的 one-stage 路线。",
     intuition:
       "Faster R-CNN 先问‘哪里可能有物体’，再仔细看每个候选；YOLO 类模型一次扫过整图，同时回答位置与类别。",
-    core: "backbone/FPN 产生多尺度特征。Faster R-CNN 的 RPN 生成 proposals，经 RoIAlign 得定长特征后分类回归；YOLO 类 head 在多尺度位置直接输出 objectness/class/box。训练依赖匹配规则，推理通常还需阈值和 NMS。",
+    core: "Backbone 提取特征，现代配置常接 FPN。Faster R-CNN 的 RPN 生成 proposals；原版使用 RoI Pooling，现代实现可用 RoIAlign 提取定长区域特征，再分类与回归。YOLO 是一组 one-stage detection 方法，不同版本的 anchor、objectness、head、matching 与后处理不同，需按选定实现核对。训练依赖目标分配与损失，推理是否需要 NMS 也应按版本确认。",
     equation:
       "L=Lcls+λbox Lbox; IoU(A,B)=|A∩B|/|A∪B|; NMS keeps high-score boxes under IoU threshold",
     mechanicsSteps: [
       "把图像 resize/pad，同时以相同几何变换更新 xyxy boxes；记录原图逆变换。",
-      "backbone 和 FPN 输出多分辨率特征，小目标使用较高分辨率层。",
+      "Backbone 提取特征；采用 FPN 的配置输出多分辨率特征，并按 head 的 target assignment 规则监督各尺度。",
       "two-stage 先匹配 anchors/proposals 再 RoI 分类；one-stage 在密集位置完成匹配与预测。",
-      "把框映射回原图，按类做 score filter 与 NMS，再用 mAP 和业务误报指标评估。",
+      "把框映射回原图，按选定实现做 score filter；若该版本使用 NMS，再按对应 class rule 去重。固定评价协议后计算 mAP 与业务误报指标。",
     ],
     whenToUse: [
       "Faster R-CNN 适合准确率优先和中小数据迁移基线。",
@@ -268,7 +268,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
     ],
     tuning: [
       "input size 提升小目标信息但以近平方增加特征计算。",
-      "score 与 NMS IoU 是部署参数，应在验证集按成本选择。",
+      "Score threshold 与使用 NMS 时的 IoU threshold 是部署参数，应在验证集按成本选择。",
       "positive matching、focal/class weights 影响稀有目标召回。",
     ],
     settings: [
@@ -284,8 +284,10 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       },
       {
         name: "anchors / matching",
-        start: "先用数据集常见尺度并统计 box 尺寸。",
-        adjust: "极端长宽比或小框匹配不足时再改先验。",
+        start:
+          "先核版本使用 anchors 还是 anchor-free assignment，并统计 box 尺寸与 positive counts。",
+        adjust:
+          "极端长宽比或小框匹配不足时，按该 head 的尺度分配规则调整；只有 anchor-based 配置才调整 anchor 先验。",
       },
     ],
     modifications: [
@@ -297,8 +299,15 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "比较速度时一个模型含 NMS，另一个只报 backbone。",
     ],
     example:
-      "同一相机数据固定切分后，Faster R-CNN 的 small AP 更高但延迟 70 ms，YOLO 类 18 ms；最终选择由漏报成本和设备上限共同决定。",
-    compareTo: ["detr", "mask-rcnn", "resnet"],
+      "假设同一设备、同一切分的教学对照中，某 Faster R-CNN 配置的 small AP 更高但延迟 70 ms，某 YOLO 配置为 18 ms；这是 synthetic 选型例子，实际排序需对齐预处理和后处理后测量，最终由漏报成本与设备上限决定。",
+    compareTo: [
+      "detr",
+      "mask-rcnn",
+      "resnet",
+      "cv-preprocessing-augmentation",
+      "feature-pyramids-small-objects",
+      "box-regression-losses",
+    ],
   },
   {
     id: "segment-anything",
@@ -906,10 +915,10 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
     duration: "12 分钟",
     icon: "⋮",
     summary:
-      "独立初始化并训练多个模型，平均预测得到更稳的概率，用成员分歧观察 epistemic uncertainty。",
+      "独立初始化并训练多个模型，比较平均预测的质量，用成员分歧提供 model uncertainty 的线索。",
     intuition:
-      "同一数据允许多个同样合理的函数。若不同模型在某个样本上给出不同答案，说明训练数据没有把那里约束清楚。",
-    core: "分类时平均成员概率而非 logits；总预测熵混合数据噪声与模型分歧，可用平均熵和 mutual information 分解线索。回归成员可输出均值与方差，用 law of total variance 合并 aleatoric 与 epistemic 部分。",
+      "同一数据允许多个合理的函数。若模型在某个样本上给出不同答案，值得检查那里是否缺少证据；分歧也可能来自训练失败或不同建模假设，需要先诊断。",
+    core: "分类时平均成员 probabilities 而非 logits。在等权 member-mixture 下，H(p̄)−meanₘ H(pₘ) 是 label 与 member index 的 mutual information，可描述分歧；独立优化出的 members 不自动是 Bayesian posterior draws，因此该量不是已经校准的全部 epistemic uncertainty。回归用 law of total variance 分开 within-member variance 与 between-member mean variation；把它们对应到真实 aleatoric/epistemic 来源还需模型与验证依据。",
     equation: "p̄(y|x)=1/M Σₘpₘ(y|x); Var(y)=Eₘ[σₘ²+μₘ²]−Eₘ[μₘ]²",
     mechanicsSteps: [
       "固定数据切分与预处理，用不同 seed/bootstraps 独立训练 M 个成员。",
@@ -925,6 +934,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
     limits: [
       "成员共享数据和架构，可能对同一系统性偏差一致自信。",
       "计算、存储和服务成本近似乘以成员数。",
+      "有限 ensemble 的 entropy/variance 分解是其 mixture 内部的量，不保证覆盖所有真实数据噪声、模型失配或 posterior modes。",
     ],
     howToUse: [
       "先确保单模型数据与校准流程正确。",
@@ -933,7 +943,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "不确定性阈值在独立 validation/shift set 选择。",
     ],
     tuning: [
-      "M 从 3–5 常能看到大部分收益。",
+      "从 M=3 或 5 作预算起点，画本任务的质量、分歧与 latency 收益曲线；这些数量不保证已经取得大部分收益。",
       "成员多样性来自 seed、bootstrap 或架构，但不能破坏可比性。",
       "温度校准可对 ensemble 输出单独拟合。",
     ],
@@ -963,11 +973,13 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "把低 disagreement 当作输入一定属于训练分布。",
     ],
     example:
-      "五个病灶分类模型均值为 0.52，但成员从 0.1 到 0.9，适合转人工复核；若五个都错误地为 0.99，ensemble 也无法发现共同偏差。",
+      "Synthetic binary members 报 positive probabilities=[.1,.9]，平均=.5；predictive entropy≈.693147 nats、平均 member entropy≈.325083，差≈.368064。若两者都报.5，predictive entropy仍是.693147，但分歧为0；是否 review 还需成本与验证依据。两个模型也可能一致自信地犯错。",
     compareTo: [
       "calibration-uncertainty",
       "conformal-selective-prediction",
       "neural-networks",
+      "proper-scoring-rules",
+      "variational-inference-elbo",
     ],
   },
   {
@@ -995,6 +1007,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "为每个校准样本计算 nonconformity，例如分类 s=1−ptrue。",
       "将校准分数升序排列，取第 k=ceil((n+1)(1−α)) 个。若 k>n，用 +∞ 返回全集，不能截断索引后仍声称同样保证。新样本保留 s(x,y)≤q̂ 的标签。",
       "报告 coverage、平均集合大小、空/全标签比例，并按 subgroup 与 shift 压力测试。",
+      "若只接受 singleton sets，另算 acceptance rate 与 selective risk=P(预测错误|被接受)。Marginal set coverage 不是这个 conditional risk 的保证，不能由 90% set coverage 直接推出 accepted predictions 的错误率≤10%。",
     ],
     whenToUse: [
       "需要可解释的预测集合或回归区间。",
@@ -1004,6 +1017,7 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
     limits: [
       "exchangeability 被时间或域偏移破坏时 coverage 可能失效。",
       "边际 90% 不等于每个类别和每个人群都 90%。",
+      "按 set size 筛选 accepted predictions 会改变条件人群；marginal coverage 不直接约束 singleton selective risk，review cost/capacity 需单独设计。",
     ],
     howToUse: [
       "在训练/调参后再隔离 calibration。",
@@ -1029,8 +1043,10 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       },
       {
         name: "abstention rule",
-        start: "集合大于 1 或置信低时转人工。",
-        adjust: "在验证集画 coverage–risk–workload 曲线。",
+        start:
+          "先明确只接受 singleton、empty set 的处理和 review capacity；分别记录 acceptance rate 与 conditional selective risk。",
+        adjust:
+          "在独立验证集画 acceptance–risk–workload 曲线，结合 review 成本；不能从 marginal coverage 直接读取 accepted risk。",
       },
     ],
     modifications: [
@@ -1042,11 +1058,13 @@ export const frontierSystemsExpansionLessons: Lesson[] = [
       "把 softmax 最大值当成经证明的 OOD detector。",
     ],
     example:
-      "教学例：新样本 p=[0.6,0.3,0.1]，若独立校准得到 q̂=0.8，则分数 [0.4,0.7,0.9] 中前两个≤0.8，返回 {A,B}。q̂ 必须来自 calibration，不能由这一个样本猜出。新相机若 coverage 明显下降，需检查分布变化与抽样不确定性，重新校准或回退。",
+      "教学例：新样本 p=[0.6,0.3,0.1]，独立校准若给出 q̂=0.8，就保留 scores=[0.4,0.7,0.9] 中前两项，返回 {A,B}。另一个逻辑反例：synthetic population 中90%返回包含真值的多标签 set，10%返回 singleton 且其中一半错误，总 set coverage=.95，但 accepted singleton risk=.5。高 marginal coverage 不等于低 accepted risk。",
     compareTo: [
       "calibration-uncertainty",
       "deep-ensembles",
       "logistic-regression",
+      "bayes-decision-thresholds",
+      "quantile-regression",
     ],
   },
   {

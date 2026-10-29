@@ -457,6 +457,7 @@ export default function PracticeHub() {
         </p>
       </header>
       <p className="lesson-research-context">
+        <a href="#/ai-depth?lab=hmm">算法细节与逐步推演 →</a>
         <a href="#/ai-labs?lab=tree">
           AI 跨领域实验：Tree、A*、NMS、Hybrid Retrieval 与 Agent reliability →
         </a>

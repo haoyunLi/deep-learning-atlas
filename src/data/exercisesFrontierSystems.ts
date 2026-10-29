@@ -75,7 +75,7 @@ const specs: Record<string, QuizSpec> = {
   },
   "faster-rcnn-yolo": {
     mechanism: [
-      "Faster R-CNN 的 RoIAlign 位于哪条计算路径？",
+      "在采用 RoIAlign 的现代 Faster R-CNN 实现中，RoIAlign 位于哪条计算路径？",
       [
         "RPN proposals 之后、分类与框回归之前",
         "图像读取之前",
@@ -83,7 +83,7 @@ const specs: Record<string, QuizSpec> = {
         "只在 loss 之后",
       ],
       0,
-      "RPN 先提出候选区域，RoIAlign 从共享特征图提取定长 region 特征，再交给分类和边框回归 head。",
+      "在采用 RoIAlign 的实现中，RPN 先提出候选区域，RoIAlign 从共享特征图提取定长 region 特征，再交给分类与边框回归 head。原版 Faster R-CNN 使用 RoI Pooling；不要把不同实现的 region operator 混为一谈。",
     ],
     decision: [
       "YOLO 类模型总体 mAP 较高，但现场小目标漏报多。应先改什么？",

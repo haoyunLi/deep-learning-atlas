@@ -2,3 +2,6 @@ node_modules
 dist
 .DS_Store
 *.tsbuildinfo
+
+# Local visual review captures
+.impeccable/review/

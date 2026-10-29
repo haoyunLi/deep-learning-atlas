@@ -321,7 +321,7 @@ export const visionLanguageLessons: Lesson[] = [
     intuition:
       "连续几个小窗口也能覆盖较大区域，并在每一步加入非线性；结构整齐，容易看清深度的作用。",
     core: "VGG-16/19 按 stage 堆叠 3×3 卷积，stage 间下采样，末端用于分类。它没有 ResNet 的残差捷径，参数量和计算成本较高，今天更适合做架构历史与简单特征基线。",
-    equation: "Fₗ₊₁ = ReLU(Conv₃×₃(Fₗ));  多层堆叠扩大有效感受野",
+    equation: "Fₗ₊₁ = ReLU(Conv₃×₃(Fₗ)); 多层堆叠扩大 theoretical receptive field，实际影响分布需另看 Effective Receptive Field",
     mechanicsSteps: [
       "各 stage 连续执行 3×3 卷积与 ReLU，多次小卷积累积感受野并加入非线性。",
       "池化在 stage 间降低空间分辨率，同时提高后续层的通道数量。",
@@ -377,7 +377,7 @@ export const visionLanguageLessons: Lesson[] = [
     ],
     example:
       "拿预训练 VGG 卷积特征做工业图片分类，再对照 ResNet 的速度和准确率。",
-    compareTo: ["cnn", "resnet", "densenet"],
+    compareTo: ["cnn", "resnet", "densenet", "feature-pyramids-small-objects"],
   },
   {
     id: "densenet",
@@ -635,7 +635,7 @@ export const visionLanguageLessons: Lesson[] = [
       {
         name: "patch size P",
         start: "先沿用预训练权重原生 P，记录最小目标覆盖的 token 数。",
-        adjust: "小目标被整块吞没可比较更小 P；显存超限则增 P 或改 Swin。",
+        adjust: "小目标被整块混合时，先比较同 checkpoint 更高输入分辨率或局部 refinement；若比较更小 P，应选配套架构/checkpoint或明确重新适配 PatchEmbed，不能只改 P 数字复用原权重。显存超限则降低输入 token 数或比较 Swin。",
       },
       {
         name: "输入分辨率 / 位置嵌入",
@@ -681,6 +681,8 @@ export const visionLanguageLessons: Lesson[] = [
       "swin-transformer",
       "mae",
       "positional-encoding",
+      "dense-visual-correspondence",
+      "cv-preprocessing-augmentation",
     ],
   },
   {

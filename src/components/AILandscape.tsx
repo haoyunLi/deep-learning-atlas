@@ -50,6 +50,11 @@ export default function AILandscape({ query }: { query: string }) {
         </div>
         <AIScopeDiagram />
       </header>
+      <p>
+        <a href="#/ai-depth?lab=hmm">
+          深入机制：HMM、Kalman、Assignment、Geometry、MCTS 与 Beam 逐步实验 →
+        </a>
+      </p>
       <section className="ai-map-section">
         <h2>先按问题认识十个领域</h2>
         <p>

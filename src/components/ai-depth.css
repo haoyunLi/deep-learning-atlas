@@ -1,0 +1,26 @@
+.depth-derivation {
+  border-block: 1px solid #d6dfe9;
+  padding: 12px 0;
+  margin: 24px 0;
+}
+.depth-derivation p {
+  font-variant-numeric: tabular-nums;
+}
+.ai-depth .bio-plot :is(circle, rect, line) {
+  transition:
+    fill 240ms ease-out,
+    stroke 240ms ease-out,
+    opacity 240ms ease-out;
+}
+.ai-depth :is(a, button, input, select, summary):focus-visible {
+  outline: 3px solid #245fbd;
+  outline-offset: 3px;
+}
+.ai-depth a {
+  text-underline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-depth .bio-plot * {
+    transition: none;
+  }
+}

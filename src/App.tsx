@@ -33,6 +33,7 @@ const PracticeHub = lazy(() => import("./components/PracticeHub"));
 const StudioPage = lazy(() => import("./components/studio/StudioPage"));
 const BioAlgorithmLab = lazy(() => import("./components/BioAlgorithmLab"));
 const BioLessonFigure = lazy(() => import("./components/BioLessonFigure"));
+const AIDepthLab = lazy(() => import("./components/AIDepthLab"));
 const AILandscape = lazy(() => import("./components/AILandscape"));
 const AIBreadthLab = lazy(() => import("./components/AIBreadthLab"));
 const BreadthLessonFigure = lazy(
@@ -906,6 +907,14 @@ function Detail({
             </a>
           </div>
         )}
+        {lesson.supplementarySources?.map((source) => (
+          <div className="source-line" key={source.url}>
+            计算与实现 / Reference　
+            <a href={source.url} target="_blank" rel="noreferrer">
+              {source.label} <ArrowIcon diagonal />
+            </a>
+          </div>
+        ))}
         <div className="lesson-next">
           {index > 0 && (
             <a href={`#/lesson/${lessons[index - 1].id}`}>
@@ -1323,6 +1332,7 @@ function App() {
     "/bio-algorithms": "Single-cell / Spatial 算法实验",
     "/landscape": "AI / ML 全景",
     "/ai-labs": "AI 跨领域机制实验",
+    "/ai-depth": "算法细节推演",
     "/compare": "算法对比",
     "/guide": "选型指南",
     "/glossary": "术语表",
@@ -1355,6 +1365,7 @@ function App() {
   else if (path === "/animations") page = <AnimationDirectory />;
   else if (path === "/practice") page = <PracticeHub />;
   else if (path === "/landscape") page = <AILandscape query={routeQuery} />;
+  else if (path === "/ai-depth") page = <AIDepthLab query={routeQuery} />;
   else if (path === "/ai-labs") page = <AIBreadthLab query={routeQuery} />;
   else if (path === "/bio-algorithms")
     page = <BioAlgorithmLab query={routeQuery} />;

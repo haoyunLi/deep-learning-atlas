@@ -193,6 +193,7 @@ export const dataConceptLessons: Lesson[] = [
       "指定 source domain 和实际 target domain：人群、地点、时间、仪器、采集流程与标签定义。",
       "比较输入与标签的边际分布，以及关键子群的性能；不要只依据一个总体距离或单个 AUC 判断是否安全。",
       "在能获得目标域标签时检查 P(Y|X) 是否仍可用；区分输入比例变化、类别基率变化与概念关系变化。",
+      "手算 Label Shift：若 P(X|Y) 稳定、source prior=.2、target prior=.5、source posterior=.4，则 positive weight=.4×(.5/.2)=1，negative weight=.6×(.5/.8)=.375；归一化得到 target posterior=8/11。这个修正依赖概率与 shift 假设，不是任意 drift 都适用。",
       "选择应对方式：收集目标域标注并重新训练/微调，或在假设合理时做加权与校准；最终在未参与调整的目标域样本复验。",
     ],
     whenToUse: [
@@ -202,6 +203,7 @@ export const dataConceptLessons: Lesson[] = [
     limits: [
       "只看无标签输入分布无法证明 P(Y|X) 没变；真正的目标域表现需要可核验的标签或可信代理。",
       "重要目标样本可能超出训练支持范围，此时重加权无法凭空学到从未见过的关系。",
+      "Unlabelled prediction frequencies 改变不能单独证明 P(X|Y) 稳定；Label Shift 的 prior correction 需要额外假设及目标域复验。",
     ],
     howToUse: [
       "写清目标使用环境，记录训练和目标数据的时间、采集流程、人口/对象组成和标签定义。",
@@ -248,6 +250,8 @@ export const dataConceptLessons: Lesson[] = [
       "external-validation",
       "cohort-design",
       "calibration-uncertainty",
+      "label-shift-correction",
+      "importance-sampling",
     ],
   },
   {
@@ -427,6 +431,7 @@ export const dataConceptLessons: Lesson[] = [
       "统计训练、验证与预期部署的每类样本数和事件率，明确误报与漏报各自的代价。",
       "先用普通 cross-entropy 训练 baseline，检查 per-class recall、precision、PR 曲线及概率校准。",
       "若易负例淹没训练信号，比较 class weighting、训练集内重采样或 focal loss；它们分别改变代价、样本频率和难度权重。",
+      "检查 weighting 改变的概率目标：synthetic constant-feature population 的 true positive rate r=.2，weighted Log Loss 用 w₁=3、w₀=1 时，population 最优报告 p*=w₁r/[w₁r+w₀(1−r)]=3/7，而非.2。它是此目标的解析 optimum，不是任意有限模型必然输出的值。",
       "在保持自然基率的验证集选择阈值，在独立测试集报告 confusion matrix、每类指标及误报数量。",
     ],
     whenToUse: [
@@ -436,6 +441,7 @@ export const dataConceptLessons: Lesson[] = [
     limits: [
       "极少正例会让验证指标方差很大，重加权无法替代更多高质量标注。",
       "采样或权重会改变训练概率与校准；若需要可靠风险概率，应在自然分布上检查并可能重新校准。",
+      "Class weighting 与对 calibrated probabilities 作 cost-based thresholding 不是所有有限模型、regularization 和 capacity 条件下都等价；应分别验证概率质量与 action utility。",
     ],
     howToUse: [
       "先检查标签质量与各分区基率，确认少数类不是编码错误或 cohort 选择造成。",
@@ -481,6 +487,9 @@ export const dataConceptLessons: Lesson[] = [
       "loss-functions",
       "model-evaluation",
       "calibration-uncertainty",
+      "proper-scoring-rules",
+      "bayes-decision-thresholds",
+      "label-shift-correction",
     ],
   },
 ];

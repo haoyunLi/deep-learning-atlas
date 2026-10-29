@@ -1,3 +1,6 @@
+import { mlDepthExercises } from "./exercisesMLDepth";
+import { cvDepthExercises } from "./exercisesCVDepth";
+import { agentDepthExercises } from "./exercisesAgentDepth";
 import type { Exercise } from "./exerciseTypes";
 import { coreExercises } from "./exercisesCore";
 import { trainingLanguageExercises } from "./exercisesTrainingLanguage";
@@ -29,6 +32,9 @@ export const exerciseGroups: Record<string, Exercise[]>[] = [
   mlBreadthExercises,
   cvBreadthExercises,
   agentBreadthExercises,
+  mlDepthExercises,
+  cvDepthExercises,
+  agentDepthExercises,
 ];
 export const exercises: Record<string, Exercise[]> = Object.assign(
   {},

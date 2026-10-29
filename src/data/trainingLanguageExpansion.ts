@@ -640,7 +640,14 @@ export const trainingLanguageExpansionLessons: Lesson[] = [
     ],
     example:
       "同一提示先用 greedy 输出一份短答案，再在 τ=0.8、top-p=0.9 下采样 5 份候选。报告任务成功率与平均 token 成本，不能只展示最漂亮的一次。",
-    compareTo: ["gpt-language-model", "kv-cache", "language-model-evaluation"],
+    compareTo: [
+      "gpt-language-model",
+      "kv-cache",
+      "language-model-evaluation",
+      "beam-search-decoding",
+      "grammar-constrained-decoding",
+      "speculative-decoding",
+    ],
   },
   {
     id: "kv-cache",

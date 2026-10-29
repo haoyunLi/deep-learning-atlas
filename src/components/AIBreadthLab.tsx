@@ -26,7 +26,7 @@ const blue = "#245fbd",
   purple = "#7855a2";
 const f = (x: number, n = 3) =>
   x !== 0 && Math.abs(x) < 0.0005 ? x.toExponential(2) : x.toFixed(n);
-function Range({
+export function Range({
   label,
   value,
   min,
@@ -64,7 +64,7 @@ function Range({
     </label>
   );
 }
-function Choice({
+export function Choice({
   label,
   value,
   set,
@@ -92,7 +92,7 @@ function Choice({
     </label>
   );
 }
-function Plot({
+export function Plot({
   label,
   children,
   height = 280,
@@ -115,7 +115,7 @@ function Plot({
     </div>
   );
 }
-function Readout({ values }: { values: [string, string][] }) {
+export function Readout({ values }: { values: [string, string][] }) {
   return (
     <dl className="bio-readout">
       {values.map(([label, value]) => (
@@ -127,7 +127,7 @@ function Readout({ values }: { values: [string, string][] }) {
     </dl>
   );
 }
-function Check({
+export function Check({
   question,
   options,
   answer,
@@ -170,7 +170,7 @@ function Check({
     </fieldset>
   );
 }
-function Notes({
+export function Notes({
   children,
   lessons,
   sources,
@@ -202,7 +202,7 @@ function Notes({
     </details>
   );
 }
-function useSteps(max: number) {
+export function useSteps(max: number) {
   const [step, setStep] = useState(0),
     [playing, setPlaying] = useState(false),
     [reduced, setReduced] = useState(false);

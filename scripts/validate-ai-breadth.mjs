@@ -233,7 +233,7 @@ for (const id of ids) {
     assert.equal((html.match(/<li\b/g) || []).length, 3);
   }
 }
-assert.equal(figureCount, 36);
+assert.equal(figureCount, 54);
 console.log(
-  `Validated AI breadth: ${checks} numerical checks, optimal-search oracle, strict/class-aware NMS, RRF candidate bounds, early-stop retry recursion, 5 lab SSR routes, 10 areas, 4 journeys, 6 compositions and 36 lesson figures.`,
+  `Validated AI breadth: ${checks} numerical checks, optimal-search oracle, strict/class-aware NMS, RRF candidate bounds, early-stop retry recursion, 5 lab SSR routes, 10 areas, 4 journeys, 6 compositions and 54 breadth/depth lesson figures.`,
 );
