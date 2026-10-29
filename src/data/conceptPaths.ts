@@ -13,14 +13,14 @@ export const conceptPaths: ConceptPath[] = [
   {
     id: "biology-regulation-inference",
     title: "生物调控：从观测信号到算法证据",
-    description: "先区分 lineage、sequence、binding、expression 和 activity，再选择计算模型。连接 Bio/CS 的 Model Systems、Somatic/Germline、Enhancer、TF、Ligand–Receptor 与 Perturbation Logic。",
+    description: "沿 DNA 观测、调控候选、target response、细胞间通信和功能验证逐层推进。每一课先明确测量对象，再问算法能支持什么结论；生物概念可从课内 Bio/CS 链接补齐。",
     steps: [
-      { lessonId: "variant-mixture-inference", why: "一个 VAF 可以对应多个 purity / copy-number / lineage 组合，先辨 observed fraction 与 latent explanation。" },
-      { lessonId: "motif-pwm-scoring", why: "从 sequence 和 background model 计算相对兼容性；motif score 不等于实际 TF binding。" },
-      { lessonId: "enhancer-gene-abc", why: "将 activity 和 contact 组合成候选连接，并观察竞争候选集合如何改变分母。" },
-      { lessonId: "regulon-tf-activity", why: "用 target genes 的方向和权重解释 activity score，区分网络推断与活动评分。" },
-      { lessonId: "ligand-receptor-inference", why: "先写 complex aggregation 和 null hypothesis，再解释细胞标签、donor 与空间信息。" },
-      { lessonId: "perturbation-generalization", why: "用 held-out context 和 intervention 检验迁移，比较 additive baseline、interaction 与模型假设。" },
+      { lessonId: "variant-mixture-inference", why: "先从 DNA reads 开始：VAF 的分母是什么，同一个比例为什么能对应不同的 cell mixture？" },
+      { lessonId: "motif-pwm-scoring", why: "读懂 variant 的观测后，再问 sequence 是否符合某个 TF motif。用 background 比较兼容性，同时保留 binding 尚未验证的边界。" },
+      { lessonId: "enhancer-gene-abc", why: "知道候选 regulatory sequence 后，下一问是它可能影响哪个 gene。组合 activity 与 contact，并检查候选集合怎样改变分母。" },
+      { lessonId: "regulon-tf-activity", why: "从 DNA 层的候选连接转到 RNA response：一组 targets 的变化，怎样形成带方向的 TF activity score？" },
+      { lessonId: "ligand-receptor-inference", why: "再把问题从 cell 内扩到 cell 间：表达支持哪些 Ligand–Receptor 候选？先声明 complex 规则与 null，再解释 score。" },
+      { lessonId: "perturbation-generalization", why: "最后明确 Perturbation 的预测与验证任务：先建 additive baseline，再区分新组合、新 donor 和新 context；预测仍需实验检验。" },
     ],
   },
   {
@@ -500,7 +500,7 @@ export const conceptPaths: ConceptPath[] = [
       },
       {
         lessonId: "data-leakage",
-        why: "部署数据可用性与训练定义必须一致，防止离线特征在线不可获得。",
+        why: "最后回看整条流程：部署时实际可获得的特征是否与离线定义一致？这项检查也应贯穿前面的训练与压缩步骤。",
       },
     ],
   },

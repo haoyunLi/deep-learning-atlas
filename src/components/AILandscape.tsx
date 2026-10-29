@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { aiAreas, aiJourneys, aiTaskCompositions } from "../data/aiLandscape";
 import { lessons } from "../data/lessons";
 import { useStudyState } from "../lib/studyState";
+import { lessonHref } from "../lib/learningNavigation";
 import AIScopeDiagram from "./AIScopeDiagram";
 import "./ai-landscape.css";
-function CourseLinks({ ids }: { ids: string[] }) {
+function CourseLinks({ ids, pathId }: { ids: string[]; pathId?: string }) {
   const { completed } = useStudyState();
   return (
     <ol className="ai-course-list">
@@ -11,7 +13,7 @@ function CourseLinks({ ids }: { ids: string[] }) {
         const lesson = lessons.find((l) => l.id === id);
         return lesson ? (
           <li key={id}>
-            <a href={`#/lesson/${id}`}>
+            <a href={lessonHref(id, pathId)}>
               <span>{lesson.englishTitle}</span>
               <small>{lesson.title}</small>
             </a>
@@ -28,6 +30,14 @@ export default function AILandscape({ query }: { query: string }) {
     task =
       aiTaskCompositions.find((t) => t.id === params.get("task")) ??
       aiTaskCompositions[0];
+  const selectedJourney = aiJourneys.find((journey) => journey.id === params.get("journey"))?.id;
+  useEffect(() => {
+    if (!selectedJourney) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(`journey-${selectedJourney}`)?.scrollIntoView({ behavior: "instant", block: "start" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [selectedJourney]);
   const href = (key: string, value: string) => {
     const next = new URLSearchParams(query);
     next.set(key, value);
@@ -143,12 +153,12 @@ export default function AILandscape({ query }: { query: string }) {
           先读一条路线，再按实际问题回到全景地图补缺口。课程标记沿用已有的浏览器学习记录。
         </p>
         {aiJourneys.map((j) => (
-          <details key={j.id} open={j.id === "breadth"}>
+          <details key={j.id} id={`journey-${j.id}`} open={selectedJourney ? j.id === selectedJourney : j.id === "breadth"}>
             <summary>
               {j.title} <span>{j.ids.length} lessons</span>
             </summary>
             <p>{j.why}</p>
-            <CourseLinks ids={j.ids} />
+            <CourseLinks ids={j.ids} pathId={`journey-${j.id}`} />
           </details>
         ))}
       </section>

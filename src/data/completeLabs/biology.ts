@@ -60,7 +60,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
   "motif-pwm-scoring": define({
     question: "相同的 AT，换 background 后 score 为什么变？",
     input:
-      "两位置 DNA motif counts：第一行[8,1,1,0]，第二行[0,1,1,8]，列为A,C,G,T。固定query=AT，按background分配total pseudocount α。",
+      "沿用正文的两位置 motif：counts 为 [8,1,1,0] 和 [0,1,1,8]，列依次为 A,C,G,T。主要观察 AT，最后与 TT 比较。按 background 分配 total pseudocount α。",
     controls: [
       control(
         "gc",
@@ -69,7 +69,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
         0.8,
         0.05,
         0.5,
-        "q_C=q_G=GC/2，q_A=q_T=(1−GC)/2；对同一query重算reference。",
+        "q_C=q_G=GC/2，q_A=q_T=(1−GC)/2。改变 GC 会重算当前结果；固定对照保留原参数。",
       ),
       control(
         "alpha",
@@ -99,8 +99,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
       return {
         stages: [
           stage(
-            "Counts and background",
-            "固定motif observations，只有背景组成及smoothing可调。",
+            "先固定 counts 与 background",
+            "两行 motif counts 保持不变。先看原始观察，再明确当前 background 为每种 base 分配多少概率。",
             `q=[${q.map((v) => fmt(v)).join(", ")}]; N=10`,
             numbers(["q_A", "q_C", "q_G", "q_T"], q, "probability"),
             matrix(
@@ -111,8 +111,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Add pseudocounts",
-            "每个位置加αq_b，总增加α；每行probability仍归一化。",
+            "加入 pseudocount 并归一化",
+            "为 base b 加入 αq_b，再除以该位置的总 count。每行新增的总量为 α，转换后的概率之和仍为 1。",
             `p_j(b)=(n_jb+${fmt(alpha)}q_b)/(10+${fmt(alpha)})`,
             numbers(["P1(A)", "P2(T)"], selected, "probability"),
             matrix(
@@ -123,8 +123,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Positionwise evidence",
-            "逐位置比较motif与background，再相加log evidence。",
+            "逐位置计算 log-odds",
+            "对 AT 的每个位置，比较 motif probability 与 background probability；取 log2 后，两个位置的贡献可以相加。",
             `bits=[${bits.map((v) => fmt(v)).join(", ")}]; S_AT=Σbits`,
             numbers(["position1", "position2"], bits, "bits"),
             bars(
@@ -134,8 +134,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Compare candidate windows",
-            "AT和TT使用完全相同的motif及background；score不是P value或binding probability。",
+            "比较 AT 与 TT 的 score",
+            "现在只改变待评分的 sequence：AT 与 TT 使用同一 motif 和 background。分数差反映 sequence compatibility，仍不是 P value 或 binding probability。",
             `S_AT=${fmt(at)}; S_TT=${fmt(tt)}`,
             numbers(["AT score", "TT score"], [at, tt], "bits"),
             bars(["AT", "TT"], [at, tt], "log2 likelihood ratio (bits)"),
@@ -179,7 +179,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
   "enhancer-gene-abc": define({
     question: "E1没有变，为什么它的 ABC score 仍会变化？",
     input:
-      "同一gene三个候选elements，A=[4,2,1]，contact=[.1,c,.4]。这里只改变E2的contact，其余输入和candidate universe固定。",
+      "沿用正文的三个候选 elements：A=[4,2,1]，contact=[.1,c,.4]。它们对应同一 gene；只改变 E2 contact，其他输入和候选集合保持不变。",
     controls: [
       control(
         "contact",
@@ -200,8 +200,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
       return {
         stages: [
           stage(
-            "Declare candidate inputs",
-            "图展示activity；下方中间量列出contact。两种输入分别进入乘积，不共用同一物理尺度。",
+            "固定候选与两类输入",
+            "先分别读 activity 和 contact：图中展示 A，中间数值列出 C。两者有不同含义，下一步才计算乘积。",
             "A=[4,2,1]; C=[.1,c,.4]",
             numbers(
               ["E1 contact", "E2 contact", "E3 contact"],
@@ -211,15 +211,15 @@ export const biologyCompleteLabs: CompleteLabMap = {
             bars(["E1", "E2", "E3"], A, "relative activity A"),
           ),
           stage(
-            "Multiply activity and contact",
-            "弱activity可能由较强contact补偿；只看一个因子会漏掉关系。",
+            "相乘得到 regulatory weights",
+            "逐个计算 A×C。较低 activity 可以被较高 contact 补偿，因此只按其中一个量排序，可能得到不同结果。",
             `w=A×C=[${w.map((v) => fmt(v)).join(", ")}]`,
             numbers(["E1 numerator", "E2 numerator", "E3 numerator"], w, "A×C"),
             bars(["E1", "E2", "E3"], w, "unnormalized regulatory weight"),
           ),
           stage(
-            "Build the denominator",
-            "同一gene的所有候选都进入分母；E1numerator固定.4。",
+            "合计同一 gene 的候选 weights",
+            "把三个 weights 相加得到分母。E1 numerator 始终为 .4，但改变 E2 contact 仍会改变这个总和。",
             `total=.4+2×${fmt(contact)}+.4=${fmt(total)}`,
             numbers(["total", "E1 numerator"], [total, 0.4], "A×C"),
             bars(
@@ -229,8 +229,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Normalize relative contributions",
-            "E1score变化可能仅由竞争分母改变；不是E1新产生了activity证据。",
+            "归一化并比较 ABC scores",
+            "最后用各自 weight 除以总和。若 E1 score 改变，先回看分母：本例并没有新增 E1 activity 的证据。",
             `ABC=[${scores.map((v) => fmt(v)).join(", ")}]; ΣABC=1`,
             numbers(["E1", "E2", "E3"], scores, "relative score"),
             bars(["E1", "E2", "E3"], scores, "ABC relative score"),
@@ -266,7 +266,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
       },
     ],
     boundary:
-      "只有一个gene三个给定elements的ABC normalization；不模拟ATAC/H3K27ac处理、Hi-C估计或CRISPR结果。",
+      "只复算一个 gene、三个给定 elements 的 ABC normalization，不模拟 ATAC/H3K27ac 处理、Hi-C 估计或 CRISPR 结果。Bio/CS 关联实验使用另一组输入并改变候选集合，两例应比较分母机制，而不是直接比较数值。",
     source: {
       label: "Fulco et al., Activity-by-Contact (2019)",
       url: "https://www.nature.com/articles/s41588-019-0538-0",
@@ -275,7 +275,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
   "regulon-tf-activity": define({
     question: "Repressive target 改变，signed activity score 朝哪边走？",
     input:
-      "已给定一个regulon，targets z=[2,1,z3]、weights=[1,1,−1]，TF自身transcript readout保持不变。输入z是contrast statistics，非raw counts。",
+      "沿用正文给定的 regulon：targets z=[2,1,z3]，weights=[1,1,−1]。z 是 contrast statistics；TF 自身的 transcript readout 保持不变。这里只改变第三个 target 的反应。",
     controls: [
       control(
         "target",
@@ -284,7 +284,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
         3,
         0.25,
         -1,
-        "负weight表示预期repression；该target上升会降低signed score。",
+        "负 weight 表示 prior 中预期 TF 抑制这个 target；该 target 上升会降低 signed score。",
       ),
     ],
     calculate: ({ target }): LabCalculation => {
@@ -297,8 +297,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
       return {
         stages: [
           stage(
-            "Fix the network prior",
-            "先给定weights；本实验没有从这些targets反推network。",
+            "先固定带符号的 network prior",
+            "先读每条 edge 的 weight 与 sign。本实验把 network 作为已知输入，不从接下来的 target responses 反推 network。",
             "w=[+1,+1,−1]",
             numbers(["g1", "g2", "g3"], w, "regulatory weight"),
             bars(
@@ -308,15 +308,15 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Measure target responses",
-            "TF自己的RNA不是这个target-based score的输入。",
+            "读取三个 targets 的变化",
+            "现在读取 z=[2,1,z3]。这些是 targets 的变化；TF 自己的 RNA 并未进入这个 score。",
             `z=[2,1,${fmt(target)}]`,
             numbers(["g1", "g2", "g3"], z, "contrast z"),
             bars(["g1", "g2", "g3"], z, "target contrast statistic"),
           ),
           stage(
-            "Apply regulatory signs",
-            "Repressed target下降贡献正向证据；忽略sign会丢失这一点。",
+            "按 sign 计算每项贡献",
+            "将每个 z 乘以对应 weight。对预期被抑制的 target，下降与 prior 方向一致，因此得到正贡献。",
             `w×z=[${parts.map((v) => fmt(v)).join(", ")}]`,
             numbers(
               ["g1 contribution", "g2 contribution", "g3 contribution"],
@@ -326,8 +326,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             bars(["g1", "g2", "g3"], parts, "signed contribution"),
           ),
           stage(
-            "Normalize by absolute weights",
-            "本课明确使用L1分母3；与unsigned mean比较只用于展示sign的作用。",
+            "用绝对 weights 归一化",
+            "按本课定义除以 Σ|w|=3，得到 signed score。旁边的 unsigned mean 忽略了 sign，用来说明两种计算为什么会给出不同解释。",
             `signed=(3−(${fmt(target)}))/3=${fmt(signed)}; unsigned=(3+(${fmt(target)}))/3`,
             numbers(
               ["signed score", "unsigned mean"],
@@ -378,7 +378,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
   "ligand-receptor-inference": define({
     question: "Receptor 瓶颈改变时，interaction score 与 null 怎样变？",
     input:
-      "LR在本课指Ligand–Receptor。六个独立synthetic cells：前三个L=4,R1=R2=0；后三个L=0,R1=4,R2=r。枚举全部20种三对三cell-label划分。",
+      "LR 在这里指 Ligand–Receptor。沿用正文的六个独立 synthetic cells：前三个 L=4、R1=R2=0；后三个 L=0、R1=4、R2=r。固定 group sizes 为 3 对 3，枚举全部 20 种 cell-label 划分。",
     controls: [
       control(
         "subunit",
@@ -404,8 +404,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
       return {
         stages: [
           stage(
-            "Cells and participant genes",
-            "保留每个cell的joint gene profile；permutation只交换cell labels。",
+            "先读 cells 与成员 genes",
+            "每行保留一个 cell 完整的 L、R1、R2 表达。后面的 permutation 只改变分组标签，不拆散同一 cell 的 gene profile。",
             "rows=cells; columns=L,R1,R2",
             [metric("Cells", 6), metric("Group size", 3)],
             matrix(
@@ -416,8 +416,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Observed interaction mean",
-            "先求group means，再取最小receptor subunit；不是直接把RNA相乘当binding概率。",
+            "计算观察到的 interaction mean",
+            "先计算 group means，再用最低表达的 receptor subunit 表示 complex 瓶颈，最后与 sender ligand mean 取平均。这里得到的是声明过的表达 score。",
             `R=min(4,${fmt(subunit)})=${fmt(complex)}; T=(4+R)/2=${fmt(observed)}`,
             numbers(
               ["sender L", "receiver complex", "observed T"],
@@ -431,8 +431,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Exact cell-label null",
-            "每种划分均保留3对3；相同score的划分合并显示为频数，合计仍为20。",
+            "枚举 cell-label null",
+            "保持 3 对 3 的分组大小，对每种标签划分重算同一个 score。图把相同 score 合并成频数，所有柱子的计数总和仍为 20。",
             `C(6,3)=20; T bins=[${levels.map((v) => fmt(v)).join(", ")}]; counts=[${counts.join(", ")}]`,
             [
               metric("Permutations", 20),
@@ -445,8 +445,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Count the upper tail",
-            "Observed arrangement包含在枚举中；此离散例p最小为1/20。调整强度不一定改变specificity rank。",
+            "数出 null 的 upper tail",
+            "枚举包含 observed arrangement。本例允许的 r 范围内，它始终是唯一最大值，所以 exact p 一直为 1/20；score 的数值变化，并不必然改变它在 null 中的排名。",
             `p_exact=${tail}/20=${fmt(p)}`,
             [metric("Tail count", tail), metric("Exact P value", p)],
             bars(
@@ -494,7 +494,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
   "perturbation-generalization": define({
     question: "Additive baseline 遇到 interaction 和新 context，会错在哪里？",
     input:
-      "两个gene readouts，control=[10,10]，ΔA=[−2,1]、ΔB=[1,−3]。Held-out double response人为定义为[9+δ+c,8−δ+c]，便于分解误差。",
+      "沿用正文的两个 gene readouts：control=[10,10]，ΔA=[−2,1]，ΔB=[1,−3]。先仅用单扰动构建预测，再揭示人为设定的 held-out double response=[9+δ+c,8−δ+c]。",
     controls: [
       control(
         "interaction",
@@ -527,8 +527,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
       return {
         stages: [
           stage(
-            "Training conditions",
-            "只观察control和singleA/B，不使用double truth来选择baseline。",
+            "先看训练中已有的 conditions",
+            "训练信息只有 control、single A 和 single B。先固定 baseline，再查看 double perturbation 的 held-out 结果。",
             "y0=[10,10]; yA=[8,11]; yB=[11,7]",
             [metric("Observed conditions", 3)],
             matrix(
@@ -539,8 +539,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Add the single effects",
-            "每个single先减control；直接加两个absolute expression会重复计算baseline。",
+            "相加 single effects 得到预测",
+            "每个 single response 先减去 control，得到 ΔA 和 ΔB。把两项变化加回同一个 control；若直接相加两个绝对 expression，会重复计入 baseline。",
             "ŷ_AB=y0+(yA−y0)+(yB−y0)=[9,8]",
             numbers(["predicted gene1", "predicted gene2"], pred, "expression"),
             matrix(
@@ -555,8 +555,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Reveal held-out response",
-            "δ是interaction，c是共同context shift；它们是toy生成规则而非由test拟合的参数。",
+            "揭示 held-out response",
+            "现在揭示 double response。δ 控制 interaction，c 控制共同的 context shift；滑块改变的是 synthetic 数据生成规则，没有用 test 反向拟合 baseline。",
             `truth=[9+(${fmt(interaction)})+(${fmt(context)}),8−(${fmt(interaction)})+(${fmt(context)})]`,
             numbers(["true gene1", "true gene2"], truth, "expression"),
             matrix(
@@ -567,8 +567,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Diagnose error components",
-            "本例两个方向正交，所以MSE=δ²+c²；这个分解不是所有生物模型的通用规律。",
+            "拆开 interaction 与 context 误差",
+            "逐个 readout 计算 residual 与平方误差，再取平均。本例的两个变化方向正交，恰好得到 MSE=δ²+c²；其他生成模型不一定具有这个分解。",
             `residual=[${residual.map((v) => fmt(v)).join(", ")}]; MSE=${fmt(mse)}`,
             [
               metric("MSE", mse, "expression²"),
@@ -598,7 +598,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
       "In vitro预测与in vivo泛化需不同证据；new cell holdout不等于new intervention holdout。",
     ],
     tuning: [
-      "先固定held-outunit、control和evaluation genes，再调model capacity。",
+      "先固定 held-out unit、control 和 evaluation genes，再调整 model capacity。",
       "当absolute expression相关性很高时，继续检查delta方向、interaction residual和independent donor uncertainty。",
     ],
     troubleshooting: [
@@ -626,7 +626,7 @@ export const biologyCompleteLabs: CompleteLabMap = {
   "variant-mixture-inference": define({
     question: "相同的 5/20 reads，purity 和 copy number 怎样改变解释？",
     input:
-      "固定alternate k=5、depth n=20；目标cell群携带比例f=1、mutant multiplicity m=1，background CN=2且无variant。对照候选模型p0=.5仅代表balanced-diploid假设。",
+      "沿用正文的观测：alternate reads k=5、depth n=20。固定目标群内携带比例 f=1、mutant multiplicity m=1，以及不含 variant 的 background CN=2。只改变目标群比例 ρ 和 copy number；另一个候选模型固定 p0=.5。",
     controls: [
       control(
         "purity",
@@ -660,8 +660,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
       return {
         stages: [
           stage(
-            "Cells contribute different DNA copies",
-            "先计算混合样本每cell的expected copies，再求mutant比例。",
+            "先数各类 cells 贡献的 DNA copies",
+            "先按 cell fraction 加权，计算混合样本中每个 cell 平均贡献的 total 与 mutant copies。下一步才能把两者相除。",
             `total=ρC_T+(1−ρ)2=${fmt(total)}; mutant=ρ=${fmt(alt)}`,
             [
               metric("Total copies per mixed cell", total),
@@ -674,8 +674,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Expected allele fraction",
-            "分母是DNA copies，非cell数量；f=1不要求VAF=.5。",
+            "由 copies 得到 expected VAF",
+            "分母是 DNA copies，观测 VAF 则按 reads 计数。即使目标群内所有 cells 都携带 variant（f=1），混合样本的 expected VAF 也不必等于 .5。",
             `p=ρ/[ρC_T+(1−ρ)2]=${fmt(p)}`,
             [metric("Expected VAF", p), metric("Observed VAF", 0.25)],
             bars(
@@ -685,8 +685,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Sampling at finite depth",
-            "给定p下k仍随机；曲线连接离散Binomial mass点以便阅读，不是continuous density。",
+            "加入有限 read depth 的抽样",
+            "即使 expected VAF p 已知，20 条 reads 中的 alternate count k 仍会变化。图连接离散的 Binomial probability mass 点，不能把点之间当作连续 density。",
             `P(k|20,p)=C(20,k)p^k(1−p)^(20−k)`,
             [metric("P(k=5)", dist[5]), metric("VAF sampling SD", se)],
             line(
@@ -697,8 +697,8 @@ export const biologyCompleteLabs: CompleteLabMap = {
             ),
           ),
           stage(
-            "Compare two stated models",
-            "Likelihood ratio不是somatic/germline posterior；未指定prior且备选模型并不穷尽所有情况。",
+            "比较两种声明过的生成模型",
+            "用同一观测 k=5 比较 mixture candidate 与 p0=.5 candidate。Likelihood ratio 只比较这两个模型；没有 prior，也没有覆盖全部来源假设，因此不是 Somatic/Germline posterior。",
             `log LR=5log(p/.5)+15log((1−p)/.5)=${fmt(logLR)}`,
             [metric("Log likelihood ratio", logLR, "nats")],
             bars(

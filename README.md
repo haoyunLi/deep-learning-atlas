@@ -151,7 +151,7 @@ npm run preview
 
 ## AI / ML / CV / Agent mechanism depth · 2026-10-29
 
-在全站 233 节既有课程的目录与邻接内容审查基础上，新增 18 节细节课，当前共 **251 节课程、502 道练习**。新增课各有 8–10 个机制步骤、4 个以上使用步骤、4 个参数设置（起点及调整信号）、适用条件与限制、两道题、三阶段数值图。审阅范围及来源见 [ML](docs/audits/2026-10-29-ml-depth.md)、[CV](docs/audits/2026-10-29-cv-depth.md)、[Agent](docs/audits/2026-10-29-agent-depth.md)；这不是全 AI 知识已经穷尽的声明。
+在全站 233 节既有课程的目录与邻接内容审查基础上，该次新增 18 节细节课，扩充至 **251 节课程、502 道练习**；当前总量见下方 Biology bridge。新增课各有 8–10 个机制步骤、4 个以上使用步骤、4 个参数设置（起点及调整信号）、适用条件与限制、两道题、三阶段数值图。审阅范围及来源见 [ML](docs/audits/2026-10-29-ml-depth.md)、[CV](docs/audits/2026-10-29-cv-depth.md)、[Agent](docs/audits/2026-10-29-agent-depth.md)；这不是全 AI 知识已经穷尽的声明。
 
 - **ML / Probability**：Variational Inference / ELBO、Hierarchical Partial Pooling、Proper Scoring Rules、Bayes Decision Thresholds、Quantile Regression、Label Shift Correction。
 - **CV**：Preprocessing / Augmentation、Feature Pyramids / Small Objects、Box Regression Losses、Hungarian Set Matching、Dense Visual Correspondence、Keypoint Heatmaps / Pose。
@@ -167,7 +167,7 @@ npm run preview
 
 ## Every-course numerical walkthroughs
 
-The [animation directory](https://haoyunli.github.io/deep-learning-atlas/#/animations) now connects all 251 courses to a mechanism interaction or animation. This pass adds **170 course-specific numerical labs** to the courses that previously lacked one of the registered calculators or animations. Existing labs and cross-course experiments remain available; these counts are not additive unique-course counts.
+The [animation directory](https://haoyunli.github.io/deep-learning-atlas/#/animations) connected the then-current 251 courses to a mechanism interaction or animation. That pass added **170 course-specific numerical labs** to the courses that previously lacked one of the registered calculators or animations. Existing labs and cross-course experiments remain available; these counts are not additive unique-course counts.
 
 Each new lab has four computed stages, a real parameter control, an input contract and a stated simplification boundary. Freeze the current parameters as a reference, choose a stage, then change a parameter: the selected stage stays visible, playback pauses, and current/reference values share a chart scale. Signed bars, lines and matrices expose intermediate quantities; tables retain full labels and numbers. The final comparison reports numerical differences, not an automatic ranking of methods.
 
@@ -180,7 +180,7 @@ Useful starting points:
 - [TD3](https://haoyunli.github.io/deep-learning-atlas/#/lesson/td3?animation=1): smoothed actions, two Critics and a clipped target.
 - [Speculative Decoding](https://haoyunli.github.io/deep-learning-atlas/#/lesson/speculative-decoding?animation=1): acceptance probabilities and residual correction.
 
-Authoring: `src/data/completeLabs/` contains the typed schema and three lazy-loaded domain collections; `CompleteLessonLab.tsx` owns controls and comparison behavior, and `CompleteLabChart.tsx` owns accessible quantitative plots. After changing lab questions or controls, run `node scripts/generate-complete-lab-catalog.mjs` to refresh the lightweight directory metadata. Run `npm run validate:complete` for independent domain fixtures, slider sweeps, joint extrema, SVG/server-render checks and coverage validation. The production build runs these alongside the existing checks.
+Authoring: `src/data/completeLabs/` contains the typed schema and four lazy-loaded domain collections; `CompleteLessonLab.tsx` owns controls and comparison behavior, and `CompleteLabChart.tsx` owns accessible quantitative plots. After changing lab questions or controls, run `node scripts/generate-complete-lab-catalog.mjs` to refresh the lightweight directory metadata. Run `npm run validate:complete` for independent domain fixtures, slider sweeps, joint extrema, SVG/server-render checks and coverage validation. The production build runs these alongside the existing checks.
 
 ## Biology regulation and inference bridge
 
@@ -189,3 +189,7 @@ Authoring: `src/data/completeLabs/` contains the typed schema and three lazy-loa
 [生物调控学习路径](https://haoyunli.github.io/deep-learning-atlas/#/concepts/biology-regulation-inference) 连接每课的四阶段数值实验、参数起点与调整依据、适用条件、限制和排错。生物术语与实验前提链接到 Bio/CS 的八个专门章节与六个交互实验。模型和数值均为 synthetic teaching examples；PWM score、ABC score、TF activity 和 LR score 均不直接等于已验证的生物因果关系。
 
 `node scripts/validate-biology-bridge.mjs` 检查六课与十二题、跨站导航、独立算术、参数范围和模型边界。版本与来源说明见 [本轮审计](docs/audits/2026-10-29-biology-bridge.md)。
+
+## Reading-flow review
+
+The 18 Concept Paths and four AI journeys now carry their route into each lesson. Previous/next links follow that route, show its step count and return to the route at its endpoint; category browsing is explicitly labelled as a catalogue. Shared lessons can therefore lead to different next steps in different routes. The six biology bridge lessons now use clearer Chinese transitions while retaining English technical names, and distinguish their fixtures from Bio/CS examples. See [editorial scope and findings](docs/audits/2026-10-29-editorial-review.md). `node scripts/validate-learning-navigation.mjs` validates all 22 routes and 162 ordered steps, boundaries, overlapping lessons and invalid context.

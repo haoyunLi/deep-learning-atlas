@@ -23,7 +23,7 @@ export const biologyBridgeLessons: Lesson[] = [
     summary:
       "把 DNA motif 变成逐位置的 likelihood-ratio score，理解 background、pseudocount、reverse complement 与多重检验怎样改变结论。",
     intuition:
-      "在一个到处都是 A/T 的区域发现 AT，惊讶程度低于在 G/C 很多的区域发现同样的 AT。PWM 不只问“是否匹配共识序列”，还比较 motif 模型和 background 模型各自有多愿意产生这段序列。",
+      "同样看到 AT，在 A/T 本来就很多的区域里不算稀奇，在 G/C 很多的区域里则更意外。PWM 把这种比较写成数值：这段 DNA 在 motif 模型下出现的可能性，相对 background 模型高了多少？先读懂这个比较，再看它为什么还不能证明 TF 正在结合。",
     core: "从 aligned binding-site sequences 得到每个位置的 A/C/G/T counts，加入按 background 分配的 total pseudocount，再转为位置概率矩阵。对一段等长 DNA，累加 log2[p_j(base)/q(base)] 得到 motif 相对 zero-order background 的 log-likelihood ratio。位置独立是模型假设；motif score 不是 TF occupancy、TF activity 或 binding 的 posterior probability。FIMO 还根据 background 下的 score 分布计算 P value，并处理大量扫描位置的 multiple testing。",
     equation: "p_j(b)=(n_jb+αq_b)/(N_j+α); S(s)=Σ_j log2[p_j(s_j)/q(s_j)]",
     mechanicsSteps: [
@@ -124,8 +124,8 @@ export const biologyBridgeLessons: Lesson[] = [
     summary:
       "把 enhancer activity 与 promoter contact 合成相对贡献，逐步理解候选集合、分母、距离及功能验证的关系。",
     intuition:
-      "一个enhancer像有音量的发言者，contact像它和某个promoter交谈的机会。声音强但几乎碰不到目标，或经常碰到却没有活动，都不足以单独得到高ABC score；同一gene的其他候选elements还会分走相对权重。",
-    core: "ABC将element activity A与element–gene contact C相乘，并在同一gene的候选regulatory elements中归一化。原始模型把chromatin accessibility与H3K27ac结合估计activity，再结合contact信息；具体实现版本可改变输入与工程默认。ABC score是给定candidate universe下的relative regulatory input模型，不能直接当成细胞中真实调控比例或已证实的causal effect。Nearest gene、3D contact与functional target是不同概念。",
+      "一个 enhancer 像有音量的发言者，contact 则描述它与某个 promoter 接触的机会。声音大却接触很少，或接触很多却几乎没有 activity，乘积都可能不高。ABC 再把这个乘积放到同一 gene 的全部候选 elements 中比较，因此其他候选也会影响它的相对分数。",
+    core: "ABC 先计算每个 element 的 activity A 与 element–gene contact C 的乘积，再除以同一 gene 的候选乘积总和。原始模型结合 chromatin accessibility 与 H3K27ac 估计 activity；实际输入和默认设置需按实现版本核对。因此，ABC score 表示给定候选集合中的 relative regulatory input，而不是每个 cell 中已测得的调控比例。Nearest gene、3D contact 和 functional target 分别描述距离、接触与功能证据，不能互相替代。",
     equation: "w_eg=A_e C_eg; ABC_eg=w_eg/Σ_e′∈candidate(g) A_e′C_e′g",
     mechanicsSteps: [
       "固定gene/promoter、候选elements、坐标版本和cell context；先明确分母包含哪些候选。",
@@ -154,7 +154,7 @@ export const biologyBridgeLessons: Lesson[] = [
       "记录TP/FP代价和验证预算，选择能实际检验的candidate links，并报告candidate universe。",
     ],
     example:
-      "E1的activity/contact都未改变，但E2 contact减半后E1的ABC score增加。这是竞争分母效应，不是新证据证明E1变得更强。",
+      "本课实验固定 E1 的 activity 和 contact，只把 E2 contact 从 .2 改为 .1：E1 score 由 1/3 增至 .4，原因是分母变小。Bio/CS 的关联实验改为增删第三个候选，使用另一组 synthetic inputs；两例数值不同，但都在检验“分子不变，分母改变”这一机制。",
     tuning: [
       "先检查coordinate和候选集合，再调score threshold；系统性错配不是阈值能修复的。",
       "比较activity/contact替代输入时保持candidate universe固定，以免把分母变化误判为新assay效果。",
@@ -223,10 +223,10 @@ export const biologyBridgeLessons: Lesson[] = [
     duration: "18 分钟",
     icon: "⌘",
     summary:
-      "区分 network inference、motif pruning与target-based activity scoring，理解为什么TF expression、binding和activity不能互相替代。",
+      "把 network inference、motif pruning 与 target-based activity scoring 分成三步，理解 TF expression、binding 和 activity 各自提供什么证据。",
     intuition:
-      "想知道一位调度者是否在工作，不能只数办公室里有几个人；还要看受其调度的任务是否朝预期方向变化。TF transcript是自身RNA，regulon score则从一组targets的联合变化推断状态，两者不必同步。",
-    core: "GRN inference提出TF–target候选edges；regulon定义一个TF及其候选targets；activity scoring再在每个sample/cell上整合target evidence。SCENIC使用co-expression建候选modules、motif enrichment进行pruning、AUCell按target ranks计算activity。这里的可计算示例另用明确的signed WMEAN-style raw score Σw_gz_g/Σ|w_g|：正weight代表activating expectation、负weight代表repressive expectation。它不是AUCell，不是SCENIC网络推断，也不自动代表TF蛋白的真实活性。",
+      "想知道一位调度者是否在发挥作用，除了看他是否在场，还要看相关任务有没有朝预期方向变化。TF transcript 记录 TF 自身的 RNA；regulon score 则整合一组 targets 的变化。两种读数回答不同问题，因此不必同步升降。",
+    core: "先区分三个对象：GRN inference 提出 TF–target 候选 edges；一个 regulon 包含一个 TF 及其候选 targets；activity scoring 则整合这些 targets 在某个 sample 或 cell 中的信号。SCENIC 依次使用 co-expression、motif enrichment 和 AUCell 完成候选构建、筛选与评分。本课为了逐项手算，另外采用 signed WMEAN-style raw score：Σw_gz_g/Σ|w_g|。正 weight 表示预期 activation，负 weight 表示预期 repression。这个实验用于解释符号和分母，不复现 AUCell，也不把 target score 当作已测得的 TF protein activity。",
     equation:
       "a_TF=Σ_g w_TF,g z_g / Σ_g |w_TF,g|; inferred edge ≠ established causal regulation",
     mechanicsSteps: [
@@ -256,7 +256,7 @@ export const biologyBridgeLessons: Lesson[] = [
       "检查每个高score由哪些targets驱动，比较去除单一dominant target后的稳定性。",
     ],
     example:
-      "TF自身RNA保持不变，repressive target从z=−1升到z=2，signed target score由1.333降到.333。该结果说明target pattern变化，不能单独证明TF蛋白数量、binding或causal activity发生了对应幅度的变化。",
+      "保持 TF 自身 RNA 不变，把带负 weight 的 target 从 z=−1 调到 z=2，signed score 就从 1.333 降到 .333。变化来自 targets 的组合，而不是 TF RNA。关联的 Bio/CS 实验先解释 motif 证据；本课在此基础上进一步计算 target-based score，两者不在同一个测量层。",
     tuning: [
       "先选择符合输入与network的score定义，再比较threshold；不要为制造二峰分布强行二值化。",
       "按method要求设置minimum target coverage，并报告缺失targets；toy只有3targets用于手算，不是默认生物分析门槛。",
@@ -326,10 +326,10 @@ export const biologyBridgeLessons: Lesson[] = [
     duration: "19 分钟",
     icon: "⇄",
     summary:
-      "从cell-type expression与receptor complex计算候选interaction，再用明确的null检验specificity，避免把共表达、显著性和真实通信混为一谈。",
+      "先由 cell-type expression 与 receptor complex 计算候选 interaction，再写清 null hypothesis，区分表达特异性、统计显著性与真实通信。",
     intuition:
-      "两间房分别有发射机和接收机，只说明可能通信；接收机缺一块必需部件、两间房不在可达距离，或根本没有发射信号，都会改变结论。LR分析先做候选筛选，再需要时空、protein及功能证据。",
-    core: "LR 的含义依语境可为 Ligand–Receptor、learning rate 或 Logistic Regression；本课指 Ligand–Receptor。CellPhoneDB-style analysis把表达数据映射到curated interaction database，检查相关cell types中各成员的表达比例，并对heteromeric complex使用最低表达subunit代表其限制。它用ligand与receptor的cluster mean形成interaction mean，并通过cell-label shuffling构建specificity null。本课toy复算这些基本ingredients，但只枚举六个可交换synthetic cells的20种三对三划分，不复现数据库筛选、large-scale multiple testing、spatial建模或完整软件。P value回答指定null下score有多极端，不能直接证明communication或condition差异。",
+      "两间房里分别有发射机和接收机，只能说明具备候选通信条件。如果接收机缺少必需部件、信号无法到达，或发射机没有工作，就不能断言发生了通信。LR analysis 先依据表达筛选候选，再用空间、protein、下游 response 和干预证据逐层检验。",
+    core: "这里的 LR 指 Ligand–Receptor；在其他课程中，同一缩写还可能指 learning rate 或 Logistic Regression。CellPhoneDB-style analysis 先将表达数据与 interaction database 对齐，再检查成员表达比例，并用最低表达的必需 subunit 表示 heteromeric complex 的瓶颈。随后，以 ligand 和 receptor 的 cluster means 计算 interaction mean，通过 cell-label shuffling 构建 specificity null。本课用六个可交换的 synthetic cells 枚举全部 20 种三对三划分，只复算 complex、score 和 null 三步。得到的 P value 回答该表达分配在指定 null 下是否极端；数据库筛选、多重检验、空间建模和 condition 差异需要各自的方法。",
     equation:
       "R_complex=min(mean(R1),mean(R2)); T=(mean(L_sender)+R_complex,receiver)/2; p_exact=#{permuted T≥observed T}/20",
     mechanicsSteps: [
@@ -361,7 +361,7 @@ export const biologyBridgeLessons: Lesson[] = [
       "选高优先级候选后用spatial/protein/downstream和perturbation证据形成验证链。",
     ],
     example:
-      "默认六cell例子的T=3、exact p=.05仅说明该cell-label分配产生了很特异的表达pattern。它没有观察到ligand分泌，也没有测到receptor activation，更没有证明患者之间的condition effect。",
+      "默认六个 cells 的例子得到 T=3、exact p=.05，它比较的是 cell-label 分配。Bio/CS 的关联实验则用四个 paired donors 的 16 种 sign flips 比较 condition 差异；检验单位和 null 不同，不能直接对照两边的 p 值。两者都没有单独证明 ligand 分泌或 receptor activation。",
     tuning: [
       "低表达edge太多时先看expression fraction与complex completeness，再调P-value cutoff。",
       "Annotation从粗到细会改变group means与检验数量；比较多个合理granularities并保留稀有群支持量。",
@@ -438,10 +438,10 @@ export const biologyBridgeLessons: Lesson[] = [
     duration: "19 分钟",
     icon: "Δ",
     summary:
-      "用可复算的additive baseline与interaction residual，区分held-out cells、perturbations、combinations和生物context的泛化目标。",
+      "从可复算的 additive baseline 出发，逐步加入 interaction residual 和 context shift，区分对新 cells、新 perturbations、新 combinations 与新 context 的预测。",
     intuition:
-      "分别知道“按A按钮”和“按B按钮”的后果，不保证知道一起按的后果；在培养皿中学到的按钮关系，也不自动适用于完整组织。模型评估必须明确究竟哪个按钮、组合或环境是新的。",
-    core: "Perturbation prediction把unperturbed state/context与intervention编码映射到postperturbation expression或distribution。GEARS把gene关系prior与GNN用于perturbation generalization；它的实验区分组合中零个、一个或两个genes未被单独perturb过的情况。本课使用可解释的additive baseline，明确interaction residual和context shift，演示评估逻辑，不训练GEARS或声称模拟完整细胞。In vitro到in vivo的迁移可能改变cell interactions、exposure和response mechanism，不能仅按embedding接近来保证。",
+      "知道单独按 A、单独按 B 的后果，还不能确定同时按 A 和 B 会怎样。在培养皿里学到的关系，换到完整组织中也可能变化。因此，评估前先说清楚：新的究竟是 cell、perturbation、组合，还是实验环境？",
+    core: "Perturbation prediction 的输入是未干预状态、context 与 intervention，目标是干预后的 expression 或 distribution。以 GEARS 为例，它利用 gene 关系 prior 和 GNN，并区分组合中零个、一个或两个 genes 未在训练中被单独 perturb 的情况。理解复杂模型前，本课先计算 additive baseline：把两个 single perturbations 相对 control 的变化相加，再检查 double perturbation 的实际结果偏离多少。实验进一步加入 context shift，说明新组合与新环境是两种不同的外推问题；它不训练 GEARS，也不模拟完整 cell。",
     equation:
       "ŷ_AB,c=y_0,c+Δ_A,c+Δ_B,c; r_AB,c=y_AB,c−ŷ_AB,c; unseen cells ≠ unseen perturbations ≠ unseen context",
     mechanicsSteps: [
@@ -449,7 +449,7 @@ export const biologyBridgeLessons: Lesson[] = [
       "Toy控制表达vector y0=[10,10]，单A effect=[−2,1]、单B effect=[1,−3]；这些是给定condition means，不包含cell-level噪声。",
       "从单扰动计算ΔA、ΔB，并得到additive double prediction=[9,8]。所有fit/normalization只使用训练conditions。",
       "Held-out double的真实response在toy中设为[9+δ,8−δ]。默认δ=2时true=[11,6]；interaction residual=[2,−2]。",
-      "MSE=mean([δ²,δ²])=δ²=4。预测绝对expression可能仍与truth高度相关，但对关键change的方向和interaction判断可以错误。",
+      "本例两个 readouts 的误差分别为 δ 和 −δ，因此 MSE=mean([δ²,δ²])=δ²=4。这里直接检查误差与变化方向；在真实高维 expression 中，还要避免大量未变化 genes 掩盖少数关键 targets 的预测错误。",
       "另加context shift c到held-out response：[9+δ+c,8−δ+c]。此时source-context baseline的MSE=δ²+c²，明确两个误差来源。",
       "Random cell split可能在train和test中都出现同一个perturbation/context。若目标是新组合，必须hold out整个combination；若目标是新gene或新donor/context，再加相应分组切分。",
       "比较no-change、additive和更复杂模型，并在预定义genes、independent conditions和donors上报告effect与uncertainty；不要用test DE gene selection反复调参。",
@@ -550,10 +550,10 @@ export const biologyBridgeLessons: Lesson[] = [
     duration: "18 分钟",
     icon: "◐",
     summary:
-      "从cell mixture到DNA copies再到sequencing reads建立概率模型，区分VAF、cell fraction、somatic/germline与可识别性。",
+      "沿 cell mixture → DNA copies → sequencing reads 建立概率模型，逐步区分 VAF、cell fraction、variant 来源与 identifiability。",
     intuition:
-      "从一袋混合颜色的积木抽样，看到某颜色占四分之一，并不能直接说四分之一的人拿了它：每人带的积木数量可能不同，一些人带多套，样本里还混着另一群人。VAF的分母是reads对应的allele copies，不是cells。",
-    core: "在给定copy-number及无bias假设下，somatic variant的expected VAF可写为p=ρ f m/[ρ C_T+(1−ρ)C_N]，其中ρ为目标cell群比例、f为该群中携带variant的cell fraction、m为携带cells中的mutant copy multiplicity，C_T/C_N为目标/背景群的总copy数。本课固定局部copy状态在群内一致，用Binomial(k|n,p)解释有限depth的抽样。Somatic/germline属于variant出现的lineage与遗传背景；一个VAF值或likelihood ratio不能独立判定它。",
+      "把不同人带来的积木混在一起，某种颜色占四分之一，并不意味着四分之一的人带了它：每人可能带不同数量的积木。同样，VAF 按 reads 计数，其背后反映 allele copies 的混合；要推到 cell fraction，还必须知道每类 cell 贡献多少 DNA copies。",
+    core: "先固定一个候选生成模型：背景群不含 variant，两群内部各自具有一致的局部 copy number，且测序无 bias。此时 expected VAF 为 p=ρfm/[ρC_T+(1−ρ)C_N]。ρ 是目标 cell 群比例，f 是其中携带 variant 的比例，m 是携带者的 mutant copy multiplicity，C_T/C_N 是两群的总 copy 数。再用 Binomial(k|n,p) 描述有限 read depth 的抽样。这样就把 cell composition、DNA 分母和 read sampling 分开了。Somatic/Germline 与 Inherited/De novo 属于不同分类维度；单一 VAF 或 likelihood ratio 都不足以独立判定来源。",
     equation:
       "p=ρfm/[ρC_T+(1−ρ)C_N]; k|n,p~Binomial(n,p); log LR=k log(p/p0)+(n−k)log[(1−p)/(1−p0)]",
     mechanicsSteps: [
@@ -583,7 +583,7 @@ export const biologyBridgeLessons: Lesson[] = [
       "结合matched normal和independent loci检查备选解释，并用适当专业流程解释真实variant。",
     ],
     example:
-      "5/20 alternate reads与p=.25相容；但纯目标群的一半cells携带heterozygous variant，也可得到同样p。增加depth可缩小sampling uncertainty，却不能消除这两个参数组合的structural nonidentifiability。",
+      "5/20 alternate reads 与 p=.25 相容；但目标群占一半且全部携带 variant，与纯目标群中只有一半 cells 携带 heterozygous variant，都能给出同样的 p。增加 read depth 可以减少 sampling uncertainty，却不能区分这两种生成机制。Bio/CS 先解释 lineage 和 DNA-copy 分母，本课再加入 finite-depth likelihood。",
     settings: [
       {
         name: "copy-number model",

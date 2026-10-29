@@ -8,6 +8,7 @@ import {
 } from "react";
 import { categories, lessons, type Lesson } from "./data/lessons";
 import { conceptPaths } from "./data/conceptPaths";
+import { lessonHref, resolveLessonNavigation } from "./lib/learningNavigation";
 import { researchLinksForLesson } from "./data/researchPaths";
 import AnimationDirectory from "./components/AnimationDirectory";
 import AIScopeDiagram from "./components/AIScopeDiagram";
@@ -285,8 +286,8 @@ function Home({
       </section>
       <section className="route-section page-gutter" id="path">
         <div className="section-intro">
-          <h2>学习路径</h2>
-          <p>Learning Route</p>
+          <h2>按领域浏览</h2>
+          <p>这里按主题筛选课程；要连续学习，请选择 AI 全景或关键概念中的学习路径。</p>
         </div>
         <div className="route-grid">
           {categories.map((item, index) => (
@@ -546,11 +547,13 @@ function TextList({ items }: { items: string[] }) {
 
 function Detail({
   id,
+  routeQuery = "",
   showAnimation = false,
   showSandbox = false,
   showExercise = false,
 }: {
   id: string;
+  routeQuery?: string;
   showAnimation?: boolean;
   showSandbox?: boolean;
   showExercise?: boolean;
@@ -580,6 +583,10 @@ function Detail({
       </div>
     );
   const index = lessons.indexOf(lesson);
+  const requestedPath = new URLSearchParams(routeQuery).get("path");
+  const navigation = resolveLessonNavigation(id, requestedPath, lessons.map((item) => item.id));
+  const previousLesson = lessons.find((item) => item.id === navigation.previousId);
+  const nextLesson = lessons.find((item) => item.id === navigation.nextId);
   const researchConnections = researchLinksForLesson(lesson.id);
   const related = lesson.compareTo
     .map((other) => lessons.find((item) => item.id === other))
@@ -678,6 +685,15 @@ function Detail({
           <span>{lesson.englishTitle}</span>
         </h1>
         <p className="detail-summary">{lesson.summary}</p>
+        {navigation.route ? (
+          <section className="lesson-research-context" aria-label="当前学习路径">
+            <strong>{navigation.route.title} · 第 {navigation.index + 1} / {navigation.total} 步</strong>
+            <p>本页的“上一步 / 下一步”沿这条路径继续；侧栏仍可按领域查阅其他课程。</p>
+            <a href={navigation.route.href}>返回这条学习路径 →</a>
+          </section>
+        ) : requestedPath ? (
+          <p className="lesson-research-context">未找到与本课匹配的学习路径，以下按课程目录顺序浏览。</p>
+        ) : null}
         {[
           "bayesian-updating",
           "hierarchical-bootstrap",
@@ -916,16 +932,18 @@ function Detail({
           </div>
         ))}
         <div className="lesson-next">
-          {index > 0 && (
-            <a href={`#/lesson/${lessons[index - 1].id}`}>
-              ← 上一节 <strong>{lessons[index - 1].title}</strong>
+          {previousLesson && (
+            <a href={lessonHref(previousLesson.id, navigation.route?.id, routeQuery)}>
+              {navigation.route ? "← 本路径上一步" : "← 目录上一节"} <strong>{previousLesson.title}</strong>
             </a>
           )}
-          {index < lessons.length - 1 && (
-            <a href={`#/lesson/${lessons[index + 1].id}`}>
-              下一节 → <strong>{lessons[index + 1].title}</strong>
+          {nextLesson ? (
+            <a href={lessonHref(nextLesson.id, navigation.route?.id, routeQuery)}>
+              {navigation.route ? "本路径下一步 →" : "目录下一节 →"} <strong>{nextLesson.title}</strong>
             </a>
-          )}
+          ) : navigation.route ? (
+            <a href={navigation.route.href}>本路径已到终点 · 返回路径检查掌握情况 →</a>
+          ) : null}
         </div>
       </article>
       <aside className="detail-right">
@@ -1257,7 +1275,7 @@ function Concepts({ selectedPath }: { selectedPath?: string }) {
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <div>
-                      <a href={`#/lesson/${lesson.id}`}>
+                      <a href={lessonHref(lesson.id, path.id)}>
                         <strong>{lesson.title}</strong>
                         <em>{lesson.englishTitle}</em>
                         <ArrowIcon />
@@ -1326,7 +1344,7 @@ function App() {
   const pageNames: Record<string, string> = {
     "/": "学习首页",
     "/atlas": "算法图谱",
-    "/path": "学习路径",
+    "/path": "按领域浏览",
     "/animations": "动效实验室",
     "/practice": "实践工坊",
     "/bio-algorithms": "Single-cell / Spatial 算法实验",
@@ -1357,6 +1375,7 @@ function App() {
     page = (
       <Detail
         id={lessonId}
+        routeQuery={routeQuery}
         showAnimation={params.get("animation") === "1"}
         showSandbox={params.get("sandbox") === "1"}
         showExercise={params.get("exercise") === "1"}
