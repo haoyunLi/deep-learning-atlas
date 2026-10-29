@@ -1,0 +1,288 @@
+.complete-lesson-lab {
+  margin-block: 32px;
+  scroll-margin-top: 85px;
+  border-block: 1px solid #d6dfe9;
+  padding-block: 24px;
+  min-width: 0;
+}
+.complete-player {
+  color: #14284b;
+  min-width: 0;
+}
+.complete-player h2 {
+  font: 600 25px/1.45 var(--serif);
+  margin: 0 0 18px;
+  text-wrap: balance;
+}
+.complete-player h3 {
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 24px 0 12px;
+}
+.complete-player p,
+.complete-player li,
+.complete-player dd {
+  font-size: 15px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+.complete-input {
+  max-width: 75ch;
+}
+.complete-player .complete-scope,
+.complete-reference {
+  font-size: 13px;
+  color: #455b78;
+}
+.complete-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+  padding-block: 22px;
+}
+.complete-controls label {
+  display: grid;
+  gap: 10px;
+}
+.complete-controls label > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.complete-controls output {
+  color: #245fbd;
+  font-variant-numeric: tabular-nums;
+}
+.complete-controls input {
+  width: 100%;
+  accent-color: #245fbd;
+  min-height: 26px;
+  margin: 0;
+}
+.complete-controls small {
+  line-height: 1.7;
+  color: #455b78;
+  font-size: 13px;
+}
+.complete-comparison-controls,
+.complete-playback {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.complete-player button,
+.complete-player select {
+  min-height: 44px;
+  padding: 9px 13px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid #b9c8dc;
+  border-radius: 4px;
+  background: white;
+  color: #14284b;
+  cursor: pointer;
+}
+.complete-player button:hover:not(:disabled) {
+  background: #ecf3ff;
+  border-color: #245fbd;
+}
+.complete-player button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.complete-player
+  :is(button, input, select, summary, a, [tabindex]):focus-visible {
+  outline: 3px solid #245fbd;
+  outline-offset: 3px;
+}
+.complete-player a {
+  color: #245fbd;
+  text-underline-offset: 4px;
+}
+.complete-player ::selection {
+  background: #d7e6ff;
+  color: #14284b;
+}
+.complete-player .complete-notice {
+  min-height: 24px;
+  color: #167b73;
+  font-size: 13px;
+  margin: 0;
+}
+.complete-stages {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-block: 20px;
+}
+.complete-stages button {
+  text-align: left;
+  line-height: 1.6;
+  padding: 12px;
+}
+.complete-stages button > span {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.complete-stages button[aria-current="step"] {
+  background: #14284b;
+  border-color: #14284b;
+  color: white;
+}
+.complete-stages button[aria-current="step"]:hover {
+  background: #184998;
+  color: white;
+}
+.complete-playback > span {
+  font-size: 13px;
+  padding-inline: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.complete-playback label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+}
+.complete-stage-copy {
+  border-top: 1px solid #d6dfe9;
+  margin-top: 20px;
+}
+.complete-formula {
+  background: #f7f9fc;
+  padding: 12px 14px;
+  font-variant-numeric: tabular-nums;
+}
+.complete-chart-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  background: #f7f9fc;
+  border-block: 1px solid #d6dfe9;
+  margin-top: 20px;
+  scrollbar-color: #60708b #f7f9fc;
+}
+.complete-chart-scroll svg {
+  display: block;
+  width: 100%;
+  min-width: 660px;
+  height: auto;
+}
+.complete-chart-scroll svg text {
+  font-family: inherit;
+  font-size: 14px;
+  fill: #14284b;
+  font-variant-numeric: tabular-nums;
+}
+.complete-chart-scroll svg .complete-svg-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+.complete-chart-scroll svg :is(rect, circle, path) {
+  transition:
+    fill 240ms ease-out,
+    fill-opacity 240ms ease-out,
+    stroke 240ms ease-out,
+    opacity 240ms ease-out,
+    x 240ms ease-out,
+    y 240ms ease-out,
+    width 240ms ease-out,
+    height 240ms ease-out,
+    cx 240ms ease-out,
+    cy 240ms ease-out;
+}
+.complete-scroll-hint {
+  display: block;
+  padding: 10px 14px 0;
+  font-size: 12px;
+  color: #455b78;
+  line-height: 1.6;
+}
+.complete-table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  margin-block: 16px;
+  scrollbar-color: #60708b #f7f9fc;
+}
+.complete-table-scroll table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+.complete-table-scroll caption {
+  text-align: left;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.complete-table-scroll th,
+.complete-table-scroll td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid #d6dfe9;
+  overflow-wrap: anywhere;
+  min-width: 74px;
+}
+.complete-table-scroll th:first-child {
+  min-width: 130px;
+}
+.complete-table-scroll thead {
+  background: #f7f9fc;
+}
+.complete-chart-values summary,
+.complete-guidance summary {
+  cursor: pointer;
+  line-height: 1.7;
+  padding-block: 12px;
+  font-size: 14px;
+}
+.complete-guidance {
+  border-top: 1px solid #d6dfe9;
+  margin-top: 26px;
+}
+.complete-guidance summary {
+  font-size: 17px;
+  font-weight: 600;
+}
+.complete-guidance ul {
+  padding-left: 20px;
+}
+.complete-guidance li + li {
+  margin-top: 12px;
+}
+.complete-guidance dl > div {
+  padding-block: 15px;
+  border-bottom: 1px solid #d6dfe9;
+}
+.complete-guidance dt {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+.complete-guidance dd {
+  margin: 7px 0 0;
+}
+@media (max-width: 640px) {
+  .complete-controls {
+    grid-template-columns: 1fr;
+  }
+  .complete-stages {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .complete-player h2 {
+    font-size: 22px;
+  }
+  .complete-playback label {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .complete-chart-scroll svg * {
+    transition: none !important;
+  }
+}

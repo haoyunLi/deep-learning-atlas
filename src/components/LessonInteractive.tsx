@@ -4,6 +4,8 @@ import AnimatedExplainer from "./AnimatedExplainer";
 import HandCalculationSandbox from "./HandCalculationSandbox";
 import LessonExercises from "./LessonExercises";
 import FoundationContrasts from "./FoundationContrasts";
+import CompleteLessonLab from "./CompleteLessonLab";
+import { completeLabCatalog } from "../data/completeLabCatalog";
 
 export default function LessonInteractive({
   lesson,
@@ -33,7 +35,11 @@ export default function LessonInteractive({
           </a>
         </p>
       )}
-      <AnimatedExplainer key={lesson.id} lesson={lesson} />
+      {completeLabCatalog[lesson.id] ? (
+        <CompleteLessonLab key={lesson.id} lesson={lesson} />
+      ) : (
+        <AnimatedExplainer key={lesson.id} lesson={lesson} />
+      )}
       <FoundationContrasts key={`contrast-${lesson.id}`} lessonId={lesson.id} />
       <HandCalculationSandbox
         key={`sandbox-${lesson.id}`}

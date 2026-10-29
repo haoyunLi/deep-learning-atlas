@@ -164,3 +164,20 @@ npm run preview
 修订旧课的 RoI Pooling/RoIAlign、YOLO 版本边界、theoretical/Effective Receptive Field、ViT patch/checkpoint、β-VAE/ELBO、Ensemble disagreement、Conformal selective risk、Class Weighting、Label Shift、Bandit context/propensity 与 PUCT/UCT，并加入相应细节课的双向联系。
 
 新增四个 validators 分别检查课程算术与深度实验。Depth Lab 使用 exhaustive HMM path/assignment oracles、Kalman precision fusion、geometry round trips、MCTS backup invariants、Beam distribution normalization 等独立依据；完整 build 同时检查全站课程、练习、链接、既有实验和 TypeScript。所有教学数值均为 synthetic fixtures。
+
+## Every-course numerical walkthroughs
+
+The [animation directory](https://haoyunli.github.io/deep-learning-atlas/#/animations) now connects all 251 courses to a mechanism interaction or animation. This pass adds **170 course-specific numerical labs** to the courses that previously lacked one of the registered calculators or animations. Existing labs and cross-course experiments remain available; these counts are not additive unique-course counts.
+
+Each new lab has four computed stages, a real parameter control, an input contract and a stated simplification boundary. Freeze the current parameters as a reference, choose a stage, then change a parameter: the selected stage stays visible, playback pauses, and current/reference values share a chart scale. Signed bars, lines and matrices expose intermediate quantities; tables retain full labels and numbers. The final comparison reports numerical differences, not an automatic ranking of methods.
+
+Manual navigation and three playback speeds are available. Playback stops at the end and pauses when the lab is offscreen or the tab is hidden; Reduced Motion keeps manual steps. Download exports both parameter sets, all intermediate calculations, outcomes and the primary source as JSON. Usage guidance distinguishes settings to start with, signals to adjust them and symptom → check → action troubleshooting. These are small synthetic mechanism examples, not trained-model benchmarks.
+
+Useful starting points:
+
+- [BatchNorm](https://haoyunli.github.io/deep-learning-atlas/#/lesson/batch-normalization?animation=1): how another sample changes batch statistics and the same sample's training output.
+- [LayerNorm](https://haoyunli.github.io/deep-learning-atlas/#/lesson/layer-normalization?animation=1): normalization axes and the distinction from RMSNorm.
+- [TD3](https://haoyunli.github.io/deep-learning-atlas/#/lesson/td3?animation=1): smoothed actions, two Critics and a clipped target.
+- [Speculative Decoding](https://haoyunli.github.io/deep-learning-atlas/#/lesson/speculative-decoding?animation=1): acceptance probabilities and residual correction.
+
+Authoring: `src/data/completeLabs/` contains the typed schema and three lazy-loaded domain collections; `CompleteLessonLab.tsx` owns controls and comparison behavior, and `CompleteLabChart.tsx` owns accessible quantitative plots. After changing lab questions or controls, run `node scripts/generate-complete-lab-catalog.mjs` to refresh the lightweight directory metadata. Run `npm run validate:complete` for independent domain fixtures, slider sweeps, joint extrema, SVG/server-render checks and coverage validation. The production build runs these alongside the existing checks.

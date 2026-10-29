@@ -3,10 +3,11 @@ import { useMemo, useState } from "react";
 import { categories, lessons } from "../data/lessons";
 import {
   animationKind,
-  mechanismCount,
   animationCatalog,
+  handCalculationLessonIds,
 } from "../data/animationCatalog";
 import { matchesLesson } from "../lib/search";
+import { completeLabCatalog } from "../data/completeLabCatalog";
 
 const kindLabels = {
   parameter: "参数实验",
@@ -22,11 +23,15 @@ export default function AnimationDirectory() {
     () =>
       lessons.filter((lesson) => {
         const lab =
-          linkedLabForLesson(lesson.id) ?? animationCatalog[lesson.id];
+          linkedLabForLesson(lesson.id) ??
+          completeLabCatalog[lesson.id] ??
+          animationCatalog[lesson.id];
         return (
           (category === "all" || lesson.category === category) &&
           (kind === "all" ||
-            (linkedLabForLesson(lesson.id)
+            (linkedLabForLesson(lesson.id) ||
+            completeLabCatalog[lesson.id] ||
+            handCalculationLessonIds.includes(lesson.id)
               ? "parameter"
               : animationKind(lesson.id)) === kind) &&
           matchesLesson(lesson, query, lab?.label || "")
@@ -41,24 +46,23 @@ export default function AnimationDirectory() {
           <a className="back-link" href="#/">
             ← 回到学习首页
           </a>
-          <p className="concept-kicker">THE ALGORITHM LAB · 动效实验室</p>
           <h1>让算法在眼前发生。</h1>
           <p>
-            先播放一遍，再亲手改变一个参数。把公式、图形和每一步的原因对应起来。
+            固定一组参数作对照，再改变一个设置。逐步比较中间数值、图形和最终结果，理解差异从哪里来。
           </p>
         </div>
         <dl className="animation-stats">
           <div>
             <dt>{lessons.length}</dt>
-            <dd>课程步骤导览</dd>
+            <dd>课程已连接机制实验或动效</dd>
           </div>
           <div>
-            <dt>{mechanismCount}</dt>
-            <dd>专属机制动效</dd>
+            <dt>{Object.keys(completeLabCatalog).length}</dt>
+            <dd>新增逐课数值推演 · 含固定对照</dd>
           </div>
           <div>
             <dt>{Object.keys(animationCatalog).length}</dt>
-            <dd>课内参数实验 · 另有 {linkedLabs.length} 个跨课实验</dd>
+            <dd>原有课内参数实验 · 另有 {linkedLabs.length} 个跨课实验</dd>
           </div>
         </dl>
       </div>
@@ -71,6 +75,15 @@ export default function AnimationDirectory() {
       </div>
       <section className="animation-starts" aria-label="动效学习起点">
         <strong>从一个问题开始</strong>
+        <a href="#/lesson/batch-normalization?animation=1">
+          BatchNorm 的 batch statistics 怎样影响当前样本？ ↗
+        </a>
+        <a href="#/lesson/td3?animation=1">
+          TD3 怎样改变 target，为什么要看两个 Critics？ ↗
+        </a>
+        <a href="#/lesson/speculative-decoding?animation=1">
+          Speculative Decoding 为什么需要 residual correction？ ↗
+        </a>
         <a href="#/ai-depth?lab=hmm">
           HMM、Kalman、Assignment、Geometry、MCTS 与 Beam 怎样逐步运行？ ↗
         </a>
@@ -107,7 +120,6 @@ export default function AnimationDirectory() {
             ["all", "全部"],
             ["parameter", "可调参数"],
             ["visual", "机制动效"],
-            ["steps", "步骤导览"],
           ].map(([id, label]) => (
             <button
               key={id}
@@ -142,12 +154,23 @@ export default function AnimationDirectory() {
       <div className="animation-library-grid">
         {filtered.map((lesson, index) => {
           const external = linkedLabForLesson(lesson.id),
-            lab = external ?? animationCatalog[lesson.id],
-            type = external ? "parameter" : animationKind(lesson.id);
+            lab =
+              external ??
+              completeLabCatalog[lesson.id] ??
+              animationCatalog[lesson.id],
+            type =
+              external ||
+              completeLabCatalog[lesson.id] ||
+              handCalculationLessonIds.includes(lesson.id)
+                ? "parameter"
+                : animationKind(lesson.id);
           return (
             <a
               className={`animation-library-card kind-${type}`}
-              href={external?.href ?? `#/lesson/${lesson.id}?animation=1`}
+              href={
+                external?.href ??
+                `#/lesson/${lesson.id}?${!lab && handCalculationLessonIds.includes(lesson.id) ? "sandbox" : "animation"}=1`
+              }
               key={lesson.id}
             >
               <div className="animation-card-top">
@@ -165,7 +188,9 @@ export default function AnimationDirectory() {
                 <span>
                   {lab
                     ? `调节：${lab.label}`
-                    : `${lesson.mechanicsSteps.length} 个课程步骤`}
+                    : type === "parameter"
+                      ? "打开逐步手算沙盘"
+                      : `${lesson.mechanicsSteps.length} 个课程步骤`}
                 </span>
                 <b aria-hidden="true">↗</b>
               </div>

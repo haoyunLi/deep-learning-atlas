@@ -13,10 +13,10 @@ import AnimationDirectory from "./components/AnimationDirectory";
 import AIScopeDiagram from "./components/AIScopeDiagram";
 import "./components/ai-landscape.css";
 import {
-  mechanismCount,
   animationCatalog,
   handCalculationLessonIds,
 } from "./data/animationCatalog";
+import { completeLabCatalog } from "./data/completeLabCatalog";
 import RouteErrorBoundary from "./components/RouteErrorBoundary";
 const LessonInteractive = lazy(() => import("./components/LessonInteractive"));
 import { useStudyState, toggleCompleted, visitLesson } from "./lib/studyState";
@@ -334,8 +334,8 @@ function Home({
         <div className="animation-promo-heading">
           <h2 id="animation-promo-title">跟着动效，看懂算法的每一步。</h2>
           <a className="animation-all-link" href="#/animations">
-            {lessons.length} 节步骤导览 · {mechanismCount} 组机制动效 ·{" "}
-            {Object.keys(animationCatalog).length} 个参数实验　浏览全部 →
+            {lessons.length} 节课程 · {Object.keys(completeLabCatalog).length} 个新增参数推演 ·{" "}
+            {Object.keys(animationCatalog).length} 个原有参数实验　浏览全部 →
           </a>
         </div>
         <div className="animation-promo-grid">
