@@ -10,6 +10,7 @@ const { animationCatalog, legacyAnimationIds, handCalculationLessonIds } = load(
 );
 const { linkedLabForLesson } = load("src/data/linkedLabs.ts");
 const groups = {
+  biology: load("src/data/completeLabs/biology.ts").biologyCompleteLabs,
   ml: load("src/data/completeLabs/ml.ts").mlCompleteLabs,
   cv: load("src/data/completeLabs/cv.ts").cvCompleteLabs,
   rl: load("src/data/completeLabs/rl.ts").rlCompleteLabs,
@@ -24,8 +25,8 @@ const { default: CompleteLabChart, displayNumber } = load(
 const ids = new Set(lessons.map((l) => l.id));
 assert.equal(
   pairs.length,
-  170,
-  "All 170 audited course gaps must have authored calculations",
+  176,
+  "The original 170 course labs and six biology algorithm labs must have authored calculations",
 );
 assert.equal(
   new Set(pairs.map((p) => p.id)).size,

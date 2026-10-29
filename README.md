@@ -6,7 +6,7 @@
 
 ## 学什么
 
-网站目前包含 251 篇课程，按 12 个分类组织：基础原理、训练与泛化、Classical ML、Computer Vision、语言与序列、生成模型、表示学习、Reinforcement Learning、扩展模型与系统、Meta-Learning / Adaptation、Search / Reasoning 和 Agents。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、Continual Learning、Active Learning、Domain Adaptation、AutoML、Federated Learning 与 Test-Time Adaptation。每篇回答七个问题：
+网站目前包含 257 篇课程，按 12 个分类组织：基础原理、训练与泛化、Classical ML、Computer Vision、语言与序列、生成模型、表示学习、Reinforcement Learning、扩展模型与系统、Meta-Learning / Adaptation、Search / Reasoning 和 Agents。除 EM、kNN、U-Net／nnU-Net、ResNet、RNN、BERT、LM、Reward Model 与不同 RL 路线外，还覆盖 MAML、FOMAML、Reptile、Matching/Relation Networks、Continual Learning、Active Learning、Domain Adaptation、AutoML、Federated Learning 与 Test-Time Adaptation。每篇回答七个问题：
 
 1. 一句话怎样理解？
 2. 内部机制如何运作？
@@ -20,7 +20,7 @@
 
 还包括兼容常用缩写的关键词搜索、分类与学习状态筛选、可分享的两算法对比、关键概念路径，以及保存在本机浏览器的阅读与答题记录。124 项中英术语都能跳到相关课程；选型指南从 15 类任务的 39 种具体情境出发，给出可比较的基线、第一轮设置、适用边界和评估方法。每篇课程都链接到原始论文或官方文档。
 
-全部 251 节课程都有步骤导览；原有 56 节配有机制动效图，另新增 12 节 Biological methods 的静态机制图，53 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
+全部 257 节课程都有步骤导览；原有 56 节配有机制动效图，另新增 12 节 Biological methods 的静态机制图，53 节还可调参数并实时查看计算结果。覆盖 MLP、反向传播、优化器、EM、kNN、PCA、CNN、ResNet、U-Net、RNN、BERT、GPT、GNN、LoRA、VAE、GAN、CLIP、对比学习、Q-learning、SARSA、DQN、SAC、Reward Model、DPO，以及 cohort、数据泄漏、校准等。
 
 [动效实验室](https://haoyunli.github.io/deep-learning-atlas/#/animations) 支持关键词、学习方向与动效类型筛选。机制实验提供四步中英说明、滑块或图解、播放/暂停、慢速/快速、手动跳步与重置；也可切换到完整课程步骤。手机上支持图内横向滑动。自动播放只在图进入视野时运行；系统启用减少动态效果时关闭自动播放和过渡。参数实验使用可手算的合成案例，清楚说明哪些公式在实时计算、哪些示意并未运行模型训练。
 
@@ -30,7 +30,7 @@
 
 ## 手算、练习与实践工坊
 
-全部 251 节课各有一题机制题和一题选型/排错题，共 502 题；提交后显示解释，可重新作答。最近一次答案保存在当前浏览器，“学习记录与错题复习”页会汇总阅读标记、作答情况和待复习题目；课程题目修订后，旧答案不会误算进新题。
+全部 257 节课各有一题机制题和一题选型/排错题，共 514 题；提交后显示解释，可重新作答。最近一次答案保存在当前浏览器，“学习记录与错题复习”页会汇总阅读标记、作答情况和待复习题目；课程题目修订后，旧答案不会误算进新题。
 
 [实践工坊](https://haoyunli.github.io/deep-learning-atlas/#/practice) 包含：
 
@@ -76,10 +76,10 @@ npm run preview
 - [`src/data/learningConcepts.ts`](src/data/learningConcepts.ts)：head、zero/few-shot、in-context learning 等概念课程。
 - [`src/data/dataConcepts.ts`](src/data/dataConcepts.ts)：cohort、数据泄漏、分布变化与可信评估课程。
 - [`src/data/trainingLanguageExpansion.ts`](src/data/trainingLanguageExpansion.ts)、[`src/data/modelFamilyExpansion.ts`](src/data/modelFamilyExpansion.ts)：新增 22 节专题。
-- [`src/data/exercises.ts`](src/data/exercises.ts)：502 道题的统一注册；题目分文件维护。
+- [`src/data/exercises.ts`](src/data/exercises.ts)：514 道题的统一注册；题目分文件维护。
 - [`src/components/HandCalculationSandbox.tsx`](src/components/HandCalculationSandbox.tsx)、[`src/components/sandboxMath.ts`](src/components/sandboxMath.ts)：六个沙盘及纯数值计算。
 - [`src/components/PracticeHub.tsx`](src/components/PracticeHub.tsx)：完整实验案例、诊断与 LM 预算工坊。
-- [`src/data/conceptPaths.ts`](src/data/conceptPaths.ts)：把模型课与概念课串成17 条逐步学习路径。
+- [`src/data/conceptPaths.ts`](src/data/conceptPaths.ts)：把模型课与概念课串成18 条逐步学习路径。
 - [`src/data/glossary.ts`](src/data/glossary.ts)、[`src/data/modelGuide.ts`](src/data/modelGuide.ts)：124 项术语及 15 类任务的情境化选型数据。
 - [`src/App.tsx`](src/App.tsx)：课程图谱、详情、可分享筛选、对比与路由。
 - [`src/components/GlossaryPage.tsx`](src/components/GlossaryPage.tsx)、[`src/components/ModelGuide.tsx`](src/components/ModelGuide.tsx)、[`src/components/StudyReview.tsx`](src/components/StudyReview.tsx)：术语、选型和学习复习页面。
@@ -181,3 +181,11 @@ Useful starting points:
 - [Speculative Decoding](https://haoyunli.github.io/deep-learning-atlas/#/lesson/speculative-decoding?animation=1): acceptance probabilities and residual correction.
 
 Authoring: `src/data/completeLabs/` contains the typed schema and three lazy-loaded domain collections; `CompleteLessonLab.tsx` owns controls and comparison behavior, and `CompleteLabChart.tsx` owns accessible quantitative plots. After changing lab questions or controls, run `node scripts/generate-complete-lab-catalog.mjs` to refresh the lightweight directory metadata. Run `npm run validate:complete` for independent domain fixtures, slider sweeps, joint extrema, SVG/server-render checks and coverage validation. The production build runs these alongside the existing checks.
+
+## Biology regulation and inference bridge
+
+新增六节课程：PWM motif scoring、Activity-by-Contact、Regulon / TF activity、Ligand–Receptor inference、Perturbation generalization 与 Variant mixture inference。全站现有 **257 节课程、514 道题**，其中 **176 个 course-specific Complete Labs**，其余课程沿用已有机制图或计算实验。
+
+[生物调控学习路径](https://haoyunli.github.io/deep-learning-atlas/#/concepts/biology-regulation-inference) 连接每课的四阶段数值实验、参数起点与调整依据、适用条件、限制和排错。生物术语与实验前提链接到 Bio/CS 的八个专门章节与六个交互实验。模型和数值均为 synthetic teaching examples；PWM score、ABC score、TF activity 和 LR score 均不直接等于已验证的生物因果关系。
+
+`node scripts/validate-biology-bridge.mjs` 检查六课与十二题、跨站导航、独立算术、参数范围和模型边界。版本与来源说明见 [本轮审计](docs/audits/2026-10-29-biology-bridge.md)。

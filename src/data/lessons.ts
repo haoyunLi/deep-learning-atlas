@@ -1,3 +1,4 @@
+import { biologyBridgeLessons } from "./biologyBridge";
 import { mlDepthLessons } from "./mlDepth";
 import { cvDepthLessons } from "./cvDepth";
 import { agentDepthLessons } from "./agentDepth";
@@ -1978,6 +1979,7 @@ export const lessons: Lesson[] = [
   ...mlDepthLessons,
   ...cvDepthLessons,
   ...agentDepthLessons,
+  ...biologyBridgeLessons,
 ].sort(
   (a, b) =>
     categories.findIndex((category) => category.id === a.category) -

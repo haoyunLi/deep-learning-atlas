@@ -11,6 +11,19 @@ export type ConceptPath = {
  */
 export const conceptPaths: ConceptPath[] = [
   {
+    id: "biology-regulation-inference",
+    title: "生物调控：从观测信号到算法证据",
+    description: "先区分 lineage、sequence、binding、expression 和 activity，再选择计算模型。连接 Bio/CS 的 Model Systems、Somatic/Germline、Enhancer、TF、Ligand–Receptor 与 Perturbation Logic。",
+    steps: [
+      { lessonId: "variant-mixture-inference", why: "一个 VAF 可以对应多个 purity / copy-number / lineage 组合，先辨 observed fraction 与 latent explanation。" },
+      { lessonId: "motif-pwm-scoring", why: "从 sequence 和 background model 计算相对兼容性；motif score 不等于实际 TF binding。" },
+      { lessonId: "enhancer-gene-abc", why: "将 activity 和 contact 组合成候选连接，并观察竞争候选集合如何改变分母。" },
+      { lessonId: "regulon-tf-activity", why: "用 target genes 的方向和权重解释 activity score，区分网络推断与活动评分。" },
+      { lessonId: "ligand-receptor-inference", why: "先写 complex aggregation 和 null hypothesis，再解释细胞标签、donor 与空间信息。" },
+      { lessonId: "perturbation-generalization", why: "用 held-out context 和 intervention 检验迁移，比较 additive baseline、interaction 与模型假设。" },
+    ],
+  },
+  {
     id: "language-model-pipeline",
     title: "语言模型：从文本到可靠应用",
     description:

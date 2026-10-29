@@ -13,11 +13,13 @@ export async function loadCompleteLab(id: string): Promise<CompleteLab> {
   const entry = completeLabCatalog[id];
   if (!entry) throw new Error("此课程没有新增参数实验。");
   const collection =
-    entry.group === "ml"
-      ? (await import("../data/completeLabs/ml")).mlCompleteLabs
-      : entry.group === "cv"
-        ? (await import("../data/completeLabs/cv")).cvCompleteLabs
-        : (await import("../data/completeLabs/rl")).rlCompleteLabs;
+    entry.group === "biology"
+      ? (await import("../data/completeLabs/biology")).biologyCompleteLabs
+      : entry.group === "ml"
+        ? (await import("../data/completeLabs/ml")).mlCompleteLabs
+        : entry.group === "cv"
+          ? (await import("../data/completeLabs/cv")).cvCompleteLabs
+          : (await import("../data/completeLabs/rl")).rlCompleteLabs;
   if (!collection[id]) throw new Error("实验数据没有完整载入，请重试。");
   return collection[id];
 }

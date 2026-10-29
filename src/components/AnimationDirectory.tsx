@@ -75,6 +75,9 @@ export default function AnimationDirectory() {
       </div>
       <section className="animation-starts" aria-label="动效学习起点">
         <strong>从一个问题开始</strong>
+        <a href="#/concepts/biology-regulation-inference">
+          Motif、Enhancer、TF、Ligand–Receptor 的计算分数能支持什么生物结论？ ↗
+        </a>
         <a href="#/lesson/batch-normalization?animation=1">
           BatchNorm 的 batch statistics 怎样影响当前样本？ ↗
         </a>

@@ -1,3 +1,4 @@
+import { biologyBridgeExercises } from "./exercisesBiologyBridge";
 import { mlDepthExercises } from "./exercisesMLDepth";
 import { cvDepthExercises } from "./exercisesCVDepth";
 import { agentDepthExercises } from "./exercisesAgentDepth";
@@ -18,6 +19,7 @@ import { cvBreadthExercises } from "./exercisesCVBreadth";
 import { agentBreadthExercises } from "./exercisesAgentBreadth";
 
 export const exerciseGroups: Record<string, Exercise[]>[] = [
+  biologyBridgeExercises,
   coreExercises,
   trainingLanguageExercises,
   modelFamilyExercises,

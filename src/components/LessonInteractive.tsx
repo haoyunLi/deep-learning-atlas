@@ -6,6 +6,7 @@ import LessonExercises from "./LessonExercises";
 import FoundationContrasts from "./FoundationContrasts";
 import CompleteLessonLab from "./CompleteLessonLab";
 import { completeLabCatalog } from "../data/completeLabCatalog";
+import { biologyConnections, biologyChapterUrl, biologyLabUrl } from "../data/biologyConnections";
 
 export default function LessonInteractive({
   lesson,
@@ -28,6 +29,15 @@ export default function LessonInteractive({
     <LessonExercises key={lesson.id} lessonId={lesson.id} />
   ) : (
     <>
+      {biologyConnections[lesson.id] && (
+        <p className="training-lesson-link">
+          <strong>先连接生物对象：</strong>{" "}
+          <a href={biologyChapterUrl(biologyConnections[lesson.id].chapter)}>
+            {biologyConnections[lesson.id].label} ↗
+          </a>{" "} · {" "}
+          <a href={biologyLabUrl(biologyConnections[lesson.id].lab)}>Bio/CS 机制实验 ↗</a>
+        </p>
+      )}
       {lesson.id === "backpropagation" && (
         <p className="training-lesson-link">
           <a href="#/studio/training">
